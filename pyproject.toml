@@ -1,0 +1,22 @@
+[project]
+name = "InWorker"
+version = "0.1"
+description = ""
+authors = [
+    {name = "Артем Карабанов",email = "irazart@gmail.com"}
+]
+readme = "README.md"
+requires-python = ">=3.14"
+dependencies = [
+    "keyboard (>=0.13.5,<0.14.0)",
+    "pillow (>=12.2.0,<13.0.0)",
+    "psutil (>=7.2.2,<8.0.0)",
+    "pywin32 (>=312,<313)",
+    "mouse (>=0.7.1,<0.8.0)",
+    "pynput (>=1.8.2,<2.0.0)"
+]
+
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
