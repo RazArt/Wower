@@ -1,0 +1,4 @@
+## Interface: 30300
+## Title: Hello, World!
+## Notes: Test AddOn
+HelloWorld.lua
