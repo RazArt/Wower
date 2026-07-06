@@ -95,14 +95,19 @@ def do_rotation_4_1_1(key):
             match position:
                 case 10:
                     hotkeys.key_send(2)
+                    break
                 case 11:
                     hotkeys.key_send(4)
+                    break
                 case 12:
                     hotkeys.key_send(6)
+                    break
                 case 13:
                     hotkeys.key_send(7)
+                    break
                 case 14:
                     hotkeys.key_send(5)
+                    break
         sleep(0.1)
 
 
@@ -113,16 +118,28 @@ def do_rotation_4_1_2(key):
             match position:
                 case 10:
                     hotkeys.key_send(2)
+                    break
                 case 15:
                     hotkeys.key_send(33)
+                    break
         sleep(0.1)
 
 
 def do_trade(key):
-    while hotkeys.get_key_state(key) == True:
+    while hotkeys.get_key_state(key + 1) == False:
         for position in screen_scan.get_pixel_colors():
             do_general(position)
             match position:
-                case 1:
-                    print(123)
+                case 10:
+                    hotkeys.key_send(2)
+                    break
+                case 11:
+                    hotkeys.key_send(3)
+                    break
+                case 12:
+                    hotkeys.key_send(4)
+                    break
+                case 13:
+                    hotkeys.key_send(5)
+                    break
         sleep(0.1)

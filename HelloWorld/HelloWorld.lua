@@ -1,5 +1,8 @@
 HelloWorld = CreateFrame('Frame', nil, UIParent)
 HelloWorld.name = 'HelloWorld'
+HelloWorld.trade = {}
+HelloWorld.trade.name = 'TradeName'
+HelloWorld.trade.parent = HelloWorld
 
 HelloWorld:SetScript('OnEvent', function(self, event, ...)
     self[event](self, ...)
@@ -10,8 +13,8 @@ function HelloWorld:PLAYER_LOGIN()
     self.base_frame = CreateFrame('Frame', nil, self)
     self.base_frame.frames = {}
 
-    self.variables = {}
-    self.variables['classes'] = {
+    self.vars = {}
+    self.vars.classes = {
         warrior = '1',
         paladin = '2',
         hunter = '3',
@@ -52,10 +55,13 @@ function HelloWorld:PLAYER_LOGIN()
     else
         self.base_frame.frames[0].texture:SetTexture(50 / 255, 1 / 255, 0)
 
-        if (self['trade_init'] ~= nil) then self['trade_init'](self) end
-        if (self['trade'] ~= nil) then self:SetScript('OnUpdate', self['trade']) end
+        if (self.trade.init ~= nil) then self.trade:init() end
+        if (self['trade'] ~= nil) then
+            self:SetScript('OnUpdate', function(self, elapsed)
+                self.trade:update()
+            end)
+        end
     end
-
 end
 
 function HelloWorld:show()
@@ -86,7 +92,7 @@ function HelloWorld:get_player_name()
 end
 
 function HelloWorld:get_player_class()
-    return self.variables.classes[(select(2, UnitClass('player'))):lower()]
+    return self.vars.classes[(select(2, UnitClass('player'))):lower()]
 end
 
 function HelloWorld:get_player_spec()
@@ -157,7 +163,7 @@ end
 function HelloWorld:get_ememy_debuff_time(spellname, player)
     player = player or false
 
-    _, _, _, _, _, _, expirationTime, unitCaster = UnitDebuff('target', spellname)
+    local _, _, _, _, _, _, expirationTime, unitCaster = UnitDebuff('target', spellname)
 
     if ((player) and (unitCaster ~= 'player')) then return 0 end
     if (expirationTime == nil) then return 0 end
@@ -168,7 +174,7 @@ end
 function HelloWorld:get_player_buff_time(spellname)
     player = player or false
 
-    _, _, _, _, _, _, expirationTime, unitCaster = UnitBuff('player', spellname)
+    local _, _, _, _, _, _, expirationTime, unitCaster = UnitBuff('player', spellname)
 
     if ((player) and (unitCaster ~= 'player')) then return 0 end
     if (expirationTime == nil) then return 0 end
@@ -211,19 +217,19 @@ function HelloWorld:general_update()
 end
 
 function HelloWorld:rotation_3_1_init()
-    self.variables['mana_regeneration'] = false
+    self.vars.mana_regeneration = false
 end
 
 function HelloWorld:rotation_3_1()
     if (not self:general_update()) then return false end
 
-    if ((self:get_mana_on_percent('player') < 20) and (not self.variables['mana_regeneration'])) then
-        self.variables['mana_regeneration'] = true
-    elseif ((self:get_mana_on_percent('player') > 60) and (self.variables['mana_regeneration'])) then
-        self.variables['mana_regeneration'] = false
+    if ((self:get_mana_on_percent('player') < 20) and (not self.vars.mana_regeneration)) then
+        self.vars.mana_regeneration = true
+    elseif ((self:get_mana_on_percent('player') > 60) and (self.vars.mana_regeneration)) then
+        self.vars.mana_regeneration = false
     end
 
-    if ((self.variables['mana_regeneration'] == false) and
+    if ((self.vars.mana_regeneration == false) and
         (self:get_player_buff_time('Дух дракондора') == 0) and
         (self:get_player_buff_time('Дух дикой природы') == 0) and
         (self:can_cast('Дух дракондора'))) then
@@ -232,7 +238,7 @@ function HelloWorld:rotation_3_1()
         self:frames(10):Hide()
     end
 
-    if ((self.variables['mana_regeneration'] == true) and
+    if ((self.vars.mana_regeneration == true) and
         (self:get_player_buff_time('Дух гадюки') == 0) and
         (self:get_player_buff_time('Дух дикой природы') == 0) and
         (self:can_cast('Дух гадюки'))) then
@@ -261,7 +267,7 @@ function HelloWorld:rotation_3_1()
         self:frames(14):Hide()
     end
 
-    if ((self.variables['mana_regeneration'] == false) and
+    if ((self.vars.mana_regeneration == false) and
         (self:get_ememy_debuff_time('Укус змеи', true) == 0) and
         (self:can_cast_on_enemy('Укус змеи'))) then
         self:frames(15):Show()
@@ -269,7 +275,7 @@ function HelloWorld:rotation_3_1()
         self:frames(15):Hide()
     end
 
-    if ((self.variables['mana_regeneration'] == true) and
+    if ((self.vars.mana_regeneration == true) and
         (self:get_ememy_debuff_time('Укус гадюки', true) == 0) and
         (self:can_cast_on_enemy('Укус гадюки'))) then
         self:frames(16):Show()
@@ -362,4 +368,258 @@ function HelloWorld:rotation_4_1()
     else
         self:frames(15):Hide()
     end
+end
+
+function HelloWorld.trade:init()
+    self.step = 1
+    self.vars = {}
+    self.vars.auc_query_timer = false
+    self.vars.auc_buy_timer = false
+    self.vars.auc_page = 0
+    self.vars.auc_query_send = false
+    self.vars.auc_list_update = false
+    self.vars.auc_open = false
+    self.vars.auc_item_num = 1
+    self.vars.auc_item_list = {
+        {'Льняная сумка', 10000}, {'Абсолютная пыль', 60000},
+        {'Ледяная ткань', 15000}, {'Рулон ледяной ткани', 50000}
+    }
+
+    -- 41510 Рулон ледяной ткани
+    -- 41512 Ледотканые напульсники
+    -- 34054 Абсолютная пыль
+    -- 34056 Малая космическая субстанция
+    -- 34055 Великая космическая субстанция
+    -- 34053 Маленький осколок грез
+    -- 34052 Осколок грез
+    -- 34057 Кристалл пропасти
+    -- 38426 Этерниевая нить
+    -- 33470 Ледяная ткань
+end
+
+function HelloWorld.trade:update()
+    if (self.step == 1) then
+        self:craft()
+    elseif (self.step == 2) then
+        self:mail()
+    elseif (self.step == 3) then
+        self:auction()
+    end
+end
+
+function HelloWorld.trade:craft()
+    local items = self:get_bag_items_count()
+
+    if ((((items[34056] ~= nil) and (items[34056] > 2)) or
+        ((items[34053] ~= nil) and (items[34053] > 2))) and (self.can_cast())) then
+        self:frames(10):Show()
+    else
+        self:frames(10):Hide()
+    end
+
+    if ((items[41512] ~= nil) and (items[41512] > 0) and (self.can_cast())) then
+        self:frames(11):Show()
+    else
+        self:frames(11):Hide()
+    end
+
+    if (((items[41510] ~= nil) and (items[41510] > 2)) and
+        ((items[38426] ~= nil) and (items[38426] > 0)) and (self.can_cast()) and
+        self:get_bag_free_slots() > 1) then
+        self:frames(12):Show()
+    else
+        self:frames(12):Hide()
+    end
+
+    if (((items[33470] ~= nil) and (items[33470] > 4)) and (self.can_cast()) and
+        self:get_bag_free_slots() > 1) then
+        self:frames(13):Show()
+    else
+        self:frames(13):Hide()
+    end
+
+    if (((items[41512] == nil) or (items[41512] == 0)) and
+        (((items[41510] == nil) or (items[41510] < 3)) or
+            ((items[38426] == nil) or (items[38426] == 0))) and
+        ((items[33470] == nil) or (items[33470] < 5))) then
+        print('Step 1 stop')
+        self.step = 3
+    end
+end
+function HelloWorld.trade:mail()
+    CheckInbox()
+    local numItems, totalItems = GetInboxNumItems()
+
+    for i = numItems, 1, -1 do
+        local _, _, sender, _, money, CODAmount, _, hasItem = GetInboxHeaderInfo(i)
+
+        if (CODAmount > 0) and (InboxItemCanDelete(i) == nil) then
+            -- ReturnInboxItem(i)
+        elseif (CODAmount > 0) and (InboxItemCanDelete(i) == 1) then
+            -- DeleteInboxItem(i)
+        end
+
+        if (money > 0) then TakeInboxMoney(i) end
+
+        if (hasItem == nil) then
+            -- DeleteInboxItem(i) 
+        end
+
+        if ((hasItem ~= nil) and (self.get_bag_free_slots() - 1 >= hasItem)) then
+            -- AutoLootMailItem(i) 
+        end
+    end
+
+    CheckInbox()
+    local numItems, totalItems = GetInboxNumItems()
+    if ((totalItems == 0) or (totalItems == numItems)) then
+        print('Step 2 stop')
+        CloseMail()
+        self.step = 1
+    end
+end
+
+function HelloWorld.trade:auction()
+    local change_page = true
+
+    if ((not self.vars.auc_query_timer) and (self.vars.auc_open) and
+        ((select(1, CanSendAuctionQuery())) == 1)) then
+        if (IsAuctionSortReversed("list", "bid") == nil) then
+            SortAuctionItems("list", "bid")
+            print('Сортируем')
+        end
+
+        if (self.vars.auc_query_send == false) then
+            QueryAuctionItems(self.vars.auc_item_list[self.vars.auc_item_num][1], 0, 0, 0, 0, 0,
+                              self.vars.auc_page, false, 0, 0)
+
+            self.vars.auc_query_send = true
+            self.vars.auc_query_timer = true
+            C_Timer.After(2, function()
+                self.vars.auc_query_timer = false
+            end)
+            print('Отправили запрос')
+        end
+
+        if ((self.vars.auc_list_update == true) and (self.vars.auc_query_send == true)) then
+            self.vars.auc_list_update = false
+            self.vars.auc_query_send = false
+
+            local batch, _ = GetNumAuctionItems('list')
+            print(self.vars.auc_item_list[self.vars.auc_item_num][1],
+                  'Перебираю страницу', self.vars.auc_page,
+                  ' всего элементов', batch)
+            if (batch > 0) then
+                for index = batch, 1, -1 do
+                    local _, _, count, _, _, _, _, _, buyoutPrice, _, _, owner, sold =
+                        GetAuctionItemInfo("list", index)
+                    if (buyoutPrice / count <= self.vars.auc_item_list[self.vars.auc_item_num][2]) then
+                        print(index, self.vars.auc_item_list[self.vars.auc_item_num][1], count,
+                              buyoutPrice, owner, sold)
+                        -- change_page = false
+                    end
+                end
+
+                if (change_page) then self.vars.auc_page = self.vars.auc_page + 1 end
+                print('Закончил считать страницу')
+            else
+                self.vars.auc_page = 0
+                if (self.vars.auc_item_num < #self.vars.auc_item_list) then
+                    self.vars.auc_item_num = self.vars.auc_item_num + 1
+                    print('Следующий предмет')
+                else
+                    print('Step 3 stop')
+                    self.vars.auc_item_num = 1
+                    self.step = 4
+                    -- CloseAuctionHouse()
+                end
+            end
+        end
+        self.vars.auc_query_timer = true
+        C_Timer.After(5, function()
+            self.vars.auc_query_timer = false
+        end)
+    end
+end
+
+HelloWorld:RegisterEvent("AUCTION_ITEM_LIST_UPDATE")
+function HelloWorld:AUCTION_ITEM_LIST_UPDATE()
+    if (self.trade.vars.auc_query_send == true) then
+        self.trade.vars.auc_list_update = true
+        print('Получили ответ')
+    end
+end
+HelloWorld:RegisterEvent("AUCTION_HOUSE_SHOW")
+function HelloWorld:AUCTION_HOUSE_SHOW()
+    self.trade.vars.auc_open = true
+end
+HelloWorld:RegisterEvent("AUCTION_HOUSE_CLOSED")
+function HelloWorld:AUCTION_HOUSE_CLOSED()
+    self.trade.vars.auc_open = false
+    self.trade:init()
+end
+
+function HelloWorld.trade:send_auction_query(name, page)
+
+end
+
+function HelloWorld.trade:frames(pos)
+    return self.parent.base_frame.frames[pos]
+end
+
+function HelloWorld.trade:can_cast()
+    if (UnitCastingInfo('player')) then return false end
+    if (UnitChannelInfo('player')) then return false end
+    return true
+end
+
+function HelloWorld.trade:get_bag_free_slots()
+    local free_slots_count = 0
+    for bag_num = 0, 4 do
+        free_slots_count = free_slots_count + (select(1, GetContainerNumFreeSlots(bag_num)))
+    end
+    return free_slots_count
+end
+
+function HelloWorld.trade:get_bag_items_count()
+    local items = {}
+    for bag_num = 0, 4 do
+        for slot_num = 1, GetContainerNumSlots(bag_num) do
+            local item_id = GetContainerItemID(bag_num, slot_num)
+            if (item_id ~= nil) then
+                if (items[item_id] == nil) then items[item_id] = 0 end
+                items[item_id] = items[item_id] +
+                                     (select(2, GetContainerItemInfo(bag_num, slot_num)))
+            end
+        end
+    end
+    return items
+end
+
+function HelloWorld.trade:get_tradeskill_num_available(index)
+    return (select(3, GetTradeSkillInfo(index)))
+end
+
+function HelloWorld.trade:get_tradeskill_index(name)
+    for i = GetNumTradeSkills(), 1, -1 do
+        if ((select(2, GetTradeSkillInfo(i)) == "header")) then ExpandTradeSkillSubClass(i) end
+    end
+    for i = 1, GetNumTradeSkills() do
+        if ((select(1, GetTradeSkillInfo(i))) == name) then return i end
+    end
+    return 0
+end
+
+function HelloWorld.trade:craft_item(name)
+    index = self:get_tradeskill_index(name)
+    if (index > 0) then
+        num_available = self:get_tradeskill_num_available(index)
+        if (num_available > 0) then DoTradeSkill(index) end
+    end
+end
+
+function sleep(seconds)
+    local start_time = GetTime()
+    while GetTime() - start_time < seconds do end
+    return true
 end
