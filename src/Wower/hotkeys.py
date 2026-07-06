@@ -27,6 +27,7 @@ def _check_key_state():
 
     while _running == True:
         for hotkey, properties in config.user_hotkeys.items():
+
             if (not get_key_state(hotkey)
                     and _hotkey_pressed.setdefault(hotkey, False) == True):
                 _hotkey_pressed[hotkey] = False

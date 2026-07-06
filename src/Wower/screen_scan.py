@@ -31,7 +31,7 @@ def update_info():
             info = image.getpixel((0, 0))
             if (info[0] > 0 and info[0] in config.class_hotkeys
                     and info[1] in config.class_hotkeys[info[0]]):
-                config.user_hotkeys = config.class_hotkeys
+                config.user_hotkeys = config.class_hotkeys[info[0]][info[1]]
                 for position in range(1, 101):
                     if (image.getpixel((position, 0))[1] == 255):
                         _pixel_colors.append(position)

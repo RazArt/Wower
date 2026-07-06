@@ -1,214 +1,365 @@
-local event_frame = CreateFrame('Frame')
-local spell_frames = {}
-local player_variables = {}
-player_variables['classes'] = {
-    warrior = '1',
-    paladin = '2',
-    hunter = '3',
-    rogue = '4',
-    priest = '5',
-    deathknight = '6',
-    shaman = '7',
-    mage = '8',
-    warlock = '9',
-    druid = '11'
-}
+HelloWorld = CreateFrame('Frame', nil, UIParent)
+HelloWorld.name = 'HelloWorld'
 
-function event_frame:OnEvent(event, ...) 
-	self[event](self, ...) 
-end
+HelloWorld:SetScript('OnEvent', function(self, event, ...)
+    self[event](self, ...)
+end)
 
-function event_frame:PLAYER_LOGIN()
+HelloWorld:RegisterEvent("PLAYER_LOGIN")
+function HelloWorld:PLAYER_LOGIN()
+    self.base_frame = CreateFrame('Frame', nil, self)
+    self.base_frame.frames = {}
+
+    self.variables = {}
+    self.variables['classes'] = {
+        warrior = '1',
+        paladin = '2',
+        hunter = '3',
+        rogue = '4',
+        priest = '5',
+        deathknight = '6',
+        shaman = '7',
+        mage = '8',
+        warlock = '9',
+        druid = '11'
+    }
+
+    self:SetScale(0.79)
+    self.base_frame:SetSize(101, 1)
+    self.base_frame:SetFrameStrata('tooltip')
+    self.base_frame:SetPoint('topleft', UIParent, 0, 0)
+
+    local frames = self.base_frame.frames
     for i = 0, 100 do
-        spell_frames[i] = CreateFrame('Frame', nil, UIParent)
-        spell_frames[i]:SetScale(0.79)
-        spell_frames[i]:SetSize(1, 1)
-        spell_frames[i]:SetFrameStrata('tooltip')
-        spell_frames[i]:SetPoint("TOPLEFT", UIParent, "TOPLEFT", i, 0)
-        spell_frames[i].texture = spell_frames[i]:CreateTexture(nil, 'tooltip')
-        spell_frames[i].texture:SetAllPoints(spell_frames[i])
-        spell_frames[i].texture:SetTexture(0, 0, 0, 0)
-        spell_frames[i]:Show()
-    end
-    spell_frames[0].texture:SetTexture(0, 0)
-
-    player_variables['class'] = tostring(player_variables['classes'][(select(2, UnitClass('player'))):lower()])
-    player_variables['spec'] = tostring(GetSpecialization('player'))
-    player_variables['level'] = tostring(UnitLevel('player'))
-    
-    if (string.len(player_variables['class']) > 0) then
-        player_variables['function'] = 'rotation_' .. player_variables['class'] .. '_' .. player_variables['spec']
-        player_variables['function_init'] = 'rotation_' .. player_variables['class'] .. '_' .. player_variables['spec'] .. '_init'
-
-        spell_frames[0].texture:SetTexture(tonumber(player_variables['class'], 10)/255, tonumber(player_variables['spec'], 10)/255, player_variables['level']/255)
-        
-        _G[player_variables['function_init']]()
-        event_frame:SetScript("OnUpdate", _G[player_variables['function']])
-    end
-end
-
-function check_chat_editbox()
-    if (ACTIVE_CHAT_EDIT_BOX ~= nil) then
-        for _, value in pairs(spell_frames) do
-            value.texture:SetTexture(0, 0, 0, 0)
-        end
-        return false 
+        frames[i] = CreateFrame('Frame', nil, self.base_frame)
+        frames[i]:SetSize(1, 1)
+        frames[i]:SetFrameStrata('tooltip')
+        frames[i]:SetPoint('topleft', i, 0)
+        frames[i].texture = frames[i]:CreateTexture(nil, 'tooltip')
+        frames[i].texture:SetAllPoints(frames[i])
+        frames[i].texture:SetTexture(0, 1, 0, 1)
+        frames[i]:Hide()
     end
 
-    return true
-end
+    frames[0]:Show()
+    if (self:get_player_name() ~= 'Колотая') then
+        self.base_frame.frames[0].texture:SetTexture(self:get_player_class() / 255,
+                                                     self.get_player_spec() / 255, 0)
 
-function set_frame_state(pos, state)
-    if state == 1 then
-        spell_frames[pos].texture:SetTexture(0, 1, 0)
+        local func = 'rotation_' .. self:get_player_class() .. '_' .. self.get_player_spec()
+        if (self[func .. '_init'] ~= nil) then self[func .. '_init'](self) end
+        if (self[func] ~= nil) then self:SetScript('OnUpdate', self[func]) end
     else
-        spell_frames[pos].texture:SetTexture(0, 0, 0, 0)
+        self.base_frame.frames[0].texture:SetTexture(50 / 255, 1 / 255, 0)
+
+        if (self['trade_init'] ~= nil) then self['trade_init'](self) end
+        if (self['trade'] ~= nil) then self:SetScript('OnUpdate', self['trade']) end
+    end
+
+end
+
+function HelloWorld:show()
+    self.base_frame:Show()
+end
+function HelloWorld:hide()
+    self.base_frame:Hide()
+end
+
+function HelloWorld:check_chat_editbox()
+    if ((ACTIVE_CHAT_EDIT_BOX ~= nil) and (self.visible)) then
+        self.visible = false
+        self:hide()
+        return false
+    elseif ((ACTIVE_CHAT_EDIT_BOX == nil) and (not self.visible)) then
+        self.visible = true
+        self:show()
+        return true
     end
 end
 
-function get_health_on_percent(unit)
-    return UnitHealth(unit) / UnitHealthMax(unit) * 100
+function HelloWorld:frames(pos)
+    return self.base_frame.frames[pos]
 end
 
-function get_mana_on_percent(unit)
-    return UnitMana(unit) / UnitManaMax(unit) * 100
+function HelloWorld:get_player_name()
+    return (select(1, UnitName('player')))
 end
 
-function can_cast(spellname)
-    if not (select(1, IsUsableSpell(spellname))) then 
-        return false end
-    if (UnitCastingInfo('player')) then 
-        return false end
-    if (UnitChannelInfo('player')) then 
-        return false end
-    if ((select(2, GetSpellCooldown(spellname))) > 0) then 
-        return false end
+function HelloWorld:get_player_class()
+    return self.variables.classes[(select(2, UnitClass('player'))):lower()]
+end
+
+function HelloWorld:get_player_spec()
+    return GetSpecialization('player')
+end
+
+function HelloWorld:get_player_level()
+    return UnitLevel('player')
+end
+
+function HelloWorld:get_health_on_percent()
+    return UnitHealth('player') / UnitHealthMax('player') * 100
+end
+
+function HelloWorld:get_mana_on_percent()
+    return UnitMana('player') / UnitManaMax('player') * 100
+end
+
+function HelloWorld:get_health()
+    return UnitHealth('player')
+end
+
+function HelloWorld:get_mana()
+    return UnitMana('player')
+end
+
+function HelloWorld:get_power()
+    return UnitPower('player')
+end
+
+function HelloWorld:get_combo_points()
+    return GetComboPoints('player', 'target')
+end
+
+function HelloWorld:get_spell_cooldown(spellname)
+    local start, duration, _ = GetSpellCooldown(spellname);
+    local cd_time = start + duration - GetTime()
+
+    if cd_time < 0 then
+        return 0
+    else
+        return cd_time
+    end
+end
+
+function HelloWorld:can_cast(spellname)
+    if (not (select(1, IsUsableSpell(spellname)))) then return false end
+    if (UnitCastingInfo('player')) then return false end
+    if (UnitChannelInfo('player')) then return false end
+    if (self:get_spell_cooldown(spellname) > 0) then return false end
     return true
 end
 
-function can_cast_on_enemy(spellname)
-    if not can_cast(spellname) then 
-        return false end
-    if UnitIsDeadOrGhost('target') then 
-        return false end
-    if (UnitCanAttack('player', 'target') ~= 1) then 
-        return false end
-    if (IsSpellInRange(spellname, 'target') ~= 1) then 
-        return false end
+function HelloWorld:can_cast_on_enemy(spellname)
+    if (not self:can_cast(spellname)) then return false end
+    if (UnitIsDeadOrGhost('target')) then return false end
+    if (UnitCanAttack('player', 'target') ~= 1) then return false end
+    if (IsSpellInRange(spellname, 'target') ~= 1) then return false end
     return true
 end
 
-function can_cast_on_point(spellname)
-    if not can_cast(spellname) then 
-        return false end
-    if (UnitExists('mouseover') ~= 1) then 
-        return false end
+function HelloWorld:can_cast_on_point(spellname)
+    if (not self:can_cast(spellname)) then return false end
+    if (UnitExists('mouseover') ~= 1) then return false end
     return true
 end
 
-function check_ememy_debuff(spellname, player)
+function HelloWorld:get_ememy_debuff_time(spellname, player)
     player = player or false
-    if (player and (select(8, UnitDebuff('target', spellname))) == 'player') then
-        return true
-    elseif (not player and UnitDebuff('target', spellname)) then
-        return true
-    end
+
+    _, _, _, _, _, _, expirationTime, unitCaster = UnitDebuff('target', spellname)
+
+    if ((player) and (unitCaster ~= 'player')) then return 0 end
+    if (expirationTime == nil) then return 0 end
+
+    return expirationTime - GetTime()
+end
+
+function HelloWorld:get_player_buff_time(spellname)
+    player = player or false
+
+    _, _, _, _, _, _, expirationTime, unitCaster = UnitBuff('player', spellname)
+
+    if ((player) and (unitCaster ~= 'player')) then return 0 end
+    if (expirationTime == nil) then return 0 end
+
+    return expirationTime - GetTime()
+end
+
+function HelloWorld:is_enemy_cast()
+    if (UnitCastingInfo('target')) then return true end
+    if (UnitChannelInfo('target')) then return true end
     return false
 end
 
-function check_player_buff(spellname)
-    if (UnitBuff('player', spellname)) then 
-        return true end
-    return false
-end
+function HelloWorld:general_update()
+    self:check_chat_editbox()
 
-function is_enemy_cast()
-    if (UnitCastingInfo('target')) then 
-        return true end
-    if (UnitChannelInfo('target')) then 
-        return true end
-    return false
-end
-
-function general_update()
-    if (not check_chat_editbox()) then
-        return false end
+    if (not self.visible) then return false end
 
     if (not UnitExists('target')) then
-        set_frame_state(1, 1) else set_frame_state(1, 0) end
+        self:frames(1):Show()
+    else
+        self:frames(1):Hide()
+    end
 
-    if (get_health_on_percent('player') < 20) then
-        set_frame_state(2, 1) else set_frame_state(2, 0) end
+    if ((self:get_health_on_percent() < 10) and (GetItemCount(33447) > 0) and
+        ((select(1, GetItemCooldown(33447))) == 0)) then
+        self:frames(2):Show()
+    else
+        self:frames(2):Hide()
+    end
 
-    if (get_mana_on_percent('player') < 10) then
-        set_frame_state(3, 1) else set_frame_state(3, 0) end
+    if ((self:get_mana_on_percent() < 10) and (GetItemCount(33448) > 0) and
+        ((select(1, GetItemCooldown(33448))) == 0)) then
+        self:frames(3):Show()
+    else
+        self:frames(3):Hide()
+    end
 
     return true
 end
 
-function rotation_3_1_init()
-    player_variables['mana_regeneration_mode'] = false
+function HelloWorld:rotation_3_1_init()
+    self.variables['mana_regeneration'] = false
 end
 
-function rotation_3_1()
-    if (not general_update()) then
-        return false end
-    
-    if (get_mana_on_percent('player') < 20 and not player_variables['mana_regeneration_mode']) then
-        player_variables['mana_regeneration_mode'] = true
-    elseif (get_mana_on_percent('player') > 60 and player_variables['mana_regeneration_mode']) then
-        player_variables['mana_regeneration_mode'] = false
+function HelloWorld:rotation_3_1()
+    if (not self:general_update()) then return false end
+
+    if ((self:get_mana_on_percent('player') < 20) and (not self.variables['mana_regeneration'])) then
+        self.variables['mana_regeneration'] = true
+    elseif ((self:get_mana_on_percent('player') > 60) and (self.variables['mana_regeneration'])) then
+        self.variables['mana_regeneration'] = false
     end
 
-    if (player_variables['mana_regeneration_mode'] == false and 
-        not check_player_buff('Дух дракондора') and 
-        not check_player_buff('Дух дикой природы') and 
-        can_cast('Дух дракондора')) then
-        set_frame_state(10, 1) else set_frame_state(10, 0) end
-    
-    if (player_variables['mana_regeneration_mode'] == false and 
-        not check_ememy_debuff('Укус змеи', true)  and
-        can_cast_on_enemy('Укус змеи')) then
-        set_frame_state(11, 1) else set_frame_state(11, 0) end
+    if ((self.variables['mana_regeneration'] == false) and
+        (self:get_player_buff_time('Дух дракондора') == 0) and
+        (self:get_player_buff_time('Дух дикой природы') == 0) and
+        (self:can_cast('Дух дракондора'))) then
+        self:frames(10):Show()
+    else
+        self:frames(10):Hide()
+    end
 
-    if (player_variables['mana_regeneration_mode'] == true and 
-        not check_player_buff('Дух гадюки') and 
-        not check_player_buff('Дух дикой природы') and 
-        can_cast('Дух гадюки')) then
-        set_frame_state(12, 1) else set_frame_state(12, 0) end
+    if ((self.variables['mana_regeneration'] == true) and
+        (self:get_player_buff_time('Дух гадюки') == 0) and
+        (self:get_player_buff_time('Дух дикой природы') == 0) and
+        (self:can_cast('Дух гадюки'))) then
+        self:frames(11):Show()
+    else
+        self:frames(11):Hide()
+    end
 
-    if (player_variables['mana_regeneration_mode'] == true and 
-        not check_ememy_debuff('Укус гадюки', true) and
-        can_cast_on_enemy('Укус гадюки')) then
-        set_frame_state(13, 1) else set_frame_state(13, 0) end
+    if ((self:get_player_buff_time('Аура меткого выстрела') == 0) and
+        (self:can_cast('Аура меткого выстрела'))) then
+        self:frames(12):Show()
+    else
+        self:frames(12):Hide()
+    end
 
-    if (not check_player_buff('Аура меткого выстрела') and can_cast('Аура меткого выстрела')) then
-        set_frame_state(14, 1) else set_frame_state(14, 0) end
-    
-    if (not check_ememy_debuff('Метка охотника') and can_cast_on_enemy('Метка охотника')) then
-        set_frame_state(15, 1) else set_frame_state(15, 0) end
+    if (self:is_enemy_cast() and self:can_cast_on_enemy('Глушащий выстрел')) then
+        self:frames(13):Show()
+    else
+        self:frames(13):Hide()
+    end
 
-    if (can_cast_on_enemy('Убийственный выстрел')) then
-        set_frame_state(16, 1) else set_frame_state(16, 0) end
+    if ((self:get_ememy_debuff_time('Метка охотника') == 0) and
+        (self:can_cast_on_enemy('Метка охотника')) and (IsShiftKeyDown() ~= 1)) then
+        self:frames(14):Show()
+    else
+        self:frames(14):Hide()
+    end
 
-    if (can_cast_on_enemy('Выстрел химеры')) then
-        set_frame_state(17, 1) else set_frame_state(17, 0) end
+    if ((self.variables['mana_regeneration'] == false) and
+        (self:get_ememy_debuff_time('Укус змеи', true) == 0) and
+        (self:can_cast_on_enemy('Укус змеи'))) then
+        self:frames(15):Show()
+    else
+        self:frames(15):Hide()
+    end
 
-    if (can_cast_on_enemy('Прицельный выстрел')) then
-        set_frame_state(18, 1) else set_frame_state(18, 0) end
+    if ((self.variables['mana_regeneration'] == true) and
+        (self:get_ememy_debuff_time('Укус гадюки', true) == 0) and
+        (self:can_cast_on_enemy('Укус гадюки'))) then
+        self:frames(16):Show()
+    else
+        self:frames(16):Hide()
+    end
 
-    if (can_cast_on_enemy('Чародейский выстрел')) then
-        set_frame_state(19, 1) else set_frame_state(19, 0) end
+    if (self:can_cast_on_enemy('Убийственный выстрел')) then
+        self:frames(17):Show()
+    else
+        self:frames(17):Hide()
+    end
 
-    if (can_cast_on_point('Бросок ловушки: взрывная ловушка')) then
-        set_frame_state(20, 1) else set_frame_state(20, 0) end
+    if (self:can_cast_on_enemy('Выстрел химеры')) then
+        self:frames(18):Show()
+    else
+        self:frames(18):Hide()
+    end
 
-    if (can_cast_on_enemy('Верный выстрел')) then
-        set_frame_state(21, 1) else set_frame_state(21, 0) end
+    if (self:can_cast_on_enemy('Прицельный выстрел')) then
+        self:frames(19):Show()
+    else
+        self:frames(19):Hide()
+    end
 
-    if (can_cast_on_point('Град стрел')) then
-        set_frame_state(22, 1) else set_frame_state(22, 0) end
+    if (self:can_cast_on_enemy('Чародейский выстрел')) then
+        self:frames(20):Show()
+    else
+        self:frames(20):Hide()
+    end
+
+    if (self:can_cast_on_point('Бросок ловушки: взрывная ловушка')) then
+        self:frames(21):Show()
+    else
+        self:frames(21):Hide()
+    end
+
+    if (self:can_cast_on_enemy('Верный выстрел')) then
+        self:frames(22):Show()
+    else
+        self:frames(22):Hide()
+    end
+
+    if (self:can_cast_on_point('Град стрел')) then
+        self:frames(23):Show()
+    else
+        self:frames(23):Hide()
+    end
+    -- /cast [@target,help,nodead][@focus,help,nodead][@targettarget,help,nodead] Маленькие хитрости
 end
 
-event_frame:SetScript('OnEvent', event_frame.OnEvent)
-event_frame:RegisterEvent("PLAYER_LOGIN")
+function HelloWorld:rotation_4_1()
+    if (not self:general_update()) then return false end
+
+    if (self:is_enemy_cast() and self:can_cast_on_enemy('Пинок')) then
+        self:frames(10):Show()
+    else
+        self:frames(10):Hide()
+    end
+
+    if ((self:get_player_buff_time('Мясорубка') < 2) and
+        (self:can_cast('Мясорубка')) and (self:get_combo_points() > 3)) then
+        self:frames(11):Show()
+    else
+        self:frames(11):Hide()
+    end
+
+    if ((self:get_ememy_debuff_time('Рваная рана', true) == 0) and
+        (self:can_cast('Рваная рана')) and (self:get_combo_points() > 4)) then
+        self:frames(12):Show()
+    else
+        self:frames(12):Hide()
+    end
+
+    if ((self:get_ememy_debuff_time('Рваная рана', true) > 4) and
+        (self:can_cast('Потрошение')) and (self:get_combo_points() > 3)) then
+        self:frames(13):Show()
+    else
+        self:frames(13):Hide()
+    end
+
+    if (self:can_cast('Коварный удар')) then
+        self:frames(14):Show()
+    else
+        self:frames(14):Hide()
+    end
+
+    if (self:can_cast('Веер клинков')) then
+        self:frames(15):Show()
+    else
+        self:frames(15):Hide()
+    end
+end
