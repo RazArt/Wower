@@ -3,6 +3,7 @@ HelloWorld.name = 'HelloWorld'
 HelloWorld.trade = {}
 HelloWorld.trade.name = 'TradeName'
 HelloWorld.trade.parent = HelloWorld
+HelloWorld.trade.name = 'Колотая'
 
 HelloWorld:SetScript('OnEvent', function(self, event, ...)
     self[event](self, ...)
@@ -45,7 +46,7 @@ function HelloWorld:PLAYER_LOGIN()
     end
 
     frames[0]:Show()
-    if (self:get_player_name() ~= 'Колотая') then
+    if (self:get_player_name() ~= self.trade.name) then
         self.base_frame.frames[0].texture:SetTexture(self:get_player_class() / 255,
                                                      self.get_player_spec() / 255, 0)
 
@@ -371,19 +372,28 @@ function HelloWorld:rotation_4_1()
 end
 
 function HelloWorld.trade:init()
-    self.step = 1
+    if (self.step == nil) then self.step = 1 end
+
     self.vars = {}
-    self.vars.auc_query_timer = false
-    self.vars.auc_buy_timer = false
-    self.vars.auc_page = 0
-    self.vars.auc_query_send = false
-    self.vars.auc_list_update = false
-    self.vars.auc_open = false
-    self.vars.auc_item_num = 1
-    self.vars.auc_item_list = {
+
+    self.vars.auc = {}
+    self.vars.auc.open = false
+
+    self.vars.auc.page = 0
+    self.vars.auc.change_page = true
+    self.vars.auc.item_num = 1
+    self.vars.auc.item_list = {
         {'Льняная сумка', 10000}, {'Абсолютная пыль', 60000},
         {'Ледяная ткань', 15000}, {'Рулон ледяной ткани', 50000}
     }
+
+    self.vars.auc.query_timer = false
+    self.vars.auc.query_processed = true
+    self.vars.auc.list_updated = false
+
+    self.vars.auc.buy_index = 0
+    self.vars.auc.buy_runing = false
+    self.vars.auc.buy_timer = false
 
     -- 41510 Рулон ледяной ткани
     -- 41512 Ледотканые напульсники
@@ -480,83 +490,135 @@ function HelloWorld.trade:mail()
 end
 
 function HelloWorld.trade:auction()
-    local change_page = true
+    -- local f = EnumerateFrames()
+    -- while f do
+    --     if f:IsVisible() and f:IsMouseOver() then
+    --         print("Видимый фрейм под курсором:", f:GetName())
+    --         -- f:SetHorizontalScroll(242)
+    --     end
+    --     f = EnumerateFrames(f)
+    -- end
+    -- BrowseScrollFrameScrollBar:SetVerticalScroll(234)
 
-    if ((not self.vars.auc_query_timer) and (self.vars.auc_open) and
-        ((select(1, CanSendAuctionQuery())) == 1)) then
+    if (self.vars.auc.open) then
+        self:auction_update()
+        self:auction_buy()
+    end
+end
+
+function HelloWorld.trade:auction_update()
+    if ((not self.vars.auc.buy_runing) and (not self.vars.auc.query_timer)) then
         if (IsAuctionSortReversed("list", "bid") == nil) then
             SortAuctionItems("list", "bid")
-            print('Сортируем')
+            self:auction_query_timer(3)
+            print('Сортируем аукцион')
+            return
         end
 
-        if (self.vars.auc_query_send == false) then
-            QueryAuctionItems(self.vars.auc_item_list[self.vars.auc_item_num][1], 0, 0, 0, 0, 0,
-                              self.vars.auc_page, false, 0, 0)
-
-            self.vars.auc_query_send = true
-            self.vars.auc_query_timer = true
-            C_Timer.After(2, function()
-                self.vars.auc_query_timer = false
-            end)
-            print('Отправили запрос')
+        if ((self.vars.auc.query_processed == true) and ((select(1, CanSendAuctionQuery())) == 1)) then
+            QueryAuctionItems(self.vars.auc.item_list[self.vars.auc.item_num][1], 0, 0, 0, 0, 0,
+                              self.vars.auc.page, false, 0, 0)
+            self.vars.auc.query_processed = false
+            self:auction_query_timer(3)
+            print('Запрос отправлен')
+            return
         end
 
-        if ((self.vars.auc_list_update == true) and (self.vars.auc_query_send == true)) then
-            self.vars.auc_list_update = false
-            self.vars.auc_query_send = false
+        if ((self.vars.auc.query_processed == false) and (self.vars.auc.list_updated == true)) then
+            local batch = (select(1, GetNumAuctionItems('list')))
 
-            local batch, _ = GetNumAuctionItems('list')
-            print(self.vars.auc_item_list[self.vars.auc_item_num][1],
-                  'Перебираю страницу', self.vars.auc_page,
-                  ' всего элементов', batch)
             if (batch > 0) then
-                for index = batch, 1, -1 do
-                    local _, _, count, _, _, _, _, _, buyoutPrice, _, _, owner, sold =
-                        GetAuctionItemInfo("list", index)
-                    if (buyoutPrice / count <= self.vars.auc_item_list[self.vars.auc_item_num][2]) then
-                        print(index, self.vars.auc_item_list[self.vars.auc_item_num][1], count,
-                              buyoutPrice, owner, sold)
-                        -- change_page = false
-                    end
-                end
-
-                if (change_page) then self.vars.auc_page = self.vars.auc_page + 1 end
-                print('Закончил считать страницу')
+                self.vars.auc.list_updated = false
+                self.vars.auc.buy_index = batch
+                self.vars.auc.buy_runing = true
+                print(self.vars.auc.item_list[self.vars.auc.item_num][1],
+                      ' - запущена обработка страницы', self.vars.auc.page,
+                      'предметов на странице', batch)
             else
-                self.vars.auc_page = 0
-                if (self.vars.auc_item_num < #self.vars.auc_item_list) then
-                    self.vars.auc_item_num = self.vars.auc_item_num + 1
-                    print('Следующий предмет')
+                if (self.vars.auc.item_num < #self.vars.auc.item_list) then
+                    self.vars.auc.item_num = self.vars.auc.item_num + 1
+                    self.vars.auc.page = 0
+                    self.vars.auc.query_processed = true
+                    print('Переходим к следующему предмету')
                 else
                     print('Step 3 stop')
-                    self.vars.auc_item_num = 1
+                    self:init()
                     self.step = 4
                     -- CloseAuctionHouse()
                 end
             end
         end
-        self.vars.auc_query_timer = true
-        C_Timer.After(5, function()
-            self.vars.auc_query_timer = false
-        end)
     end
+end
+
+function HelloWorld.trade:auction_query_timer(time)
+    self.vars.auc.query_timer = true
+    C_Timer.After(time, function()
+        self.vars.auc.query_timer = false
+    end)
+end
+
+function HelloWorld.trade:auction_buy()
+    if (self.vars.auc.buy_runing and not self.vars.auc.buy_timer) then
+        if (self.vars.auc.buy_index > 0) then
+            local _, _, count, _, _, _, _, _, buyoutPrice, _, _, owner, sold = GetAuctionItemInfo(
+                                                                                   "list", self.vars
+                                                                                       .auc
+                                                                                       .buy_index)
+            if ((self.parent:get_player_name() ~= owner) and (GetMoney() > buyoutPrice) and
+                (sold == 0) and
+                (buyoutPrice / count <= self.vars.auc.item_list[self.vars.auc.item_num][2])) then
+                print(self.vars.auc.buy_index, self.vars.auc.item_list[self.vars.auc.item_num][1],
+                      count, buyoutPrice, owner, sold)
+                SetSelectedAuctionItem('list', self.vars.auc.buy_index)
+                AuctionFrameBrowse_Update()
+                -- BrowseBuyoutButton:Click()
+                -- StaticPopup1Button1:Click()
+                print('Предмет куплен')
+                -- self.vars.auc.change_page = false
+                self:auction_buy_timer(1)
+            end
+            self.vars.auc.buy_index = self.vars.auc.buy_index - 1
+        else
+            if (self.vars.auc.change_page) then
+                self.vars.auc.page = self.vars.auc.page + 1
+            end
+            self.vars.auc.query_processed = true
+            self.vars.auc.buy_runing = false
+        end
+    end
+end
+
+function HelloWorld.trade:auction_buy_timer(time)
+    self.vars.auc.buy_timer = true
+    C_Timer.After(time, function()
+        self.vars.auc.buy_timer = false
+    end)
 end
 
 HelloWorld:RegisterEvent("AUCTION_ITEM_LIST_UPDATE")
 function HelloWorld:AUCTION_ITEM_LIST_UPDATE()
-    if (self.trade.vars.auc_query_send == true) then
-        self.trade.vars.auc_list_update = true
-        print('Получили ответ')
+    if (self:get_player_name() == self.trade.name) then
+        if (self.trade.vars.auc.query_processed == false) then
+            self.trade.vars.auc.list_updated = true
+            print('Список товаров обновлен')
+        end
     end
 end
 HelloWorld:RegisterEvent("AUCTION_HOUSE_SHOW")
 function HelloWorld:AUCTION_HOUSE_SHOW()
-    self.trade.vars.auc_open = true
+    if (self:get_player_name() == self.trade.name) then
+        self.trade:auction_query_timer(2)
+        self.trade.vars.auc.open = true
+        print('Аукцион открыт')
+    end
 end
 HelloWorld:RegisterEvent("AUCTION_HOUSE_CLOSED")
 function HelloWorld:AUCTION_HOUSE_CLOSED()
-    self.trade.vars.auc_open = false
-    self.trade:init()
+    if (self:get_player_name() == self.trade.name) then
+        self.trade:init()
+        print('Аукцион закрыт')
+    end
 end
 
 function HelloWorld.trade:send_auction_query(name, page)
