@@ -131,15 +131,18 @@ def do_trade(key):
             do_general(position)
             match position:
                 case 10:
-                    hotkeys.key_send(2)
+                    hotkeys.key_send(2, alt=True)
                     break
                 case 11:
-                    hotkeys.key_send(3)
+                    hotkeys.key_send(3, alt=True)
                     break
                 case 12:
-                    hotkeys.key_send(4)
+                    hotkeys.key_send(4, alt=True)
                     break
                 case 13:
-                    hotkeys.key_send(5)
+                    hotkeys.key_send(5, alt=True)
+                    break
+                case 30:
+                    hotkeys.key_send(6, alt=True)
                     break
         sleep(0.1)
