@@ -61,7 +61,6 @@ function HelloWorld:update(elapsed)
     self:check_timers(elapsed)
     if (self.cooldown) then return end
     self[self.module]:update()
-
 end
 
 function HelloWorld:check_timers(elapsed)
@@ -117,12 +116,12 @@ function HelloWorld:hide(pos)
     self.base_frame.frames[pos]:Hide()
 end
 
-function HelloWorld:change_module_timer()
-    self.cooldown = true
-    self:create_timer(3, function()
-        self.cooldown = false
-    end, false, 'general_cooldown')
-end
+-- function HelloWorld:change_module_timer()
+--     self.cooldown = true
+--     self:create_timer(3, function()
+--         self.cooldown = false
+--     end, false, 'general_cooldown')
+-- end
 
 function HelloWorld:get_player_name()
     return (select(1, UnitName('player')))

@@ -15,7 +15,13 @@
 -- -- 34057 Кристалл пропасти
 -- -- 38426 Этерниевая нить
 -- -- 33470 Ледяная ткань
+function HelloWorld.craft.crafting:init()
+    self:set_step(1)
+end
+
 function HelloWorld.craft.crafting:step_1()
+    self:toggle()
+    self:add_cooldown(20)
     if (GetItemCount(41512) > 0) then
         if (self:can_cast()) then
             HelloWorld:show(11)
