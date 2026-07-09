@@ -21,22 +21,30 @@ function module(name, parent)
 
     function obj:set_module(module)
         if (rawget(self, module) ~= nil) then
+            print(self.name, '-> set_module', module)
             self.module = module
-            HelloWorld:change_module_timer()
+            -- HelloWorld:change_module_timer()
+            self[self.module]:set_step(1)
             self[self.module]:init()
         end
     end
 
     function obj:set_parent_module(module)
         if (rawget(self.parent, module) ~= nil) then
+            print(self.name, '-> set_parent_module', module)
             self.parent.module = module
             -- HelloWorld:change_module_timer()
+            self.parent[self.parent.module]:set_step(1)
             self.parent[self.parent.module]:init()
+
         end
     end
 
     function obj:set_step(step)
-        if ((step == 0) or (rawget(self, 'step_' .. step) ~= nil)) then self.step = step end
+        if ((step == 0) or (rawget(self, 'step_' .. step) ~= nil)) then
+            print(self.name, '-> set_step', step)
+            self.step = step
+        end
     end
 
     setmetatable(obj, {

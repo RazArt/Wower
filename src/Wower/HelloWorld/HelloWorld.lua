@@ -18,7 +18,7 @@ function HelloWorld:init()
     self.runing = true
     self.cooldown = false
 
-    self.base_frame = CreateFrame('Frame')
+    self.base_frame = CreateFrame('Frame', nil, UIParent)
     self.base_frame:SetScale(0.79)
     self.base_frame:SetSize(50, 1)
     self.base_frame:SetFrameStrata('tooltip')
@@ -36,7 +36,23 @@ function HelloWorld:init()
     end
     self.base_frame.frames[0]:Show()
 
-    self:set_module('craft')
+    if (self:get_player_name() ~= 'Колотая') then
+        self.base_frame.frames[0].texture:SetTexture(self:get_player_class() / 255,
+                                                     self.get_player_spec() / 255, 0)
+        local func = 'rotation_' .. self:get_player_class() .. '_' .. self.get_player_spec()
+        self:set_module('war')
+    else
+        self.base_frame.frames[0].texture:SetTexture(50 / 255, 1 / 255, 0)
+        self:set_module('craft')
+    end
+
+    -- HelloWorld:show(13)
+    -- HelloWorld:show(15)
+    -- HelloWorld:show(16)
+    -- HelloWorld:show(17)
+    -- HelloWorld:show(19)
+    -- HelloWorld:show(23)
+    -- HelloWorld:show(25)
 end
 
 function HelloWorld:update(elapsed)
@@ -101,10 +117,6 @@ function HelloWorld:hide(pos)
     self.base_frame.frames[pos]:Hide()
 end
 
-function HelloWorld:get_player_name()
-    return (select(1, UnitName('player')))
-end
-
 function HelloWorld:change_module_timer()
     self.cooldown = true
     self:create_timer(3, function()
@@ -112,15 +124,34 @@ function HelloWorld:change_module_timer()
     end, false, 'general_cooldown')
 end
 
--- function HelloWorld:get_player_class()
---     return self.vars.classes[(select(2, UnitClass('player'))):lower()]
--- end
--- function HelloWorld:get_player_spec()
---     return GetSpecialization('player')
--- end
--- function HelloWorld:get_player_level()
---     return UnitLevel('player')
--- end
+function HelloWorld:get_player_name()
+    return (select(1, UnitName('player')))
+end
+
+function HelloWorld:get_player_class()
+    local classes = {
+        warrior = '1',
+        paladin = '2',
+        hunter = '3',
+        rogue = '4',
+        priest = '5',
+        deathknight = '6',
+        shaman = '7',
+        mage = '8',
+        warlock = '9',
+        druid = '11'
+    }
+
+    return classes[(select(2, UnitClass('player'))):lower()]
+end
+
+function HelloWorld:get_player_spec()
+    return GetSpecialization('player')
+end
+
+function HelloWorld:get_player_level()
+    return UnitLevel('player')
+end
 
 -- -- function printTable(tbl, indent)
 -- --     if not indent then indent = 0 end

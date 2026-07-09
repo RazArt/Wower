@@ -142,7 +142,13 @@ def do_trade(key):
                 case 13:
                     hotkeys.key_send(5, alt=True)
                     break
+                case 20:
+                    hotkeys.key_send(12, alt=True)
+                    break
                 case 30:
+                    hotkeys.key_send(13, alt=True)
+                    break
+                case 31:
                     hotkeys.key_send(6, alt=True)
                     break
         sleep(0.1)
