@@ -1,5 +1,5 @@
 HelloWorld = module('HelloWorld')
-
+print('hallo epta')
 HelloWorld.event_frame = CreateFrame('Frame', nil, UIParent)
 HelloWorld.event_frame:SetScript('OnEvent', function(self, event, ...)
     HelloWorld[event](HelloWorld, ...)
