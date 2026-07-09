@@ -16,64 +16,46 @@
 -- -- 38426 Этерниевая нить
 -- -- 33470 Ледяная ткань
 function HelloWorld.craft.crafting:init()
-    self:set_step(1)
+    self:set_action('step_1')
 end
 
 function HelloWorld.craft.crafting:step_1()
-    self:toggle()
-    self:add_cooldown(20)
     if (GetItemCount(41512) > 0) then
-        if (self:can_cast()) then
-            HelloWorld:show(11)
-        else
-            HelloWorld:hide(11)
-        end
+        if (self:can_cast()) then HelloWorld:show(3, 0, 0, 1) end
     else
-        HelloWorld:hide(11)
-        self:set_step(2)
+        self:set_action('step_2')
     end
 end
 
 function HelloWorld.craft.crafting:step_2()
-    local items = self:get_bag_items_count()
     if ((GetItemCount(41510) > 2) and (GetItemCount(38426) > 0) and
         (self.parent:get_bag_free_slots() > 1)) then
-        if (self:can_cast()) then
-            HelloWorld:show(12)
-        else
-            HelloWorld:hide(12)
-        end
+        if (self:can_cast()) then HelloWorld:show(4, 0, 0, 1) end
     else
         if (GetItemCount(41512) > 0) then
-            self:set_step(1)
+            self:set_action('step_1')
         else
-            self:set_step(3)
+            self:set_action('step_3')
         end
-        HelloWorld:hide(12)
     end
 end
 
 function HelloWorld.craft.crafting:step_3()
     if (self.parent:get_bag_free_slots() > 2) then
         if (GetItemCount(33470) > 4) then
-            if (self:can_cast()) then
-                HelloWorld:show(13)
-            else
-                HelloWorld:hide(13)
-            end
+            if (self:can_cast()) then HelloWorld:show(5, 0, 0, 1) end
         else
             if (GetItemCount(41510) > 2 and (GetItemCount(38426) > 0)) then
-                self:set_step(2)
+                self:set_action('step_2')
             else
-                self:set_step(1)
-                self:set_parent_module('auction')
+                self:set_action('step_1')
+                -- self.parent:set_action('auction') --Debug
             end
-            HelloWorld:hide(13)
         end
     else
-        self:set_step(0)
+        self:set_action('step_1')
+        -- self:set_action('step_3')
         -- Закончили работать, сумки забиты
-        HelloWorld:hide(13)
     end
 end
 

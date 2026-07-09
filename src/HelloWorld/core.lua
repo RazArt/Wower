@@ -4,53 +4,37 @@ function module(name, parent)
 
     obj.name = name
     obj.parent = parent
-    obj.module = ''
-    obj.step = 0
+    obj.action = ''
     obj.runing = true
-    obj.cooldown = false
     obj.vars = {}
 
     function obj:init()
+        self:print('init')
     end
 
     function obj:update()
         if (not self.runing) then return end
-        if (self.cooldown) then return end
 
-        if (self.step == 0) then
-            if (rawget(self, self.module) ~= nil) then self[self.module]:update() end
-        else
-
-            self['step_' .. self.step](self)
+        if (rawget(self, self.action) ~= nil) then
+            if (type(rawget(self, self.action)) == 'table') then
+                self[self.action]:update()
+            elseif (type(rawget(self, self.action)) == 'function') then
+                self[self.action](self)
+            end
         end
     end
 
-    function obj:set_module(module)
-        if (rawget(self, module) ~= nil) then
-            self:print('set_module', module)
-            self.module = module
-            self[self.module]:init()
-        end
-    end
-
-    function obj:set_parent_module(module)
-        if (rawget(self.parent, module) ~= nil) then
-            self:print('set_parent_module', module)
-            self.parent.module = module
-            self.parent[self.parent.module]:init()
-        end
-    end
-
-    function obj:set_step(step)
-        if ((step == 0) or (rawget(self, 'step_' .. step) ~= nil)) then
-            self:print('set_step', step)
-            self.step = step
+    function obj:set_action(action)
+        if (rawget(self, action) ~= nil) then
+            self:print('set_action', action)
+            self.action = action
+            if (type(rawget(self, self.action)) == 'table') then self[self.action]:init() end
         end
     end
 
     function obj:toggle()
         if (self.runing) then
-            obj:stop()
+            self:stop()
         else
             self:start()
         end
@@ -67,11 +51,11 @@ function module(name, parent)
     end
 
     function obj:add_cooldown(time)
-        self:print('cooldown', time)
-        self.cooldown = true
+        self:print('cooldown <', time, '>')
+        self.runing = false
         HelloWorld:create_timer(time, function()
-            self:print('cooldown off')
-            self.cooldown = false
+            self:print('cooldown < off >')
+            self.runing = true
         end, false, self.name .. '_cooldown')
     end
 
@@ -81,8 +65,11 @@ function module(name, parent)
 
     setmetatable(obj, {
         __index = function(self, name)
-            self[name] = module(self.name .. '/' .. name, self)
-            return self[name]
+            if (name ~= '') then
+                self:print('create <' .. name .. '>')
+                self[name] = module(self.name .. '/' .. name, self)
+                return self[name]
+            end
         end,
         __call = function(self)
             self:init()

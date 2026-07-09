@@ -1,5 +1,5 @@
 function HelloWorld.craft:init()
-    self:set_module('crafting')
+    self:set_action('crafting')
 end
 
 function HelloWorld.craft:get_bag_free_slots()
