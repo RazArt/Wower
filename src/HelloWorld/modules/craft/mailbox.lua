@@ -4,14 +4,14 @@ function HelloWorld.craft.mailbox:init()
     self:register_event('MAIL_CLOSED')
     self:register_event('MAIL_INBOX_UPDATE')
 
-    -- self:set_action('step_1')
+    self:set_route('step_1')
 end
 
 function HelloWorld.craft.mailbox:step_1()
     if (self.vars.open == false) then
         HelloWorld:keystroke(12, 0, 0, 0, 1)
     else
-        self:set_action('step_2')
+        self:set_route('step_2')
     end
 end
 
@@ -30,7 +30,7 @@ function HelloWorld.craft.mailbox:MAIL_INBOX_UPDATE()
 end
 
 -- function HelloWorld.craft.mailbox:step_2()
---     if (not self.vars.open) then self:set_action('step_1') end
+--     if (not self.vars.open) then self:set_route('step_1') end
 
 --     if ((select(2, GetInboxNumItems())) > 0) then
 --         if ((select(1, GetInboxNumItems())) > 0) then
@@ -52,7 +52,7 @@ end
 --                     -- AutoLootMailItem(1)
 --                     return
 --                 else
---                     self.parent:set_action('crafting')
+--                     self.parent:set_route('crafting')
 --                     CloseMail()
 --                 end
 --             else
@@ -61,7 +61,7 @@ end
 --             end
 --         end
 --     else
---         self.parent:set_action('crafting')
+--         self.parent:set_route('crafting')
 --         CloseMail()
 --     end
 -- end

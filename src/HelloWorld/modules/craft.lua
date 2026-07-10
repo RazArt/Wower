@@ -1,7 +1,8 @@
 function HelloWorld.craft:init()
-    -- self:set_action('mailbox') -- Debug
-    self:set_action('auction') -- Debug
-    -- self:set_action('crafting')
+    -- self:stop()
+    -- self:set_route('mailbox') -- Debug
+    -- self:set_route('auction') -- Debug
+    self:set_route('crafting')
 end
 
 function HelloWorld.craft:get_bag_free_slots()
@@ -11,4 +12,3 @@ function HelloWorld.craft:get_bag_free_slots()
     end
     return free_slots_count
 end
-

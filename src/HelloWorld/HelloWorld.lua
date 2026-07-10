@@ -1,74 +1,51 @@
 HelloWorld = module('HelloWorld')
+
 HelloWorld:register_event("PLAYER_LOGIN")
-
-HelloWorld.event_frame:SetScript('OnUpdate', function(self, elapsed)
-    HelloWorld:update_general(elapsed)
-end)
-
 function HelloWorld:PLAYER_LOGIN()
     self()
 end
 
 function HelloWorld:init()
-    self.timers = {}
-    -- self.runing = true
-    self.runing = false
+    self._keystroke_timer = 0
 
-    self.base_frame = CreateFrame('Frame', nil, UIParent)
-    self.base_frame:SetScale(0.79)
-    self.base_frame:SetSize(3, 1)
-    self.base_frame:SetFrameStrata('tooltip')
-    self.base_frame:SetPoint('topleft', UIParent, 0, 0)
-    self.base_frame.frames = {}
+    self._base_frame = CreateFrame('Frame', nil, UIParent)
+    self._base_frame:SetScale(0.79)
+    self._base_frame:SetSize(3, 1)
+    self._base_frame:SetFrameStrata('tooltip')
+    self._base_frame:SetPoint('topleft', UIParent, 0, 0)
+    self._base_frame.frames = {}
     for i = 0, 2 do
-        self.base_frame.frames[i] = CreateFrame('Frame', nil, self.base_frame)
-        self.base_frame.frames[i]:SetSize(1, 1)
-        self.base_frame.frames[i]:SetFrameStrata('tooltip')
-        self.base_frame.frames[i]:SetPoint('topleft', i, 0)
-        self.base_frame.frames[i].texture = self.base_frame.frames[i]:CreateTexture(nil, 'tooltip')
-        self.base_frame.frames[i].texture:SetAllPoints(self.base_frame.frames[i])
+        self._base_frame.frames[i] = CreateFrame('Frame', nil, self._base_frame)
+        self._base_frame.frames[i]:SetSize(1, 1)
+        self._base_frame.frames[i]:SetFrameStrata('tooltip')
+        self._base_frame.frames[i]:SetPoint('topleft', i, 0)
+        self._base_frame.frames[i].texture =
+            self._base_frame.frames[i]:CreateTexture(nil, 'tooltip')
+        self._base_frame.frames[i].texture:SetAllPoints(self._base_frame.frames[i])
     end
-    self.base_frame.frames[0].texture:SetTexture(31 / 255, 11 / 255, 12 / 255)
-    self.base_frame:Hide()
+    self._base_frame.frames[0].texture:SetTexture(31 / 255, 11 / 255, 12 / 255)
+    self._base_frame:Hide()
 
     if (self:get_player_name() ~= 'Колотая') then
-        self:set_action('war')
+        self:set_route('war')
     else
-        self:set_action('craft')
+        self:set_route('craft')
     end
+
+    self._event_frame:SetScript('OnUpdate', function(self, elapsed)
+        self._parent:update(elapsed)
+    end)
 end
 
-function HelloWorld:update_general(elapsed)
-    if (not self.runing) then return false end
+function HelloWorld:update(elapsed)
+    self._keystroke_timer = self._keystroke_timer + elapsed
+    if ((self._keystroke_timer >= 0.01) and (self._base_frame:IsVisible())) then
+        self._base_frame:Hide()
+    end
+
     if (ACTIVE_CHAT_EDIT_BOX ~= nil) then return false end
 
-    self:check_timers(elapsed)
-    self:update()
-end
-
-function HelloWorld:check_timers(elapsed)
-    for i = 1, #self.timers do
-        if (self.timers[i] ~= nil) then
-            self.timers[i][1] = self.timers[i][1] + elapsed
-            if self.timers[i][1] >= self.timers[i][2] then
-                self.timers[i][3]()
-                self.timers[i][1] = 0
-                if (not self.timers[i][4]) then table.remove(self.timers, i) end
-            end
-        end
-    end
-end
-
-function HelloWorld:create_timer(count, func, repeating, name)
-    local name = name or false
-    local repeating = repeating or false
-
-    if (name ~= false) then
-        for i = 1, #self.timers do
-            if (self.timers[i][5] == name) then table.remove(self.timers, i) end
-        end
-    end
-    table.insert(self.timers, {0, count, func, repeating, name})
+    self:_update(elapsed)
 end
 
 function HelloWorld:keystroke(key, click, shift, ctrl, alt)
@@ -78,16 +55,13 @@ function HelloWorld:keystroke(key, click, shift, ctrl, alt)
     alt = alt or 0
 
     if (key <= 255) then
-        self.base_frame.frames[1].texture:SetTexture(key / 255, 0, click / 255)
+        self._base_frame.frames[1].texture:SetTexture(key / 255, 0, click / 255)
     else
-        self.base_frame.frames[1].texture:SetTexture(255, (key - 255) / 255, click / 255)
+        self._base_frame.frames[1].texture:SetTexture(255, (key - 255) / 255, click / 255)
     end
-    self.base_frame.frames[2].texture:SetTexture(shift / 255, ctrl / 255, alt / 255)
-    self.base_frame:Show()
-
-    HelloWorld:create_timer(0.05, function()
-        self.base_frame:Hide()
-    end, false, 'key_frame')
+    self._base_frame.frames[2].texture:SetTexture(shift / 255, ctrl / 255, alt / 255)
+    self._base_frame:Show()
+    self._keystroke_timer = 0
 end
 
 function HelloWorld:get_player_name()

@@ -1,49 +1,103 @@
-function module(name, parent)
+function Module(name, parent)
     parent = parent or UIParent
     local obj = {}
 
     obj.name = name
     obj.parent = parent
-    obj.event_frame = CreateFrame('Frame')
-    obj.event_frame.parent = obj
-    obj.event_frame:SetScript('OnEvent', function(self, event, ...)
+    obj._event_frame = CreateFrame('Frame')
+    obj._event_frame._parent = obj
+    obj._event_frame:SetScript('OnEvent', function(self, event, ...)
         local frame_parent = self:GetParent()
-        self.parent[event](self.parent, ...)
+        self._parent[event](self._parent, ...)
     end)
-    obj.action = ''
-    obj.runing = true
+
+    obj._route = ''
+    obj._runing = true
     obj.vars = {}
+    obj.timers = {}
 
     function obj:register_event(event)
-        self.event_frame:RegisterEvent(event)
+        self:print('register_event <', event, '>')
+        self._event_frame:RegisterEvent(event)
     end
 
-    function obj:init()
+    function obj:_init()
         self:print('init')
+        if (type(rawget(self, 'init')) == 'function') then self:init() end
     end
 
-    function obj:update()
-        if (not self.runing) then return end
+    function obj:_uninit()
+        self:print('uninit')
+        obj.vars = {}
+        obj.timers = {}
+        self._event_frame:UnregisterAllEvents()
+        if (type(rawget(self, 'uninit')) == 'function') then self:uninit() end
+    end
 
-        if (rawget(self, self.action) ~= nil) then
-            if (type(rawget(self, self.action)) == 'table') then
-                self[self.action]:update()
-            elseif (type(rawget(self, self.action)) == 'function') then
-                self[self.action](self)
+    function obj:_update(elapsed)
+        if (not self._runing) then return end
+
+        for i = 1, #self.timers do
+            if (self.timers[i] ~= nil) then
+                self.timers[i][1] = self.timers[i][1] + elapsed
+                if self.timers[i][1] >= self.timers[i][2] then
+                    self.timers[i][3]()
+                    self.timers[i][1] = 0
+                    if (not self.timers[i][4]) then table.remove(self.timers, i) end
+                end
+            end
+        end
+
+        if (rawget(self, self._route) ~= nil) then
+            if (type(rawget(self, self._route)) == 'table') then
+                self[self._route]:_update(elapsed)
+            elseif (type(rawget(self, self._route)) == 'function') then
+                self[self._route](self)
             end
         end
     end
 
-    function obj:set_action(action)
-        if ((self.action ~= action) and (rawget(self, action) ~= nil)) then
-            self:print('set_action <', action, '>')
-            self.action = action
-            if (type(rawget(self, self.action)) == 'table') then self[self.action]:init() end
+    function obj:set_route(route, caller)
+        caller = caller or self
+
+        if (route == '') then
+            self:print('set_route < \'\' >')
+            self._route = route
+            caller:_uninit()
+        elseif ((self._route ~= route) and (rawget(self, route) ~= nil)) then
+            self:print('set_route <', route, '>')
+            self._route = route
+            if (type(rawget(self, self._route)) == 'table') then
+                caller:_uninit()
+                self[self._route]:_init()
+            end
         end
     end
 
+    function obj:create_timer(count, func, repeating, name)
+        self:print('create_timer <', count, '>')
+        local name = name or false
+        local repeating = repeating or false
+
+        if (name ~= false) then
+            for i = 1, #self.timers do
+                if (self.timers[i][5] == name) then table.remove(self.timers, i) end
+            end
+        end
+        table.insert(self.timers, {0, count, func, repeating, name})
+    end
+
+    function obj:add_cooldown(count)
+        self:print('add_cooldown <', count, '>')
+        self._runing = false
+        self:create_timer(count, function()
+            self:print('cooldown < off >')
+            self._runing = true
+        end, false, self.name .. '_cooldown')
+    end
+
     function obj:toggle()
-        if (self.runing) then
+        if (self._runing) then
             self:stop()
         else
             self:start()
@@ -52,21 +106,12 @@ function module(name, parent)
 
     function obj:start()
         self:print('start')
-        self.runing = true
+        self._runing = true
     end
 
     function obj:stop()
         self:print('stop')
-        self.runing = false
-    end
-
-    function obj:add_cooldown(time)
-        self:print('cooldown <', time, '>')
-        self.runing = false
-        HelloWorld:create_timer(time, function()
-            self:print('cooldown < off >')
-            self.runing = true
-        end, false, self.name .. '_cooldown')
+        self._runing = false
     end
 
     function obj:print(...)
@@ -77,12 +122,12 @@ function module(name, parent)
         __index = function(self, name)
             if (name ~= '') then
                 self:print('create <', name, '>')
-                self[name] = module(self.name .. '/' .. name, self)
+                self[name] = Module(self.name .. '/' .. name, self)
                 return self[name]
             end
         end,
         __call = function(self)
-            self:init()
+            self:_init()
         end
     })
 

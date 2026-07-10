@@ -16,46 +16,42 @@
 -- -- 38426 Этерниевая нить
 -- -- 33470 Ледяная ткань
 function HelloWorld.craft.crafting:init()
-    self:set_action('step_1')
-end
-
-function HelloWorld.craft.crafting:end_crafting()
-    -- Крафт окончен
+    self:set_route('step_1')
 end
 
 function HelloWorld.craft.crafting:step_1()
     if (GetItemCount(41512) > 0) then
         if (self:can_cast()) then HelloWorld:keystroke(3, 0, 0, 0, 1) end
     else
-        self:set_action('step_2')
+        self:set_route('step_2')
     end
 end
 
 function HelloWorld.craft.crafting:step_2()
-    if (self.parent:get_bag_free_slots() <= 1) then self:set_action('end_crafting') end
+    if (self.parent:get_bag_free_slots() <= 1) then self:set_route('') end
 
     if ((GetItemCount(41510) > 2) and (GetItemCount(38426) > 0)) then
         if (self:can_cast()) then HelloWorld:keystroke(4, 0, 0, 0, 1) end
     else
         if (GetItemCount(41512) > 0) then
-            self:set_action('step_1')
+            self:set_route('step_1')
         else
-            self:set_action('step_3')
+            self:set_route('step_3')
         end
     end
 end
 
 function HelloWorld.craft.crafting:step_3()
-    if (self.parent:get_bag_free_slots() <= 2) then self:set_action('end_crafting') end
+    if (self.parent:get_bag_free_slots() <= 2) then self:set_route('') end
 
     if (GetItemCount(33470) > 4) then
         if (self:can_cast()) then HelloWorld:keystroke(5, 0, 0, 0, 1) end
     else
         if (GetItemCount(41510) > 2 and (GetItemCount(38426) > 0)) then
-            self:set_action('step_2')
+            self:set_route('step_2')
         else
-            self.parent:set_action('auction')
-            -- self:set_action('step_1') -- Debug
+            self.parent:set_route('auction', self)
+            -- self:set_route('step_1') -- Debug
         end
     end
 end
