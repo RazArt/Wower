@@ -4,9 +4,19 @@ function module(name, parent)
 
     obj.name = name
     obj.parent = parent
+    obj.event_frame = CreateFrame('Frame')
+    obj.event_frame.parent = obj
+    obj.event_frame:SetScript('OnEvent', function(self, event, ...)
+        local frame_parent = self:GetParent()
+        self.parent[event](self.parent, ...)
+    end)
     obj.action = ''
     obj.runing = true
     obj.vars = {}
+
+    function obj:register_event(event)
+        self.event_frame:RegisterEvent(event)
+    end
 
     function obj:init()
         self:print('init')
@@ -25,8 +35,8 @@ function module(name, parent)
     end
 
     function obj:set_action(action)
-        if (rawget(self, action) ~= nil) then
-            self:print('set_action', action)
+        if ((self.action ~= action) and (rawget(self, action) ~= nil)) then
+            self:print('set_action <', action, '>')
             self.action = action
             if (type(rawget(self, self.action)) == 'table') then self[self.action]:init() end
         end
@@ -66,7 +76,7 @@ function module(name, parent)
     setmetatable(obj, {
         __index = function(self, name)
             if (name ~= '') then
-                self:print('create <' .. name .. '>')
+                self:print('create <', name, '>')
                 self[name] = module(self.name .. '/' .. name, self)
                 return self[name]
             end

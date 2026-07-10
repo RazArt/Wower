@@ -1,16 +1,12 @@
 HelloWorld = module('HelloWorld')
+HelloWorld:register_event("PLAYER_LOGIN")
 
-HelloWorld.event_frame = CreateFrame('Frame', nil, UIParent)
-HelloWorld.event_frame:SetScript('OnEvent', function(self, event, ...)
-    HelloWorld[event](HelloWorld, ...)
-end)
 HelloWorld.event_frame:SetScript('OnUpdate', function(self, elapsed)
     HelloWorld:update_general(elapsed)
 end)
-HelloWorld.event_frame:RegisterEvent("PLAYER_LOGIN")
 
 function HelloWorld:PLAYER_LOGIN()
-    HelloWorld()
+    self()
 end
 
 function HelloWorld:init()
@@ -50,19 +46,14 @@ function HelloWorld:update_general(elapsed)
     self:update()
 end
 
-function HelloWorld:can_work()
-
-    return true
-end
-
 function HelloWorld:check_timers(elapsed)
     for i = 1, #self.timers do
         if (self.timers[i] ~= nil) then
-            self.timers[i].time = self.timers[i].time + elapsed
-            if self.timers[i].time >= self.timers[i].count then
-                self.timers[i].func()
-                self.timers[i].time = 0
-                if (not self.timers[i].repeating) then table.remove(self.timers, i) end
+            self.timers[i][1] = self.timers[i][1] + elapsed
+            if self.timers[i][1] >= self.timers[i][2] then
+                self.timers[i][3]()
+                self.timers[i][1] = 0
+                if (not self.timers[i][4]) then table.remove(self.timers, i) end
             end
         end
     end
@@ -74,25 +65,22 @@ function HelloWorld:create_timer(count, func, repeating, name)
 
     if (name ~= false) then
         for i = 1, #self.timers do
-            if (self.timers[i].name == name) then table.remove(self.timers, i) end
+            if (self.timers[i][5] == name) then table.remove(self.timers, i) end
         end
     end
-
-    table.insert(self.timers,
-                 {time = 0, count = count, func = func, repeating = repeating, name = name})
+    table.insert(self.timers, {0, count, func, repeating, name})
 end
 
-function HelloWorld:show(key, shift, ctrl, alt)
+function HelloWorld:keystroke(key, click, shift, ctrl, alt)
     key = key or 0
     shift = shift or 0
     ctrl = ctrl or 0
     alt = alt or 0
 
-    self:hide()
     if (key <= 255) then
-        self.base_frame.frames[1].texture:SetTexture(key / 255, 0, 0)
+        self.base_frame.frames[1].texture:SetTexture(key / 255, 0, click / 255)
     else
-        self.base_frame.frames[1].texture:SetTexture(255, (key - 255) / 255, 0)
+        self.base_frame.frames[1].texture:SetTexture(255, (key - 255) / 255, click / 255)
     end
     self.base_frame.frames[2].texture:SetTexture(shift / 255, ctrl / 255, alt / 255)
     self.base_frame:Show()
@@ -100,10 +88,6 @@ function HelloWorld:show(key, shift, ctrl, alt)
     HelloWorld:create_timer(0.05, function()
         self.base_frame:Hide()
     end, false, 'key_frame')
-end
-
-function HelloWorld:hide()
-    self.base_frame:Hide()
 end
 
 function HelloWorld:get_player_name()

@@ -1,5 +1,7 @@
 function HelloWorld.craft:init()
-    self:set_action('crafting')
+    -- self:set_action('mailbox') -- Debug
+    self:set_action('auction') -- Debug
+    -- self:set_action('crafting')
 end
 
 function HelloWorld.craft:get_bag_free_slots()
