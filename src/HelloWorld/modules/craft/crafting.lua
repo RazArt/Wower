@@ -51,7 +51,6 @@ function HelloWorld.craft.crafting:step_3()
             self:set_route('step_2')
         else
             self.parent:set_route('auction', self)
-            -- self.parent:set_route('', self)
         end
     end
 end
@@ -62,18 +61,13 @@ function HelloWorld.craft.crafting:can_cast()
     return true
 end
 
-function HelloWorld.craft.crafting:get_craftskill_index(name)
+function HelloWorld.craft.crafting:craft_item(name)
     for i = GetNumTradeSkills(), 1, -1 do
         if ((select(2, GetTradeSkillInfo(i)) == "header")) then ExpandTradeSkillSubClass(i) end
     end
     for i = 1, GetNumTradeSkills() do
-        if ((select(1, GetTradeSkillInfo(i))) == name) then return i end
+        if ((select(1, GetTradeSkillInfo(i))) == name) then index = i end
     end
-    return 0
-end
-
-function HelloWorld.craft.crafting:craft_item(name)
-    index = self:get_craftskill_index(name)
     if (index > 0) then
         if ((select(3, GetTradeSkillInfo(index))) > 0) then DoTradeSkill(index) end
     end

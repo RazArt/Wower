@@ -1,0 +1,5 @@
+/run HelloWorld.war.hunter:set_route('rotation_1')
+/run HelloWorld.war.hunter:toggle()
+
+/run HelloWorld.war.rogue:set_route('rotation_1')
+/run HelloWorld.war.rogue:toggle()

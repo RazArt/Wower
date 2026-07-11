@@ -1,6 +1,4 @@
 function HelloWorld.craft:init()
-    -- self:set_route('auction')
-    -- self:set_route('mailbox')
     self:set_route('crafting')
 end
 
