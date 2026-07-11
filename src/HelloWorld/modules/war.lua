@@ -1,5 +1,3 @@
-(select(2, UnitClass('player'))):lower()
-
 function HelloWorld.war:init()
     self:set_module((select(2, UnitClass('player'))):lower())
 end

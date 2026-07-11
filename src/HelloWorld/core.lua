@@ -1,9 +1,13 @@
-function Module(name, parent)
-    parent = parent or UIParent
+function Module(name, parent) -- Module class
     local obj = {}
 
-    obj.name = name
-    obj.parent = parent
+    if (parent ~= nil) then
+        obj.name = parent.name .. '/' .. name or name
+        obj.parent = parent
+    else
+        obj.name = name
+        obj.parent = obj
+    end
     obj._event_frame = CreateFrame('Frame')
     obj._event_frame._parent = obj
     obj._event_frame:SetScript('OnEvent', function(self, event, ...)
@@ -13,8 +17,10 @@ function Module(name, parent)
 
     obj._route = ''
     obj._runing = true
+    obj._cooldown = false
     obj.vars = {}
     obj.timers = {}
+    obj._debug = true
 
     function obj:register_event(event)
         self:print('register_event <', event, '>')
@@ -48,6 +54,9 @@ function Module(name, parent)
             end
         end
 
+        if (obj._cooldown) then return end
+
+        if (type(rawget(self, 'update')) == 'function') then self:update() end
         if (rawget(self, self._route) ~= nil) then
             if (type(rawget(self, self._route)) == 'table') then
                 self[self._route]:_update(elapsed)
@@ -76,23 +85,24 @@ function Module(name, parent)
 
     function obj:create_timer(count, func, repeating, name)
         self:print('create_timer <', count, '>')
-        local name = name or false
-        local repeating = repeating or false
+        name = name or false
+        repeating = repeating or false
 
         if (name ~= false) then
             for i = 1, #self.timers do
                 if (self.timers[i][5] == name) then table.remove(self.timers, i) end
             end
         end
+
         table.insert(self.timers, {0, count, func, repeating, name})
     end
 
     function obj:add_cooldown(count)
         self:print('add_cooldown <', count, '>')
-        self._runing = false
+        self._cooldown = true
         self:create_timer(count, function()
             self:print('cooldown < off >')
-            self._runing = true
+            self._cooldown = false
         end, false, self.name .. '_cooldown')
     end
 
@@ -115,14 +125,14 @@ function Module(name, parent)
     end
 
     function obj:print(...)
-        print(self.name, '->', ...)
+        if (obj._debug) then print(self.name, '->', ...) end
     end
 
     setmetatable(obj, {
         __index = function(self, name)
             if (name ~= '') then
                 self:print('create <', name, '>')
-                self[name] = Module(self.name .. '/' .. name, self)
+                self[name] = Module(name, self)
                 return self[name]
             end
         end,
@@ -133,3 +143,7 @@ function Module(name, parent)
 
     return obj
 end
+
+HelloWorld = Module('HelloWorld')
+Keystroke = Module('Keystroke')
+

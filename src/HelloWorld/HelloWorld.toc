@@ -3,11 +3,12 @@
 ## Notes: Test AddOn
 
 core.lua
-HelloWorld.lua
 modules\war.lua
 modules\craft.lua
+modules\keystroke.lua
 modules\war\hunter.lua
 modules\war\rogue.lua
 modules\craft\auction.lua
 modules\craft\crafting.lua
 modules\craft\mailbox.lua
+HelloWorld.lua
