@@ -9,54 +9,69 @@ function Module(name, parent) -- Module class
         obj.name = name
         obj.parent = obj
         obj.root = obj
+
+        obj.state_frame = CreateFrame('Frame')
+        obj.state_frame:SetSize(50, 50)
+        obj.state_frame:SetFrameStrata('tooltip')
+        obj.state_frame:SetPoint('center', UIParent, 'center', 0, -160)
+        obj.state_frame.texture = obj.state_frame:CreateTexture(nil, 'tooltip')
+        obj.state_frame.texture:SetAllPoints(obj.state_frame)
+        obj.state_frame.texture:SetTexture('Interface\\AddOns\\HelloWorld\\textures\\warning.tga')
+        obj.state_frame:Hide()
+
+        obj._runing = false
+        obj._cooldown = false
+        obj._timers = {}
+        obj._debug = true
     end
+
     obj._event_frame = CreateFrame('Frame')
     obj._event_frame._parent = obj
     obj._event_frame:SetScript('OnEvent', function(self, event, ...)
-        local frame_parent = self:GetParent()
         self._parent[event](self._parent, ...)
     end)
 
     obj._route = ''
-    obj._runing = true
-    obj._cooldown = false
     obj.vars = {}
-    obj.timers = {}
-    obj._debug = true
 
     function obj:register_event(event)
         self:print('register_event <', event, '>')
+
         self._event_frame:RegisterEvent(event)
     end
 
     function obj:_init()
         self:print('init')
+
         if (type(rawget(self, 'init')) == 'function') then self:init() end
     end
 
     function obj:_uninit()
         self:print('uninit')
-        obj.vars = {}
-        obj.timers = {}
+
+        self.vars = {}
+        self:delete_timer()
         self._event_frame:UnregisterAllEvents()
+
         if (type(rawget(self, 'uninit')) == 'function') then self:uninit() end
     end
 
     function obj:_update(elapsed)
-        if (not self._runing) then return end
+        if (not self.root._runing) then return end
 
-        for i = 1, #self.timers do
-            if (self.timers[i] ~= nil) then
-                self.timers[i][1] = self.timers[i][1] + elapsed
-                if self.timers[i][1] >= self.timers[i][2] then
-                    self.timers[i][3]()
-                    self.timers[i][1] = 0
-                    if (not self.timers[i][4]) then table.remove(self.timers, i) end
+        for i = #self.root._timers, 1, -1 do
+            self.root._timers[i][1] = self.root._timers[i][1] + elapsed
+            if self.root._timers[i][1] >= self.root._timers[i][2] then
+                self.root._timers[i][3]()
+                if (not self.root._timers[i][4]) then
+                    table.remove(self.root._timers, i)
+                else
+                    self.root._timers[i][1] = 0
                 end
             end
         end
 
-        if (obj._cooldown) then return end
+        if (self.root._cooldown) then return end
 
         if (type(rawget(self, 'update')) == 'function') then self:update() end
         if (rawget(self, self._route) ~= nil) then
@@ -70,8 +85,8 @@ function Module(name, parent) -- Module class
 
     function obj:set_route(route, caller)
         caller = caller or self
-
         if (route == '') then
+            -- Подумать над возвращением на шаги и init()
             self:print('set_route < \'\' >')
             self._route = route
             caller:_uninit()
@@ -85,31 +100,38 @@ function Module(name, parent) -- Module class
         end
     end
 
-    function obj:create_timer(count, func, repeating, name)
-        self:print('create_timer <', count, '>')
-        name = name or false
+    function obj:create_timer(count, func, name, repeating)
+        name = name or ''
+        full_name = self.name .. '/' .. name
         repeating = repeating or false
 
-        if (name ~= false) then
-            for i = 1, #self.timers do
-                if (self.timers[i][5] == name) then table.remove(self.timers, i) end
+        self:print('create_timer <', count, '>', full_name)
+
+        if (name ~= '') then self:delete_timer(name) end
+        table.insert(self.root._timers, {0, count, func, repeating, full_name})
+    end
+
+    function obj:delete_timer(name)
+        name = name or ''
+
+        for i = #self.root._timers, 1, -1 do
+            if (string.find(self.root._timers[i][5], '^' .. self.name .. '/' .. name)) then
+                table.remove(self.root._timers, i)
             end
         end
-
-        table.insert(self.timers, {0, count, func, repeating, name})
     end
 
     function obj:add_cooldown(count)
         self:print('add_cooldown <', count, '>')
-        self._cooldown = true
+        self.root._cooldown = true
         self:create_timer(count, function()
             self:print('cooldown < off >')
-            self._cooldown = false
-        end, false, self.name .. '_cooldown')
+            self.root._cooldown = false
+        end, 'cooldown')
     end
 
     function obj:toggle()
-        if (self._runing) then
+        if (self.root._runing) then
             self:stop()
         else
             self:start()
@@ -118,18 +140,18 @@ function Module(name, parent) -- Module class
 
     function obj:start()
         self:print('start')
-        self._runing = true
-        HelloWorld.state_frame:Show()
+        self.root._runing = true
+        self.root.state_frame:Show()
     end
 
     function obj:stop()
         self:print('stop')
-        self._runing = false
-        HelloWorld.state_frame:Hide()
+        self.root._runing = false
+        self.root.state_frame:Hide()
     end
 
     function obj:print(...)
-        -- if (obj._debug) then print(self.name, '->', ...) end
+        if (self.root._debug) then print(self.name, '->', ...) end
     end
 
     setmetatable(obj, {

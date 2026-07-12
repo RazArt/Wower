@@ -1,5 +1,6 @@
-function Keystroke:init(name, parent)
+function Keystroke:init(name)
     self._debug = false
+    self._runing = true
     self.base_frame = CreateFrame('Frame')
     self.base_frame:SetScale(0.71)
     self.base_frame:SetSize(3, 1)
@@ -37,5 +38,5 @@ function Keystroke:show(key, click, ctrl, alt, shift)
 
     self:create_timer(0.05, function()
         self.base_frame:Hide()
-    end, false, 'hide')
+    end, 'hide')
 end

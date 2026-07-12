@@ -3,22 +3,16 @@ function HelloWorld:PLAYER_LOGIN()
     HelloWorld()
     Keystroke()
 
-    HelloWorld._debug = false
-    HelloWorld:get_route()
+    self:get_route()
 
     CreateFrame('Frame'):SetScript('OnUpdate', function(self, elapsed)
         HelloWorld:_update(elapsed)
         Keystroke:_update(elapsed)
     end)
 
-    self.state_frame = CreateFrame('Frame')
-    self.state_frame:SetSize(50, 50)
-    self.state_frame:SetFrameStrata('tooltip')
-    self.state_frame:SetPoint('center', UIParent, 'center', 0, -160)
-    self.state_frame.texture = self.state_frame:CreateTexture(nil, 'tooltip')
-    self.state_frame.texture:SetAllPoints(self.state_frame)
-    self.state_frame.texture:SetTexture('Interface\\AddOns\\HelloWorld\\textures\\warning.tga')
-    self.state_frame:Hide()
+    self:create_timer(15, function()
+        print(123123123)
+    end, 'hide')
 end
 
 function HelloWorld:get_route()

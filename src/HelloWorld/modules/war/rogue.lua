@@ -1,5 +1,5 @@
 function HelloWorld.war.rogue:init()
-    self:stop()
+    -- self:stop()
 end
 
 function HelloWorld.war.rogue:update()
