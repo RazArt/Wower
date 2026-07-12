@@ -5,6 +5,7 @@ function HelloWorld.craft.auction:init()
     self.vars.item_num = 1
     self.vars.item_list = {
         {'Абсолютная пыль', 60000}, {'Ледяная ткань', 10000},
+        {'Осколок грез', 500000}, {'Кристалл пропасти', 500000},
         {'Рулон ледяной ткани', 50000}
     }
     self.vars.list_updated = false
@@ -75,10 +76,11 @@ function HelloWorld.craft.auction:step_4()
     if (self.vars.click_wait == true) then Keystroke:show(6, 0, 0, 0, 1) end
 
     if (self.vars.lot_index > 0) then
-        local _, _, count, _, _, _, _, _, buyoutPrice, _, _, owner, sold = GetAuctionItemInfo(
-                                                                               "list",
-                                                                               self.vars.lot_index)
-        if ((HelloWorld:get_player_name() ~= owner) and (GetMoney() > buyoutPrice) and
+        local name, _, count, _, _, _, _, _, buyoutPrice, _, _, owner, sold = GetAuctionItemInfo(
+                                                                                  "list", self.vars
+                                                                                      .lot_index)
+        if ((name == self.vars.item_list[self.vars.item_num][1]) and
+            (HelloWorld:get_player_name() ~= owner) and (GetMoney() > buyoutPrice) and
             (buyoutPrice > 0) and (sold == 0) and
             (buyoutPrice / count <= self.vars.item_list[self.vars.item_num][2])) then
             self.vars.buyout_price = buyoutPrice

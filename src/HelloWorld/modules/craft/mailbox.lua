@@ -55,6 +55,8 @@ function HelloWorld.craft.mailbox:step_2()
                 DeleteInboxItem(1)
                 return
             end
+        else
+            CheckInbox()
         end
     else
         self.parent:set_route('crafting', self)

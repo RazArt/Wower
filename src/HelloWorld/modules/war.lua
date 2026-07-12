@@ -56,8 +56,8 @@ function HelloWorld.war:get_power()
     return UnitPower('player')
 end
 
-function HelloWorld.war:get_combo_points()
-    return GetComboPoints('player', 'target')
+function HelloWorld.war:check_combo_points(count)
+    return (GetComboPoints('player', 'target') >= count)
 end
 
 function HelloWorld.war:get_spell_cooldown(spellname)

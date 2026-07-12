@@ -18,7 +18,7 @@ function HelloWorld.war.hunter:rotation_1()
         (self.parent:get_player_buff_time('Дух дракондора') == 0) and
         (self.parent:get_player_buff_time('Дух дикой природы') == 0) and
         (self.parent:can_cast('Дух дракондора'))) then
-        Keystroke:show(10, 0, 0, 0, 1)
+        Keystroke:show(10, false, false, true)
         return
     end
 
@@ -26,13 +26,13 @@ function HelloWorld.war.hunter:rotation_1()
         (self.parent:get_player_buff_time('Дух гадюки') == 0) and
         (self.parent:get_player_buff_time('Дух дикой природы') == 0) and
         (self.parent:can_cast('Дух гадюки'))) then
-        Keystroke:show(11, 0, 0, 0, 1)
+        Keystroke:show(11, false, false, true)
         return
     end
 
     if ((self.parent:get_player_buff_time('Аура меткого выстрела') == 0) and
         (self.parent:can_cast('Аура меткого выстрела'))) then
-        Keystroke:show(9, 0, 0, 0, 1)
+        Keystroke:show(9, false, false, true)
         return
     end
 
@@ -44,7 +44,7 @@ function HelloWorld.war.hunter:rotation_1()
 
     if ((self.parent:get_ememy_debuff_time('Метка охотника') == 0) and
         (self.parent:can_cast_on_enemy('Метка охотника')) and (IsShiftKeyDown() ~= 1)) then
-        Keystroke:show(8, 0, 0, 0, 1)
+        Keystroke:show(8, false, false, true)
         return
     end
 
@@ -77,13 +77,13 @@ function HelloWorld.war.hunter:rotation_1()
         return
     end
 
-    if (self.parent:can_cast_on_enemy('Чародейский выстрел')) then
-        Keystroke:show(8)
-        return
-    end
+    -- if (self.parent:can_cast_on_enemy('Чародейский выстрел')) then
+    --     Keystroke:show(8)
+    --     return
+    -- end
 
     if (self.parent:can_cast_on_point('Бросок ловушки: взрывная ловушка')) then
-        Keystroke:show(9, 1)
+        Keystroke:show(9, true)
         return
     end
 
@@ -104,7 +104,7 @@ function HelloWorld.war.hunter:rotation_2()
         (self.parent:get_player_buff_time('Дух дракондора') == 0) and
         (self.parent:get_player_buff_time('Дух дикой природы') == 0) and
         (self.parent:can_cast('Дух дракондора'))) then
-        Keystroke:show(10, 0, 0, 0, 1)
+        Keystroke:show(10, false, false, true)
         return
     end
 
@@ -112,13 +112,13 @@ function HelloWorld.war.hunter:rotation_2()
         (self.parent:get_player_buff_time('Дух гадюки') == 0) and
         (self.parent:get_player_buff_time('Дух дикой природы') == 0) and
         (self.parent:can_cast('Дух гадюки'))) then
-        Keystroke:show(11, 0, 0, 0, 1)
+        Keystroke:show(11, false, false, true)
         return
     end
 
     if ((self.parent:get_player_buff_time('Аура меткого выстрела') == 0) and
         (self.parent:can_cast('Аура меткого выстрела'))) then
-        Keystroke:show(9, 0, 0, 0, 1)
+        Keystroke:show(9, false, false, true)
         return
     end
 
@@ -129,12 +129,12 @@ function HelloWorld.war.hunter:rotation_2()
     end
 
     if (self.parent:can_cast_on_point('Бросок ловушки: взрывная ловушка')) then
-        Keystroke:show(9, 1)
+        Keystroke:show(9, true)
         return
     end
 
     if (self.parent:can_cast_on_point('Град стрел')) then
-        Keystroke:show(33, 1)
+        Keystroke:show(33, true)
         return
     end
 end

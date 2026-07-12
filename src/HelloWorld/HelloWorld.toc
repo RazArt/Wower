@@ -8,6 +8,14 @@ modules\craft.lua
 modules\keystroke.lua
 modules\war\hunter.lua
 modules\war\rogue.lua
+modules\war\druid.lua
+modules\war\warrior.lua
+modules\war\paladin.lua
+modules\war\priest.lua
+modules\war\deathknight.lua
+modules\war\shaman.lua
+modules\war\mage.lua
+modules\war\warlock.lua
 modules\craft\auction.lua
 modules\craft\crafting.lua
 modules\craft\mailbox.lua

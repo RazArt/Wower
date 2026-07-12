@@ -18,19 +18,21 @@ function Keystroke:init(name, parent)
     self.base_frame:Hide()
 end
 
-function Keystroke:show(key, click, shift, ctrl, alt)
-    key = key or 0
-    click = click or 0
-    shift = shift or 0
-    ctrl = ctrl or 0
-    alt = alt or 0
+function Keystroke:show(key, click, ctrl, alt, shift)
+    key = key or false
+    click = click or false
+    ctrl = ctrl or false
+    alt = alt or false
+    shift = shift or false
 
-    if (key <= 255) then
-        self.base_frame.frames[1].texture:SetTexture(key / 255, 0, click / 255)
-    else
-        self.base_frame.frames[1].texture:SetTexture(255, (key - 255) / 255, click / 255)
+    if (key ~= falae) and (key <= 255) then
+        self.base_frame.frames[1].texture:SetTexture(key / 255, 0, (click and 1 or 0) / 255)
+    elseif (key ~= falae) and (key > 255) then
+        self.base_frame.frames[1].texture:SetTexture(255, (key - 255) / 255,
+                                                     (click and 1 or 0) / 255)
     end
-    self.base_frame.frames[2].texture:SetTexture(shift / 255, ctrl / 255, alt / 255)
+    self.base_frame.frames[2].texture:SetTexture((ctrl and 1 or 0) / 255, (alt and 1 or 0) / 255,
+                                                 (shift and 1 or 0) / 255)
     self.base_frame:Show()
 
     self:create_timer(0.05, function()

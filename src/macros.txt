@@ -3,3 +3,6 @@
 
 /run HelloWorld.war.rogue:set_route('rotation_1')
 /run HelloWorld.war.rogue:toggle()
+
+/run HelloWorld.war.druid:set_route('rotation_1')
+/run HelloWorld.war.druid:toggle()

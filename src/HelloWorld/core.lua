@@ -4,9 +4,11 @@ function Module(name, parent) -- Module class
     if (parent ~= nil) then
         obj.name = parent.name .. '/' .. name or name
         obj.parent = parent
+        obj.root = obj.parent.root
     else
         obj.name = name
         obj.parent = obj
+        obj.root = obj
     end
     obj._event_frame = CreateFrame('Frame')
     obj._event_frame._parent = obj
@@ -117,15 +119,17 @@ function Module(name, parent) -- Module class
     function obj:start()
         self:print('start')
         self._runing = true
+        HelloWorld.state_frame:Show()
     end
 
     function obj:stop()
         self:print('stop')
         self._runing = false
+        HelloWorld.state_frame:Hide()
     end
 
     function obj:print(...)
-        if (obj._debug) then print(self.name, '->', ...) end
+        -- if (obj._debug) then print(self.name, '->', ...) end
     end
 
     setmetatable(obj, {

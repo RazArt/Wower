@@ -24,20 +24,19 @@ while True:
 
                 if (key_code != 0):
                     if (key_modifiers[0] == 1):
-                        keyboard.press(42)
-                    if (key_modifiers[1] == 1):
                         keyboard.press(29)
-                    if (key_modifiers[2] == 1):
+                    if (key_modifiers[1] == 1):
                         keyboard.press(56)
+                    if (key_modifiers[2] == 1):
+                        keyboard.press(42)
 
                     keyboard.send(key_code)
-
                     if (key_modifiers[0] == 1):
-                        keyboard.release(42)
-                    if (key_modifiers[1] == 1):
                         keyboard.release(29)
-                    if (key_modifiers[2] == 1):
+                    if (key_modifiers[1] == 1):
                         keyboard.release(56)
+                    if (key_modifiers[2] == 1):
+                        keyboard.release(42)
 
                 if (image.getpixel((1, 0))[2] == 1):
                     mouse.click()

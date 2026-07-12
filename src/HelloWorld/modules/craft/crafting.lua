@@ -42,7 +42,7 @@ function HelloWorld.craft.crafting:step_2()
 end
 
 function HelloWorld.craft.crafting:step_3()
-    if (self.parent:get_bag_free_slots() <= 2) then self:set_route('') end
+    if (self.parent:get_bag_free_slots() <= 2) then self:stop() end
 
     if (GetItemCount(33470) > 4) then
         if (self:can_cast()) then Keystroke:show(5, 0, 0, 0, 1) end
