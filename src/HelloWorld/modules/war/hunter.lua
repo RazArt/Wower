@@ -1,10 +1,5 @@
 function HelloWorld.war.hunter:init()
     self.vars.mana_regeneration = false
-    self:stop()
-end
-
-function HelloWorld.war.hunter:update()
-    self.parent:general_update()
 end
 
 function HelloWorld.war.hunter:rotation_1()
@@ -67,6 +62,11 @@ function HelloWorld.war.hunter:rotation_1()
         return
     end
 
+    if (self.parent:can_cast_on_point('Бросок ловушки: взрывная ловушка')) then
+        Keystroke:show(9, true)
+        return
+    end
+
     if (self.parent:can_cast_on_enemy('Выстрел химеры')) then
         Keystroke:show(6)
         return
@@ -81,11 +81,6 @@ function HelloWorld.war.hunter:rotation_1()
     --     Keystroke:show(8)
     --     return
     -- end
-
-    if (self.parent:can_cast_on_point('Бросок ловушки: взрывная ловушка')) then
-        Keystroke:show(9, true)
-        return
-    end
 
     if (self.parent:can_cast_on_enemy('Верный выстрел')) then
         Keystroke:show(10)

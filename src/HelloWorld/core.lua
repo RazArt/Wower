@@ -22,7 +22,7 @@ function Module(name, parent) -- Module class
         obj._runing = false
         obj._cooldown = false
         obj._timers = {}
-        obj._debug = true
+        obj._debug = false
     end
 
     obj._event_frame = CreateFrame('Frame')
@@ -86,17 +86,19 @@ function Module(name, parent) -- Module class
     function obj:set_route(route, caller)
         caller = caller or self
         if (route == '') then
-            -- Подумать над возвращением на шаги и init()
             self:print('set_route < \'\' >')
             self._route = route
             caller:_uninit()
         elseif ((self._route ~= route) and (rawget(self, route) ~= nil)) then
             self:print('set_route <', route, '>')
-            self._route = route
-            if (type(rawget(self, self._route)) == 'table') then
+            if (type(rawget(self, route)) == 'table') then
                 caller:_uninit()
-                self[self._route]:_init()
+                self[route]:_init()
             end
+            if ((type(rawget(self, route)) == 'function') and (route == '')) then
+                self:_init()
+            end
+            self._route = route
         end
     end
 

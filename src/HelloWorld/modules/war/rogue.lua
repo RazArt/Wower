@@ -1,24 +1,16 @@
-function HelloWorld.war.rogue:init()
-    -- self:stop()
-end
-
-function HelloWorld.war.rogue:update()
-    self.parent:general_update()
-end
-
 function HelloWorld.war.rogue:rotation_1()
     if (self.parent:is_enemy_cast() and self.parent:can_cast_on_enemy('Пинок')) then
         Keystroke:show(2)
         return
     end
 
-    if ((self.parent:get_ememy_debuff_time('Ослабление доспеха', true) == 0) and
+    if ((self.parent:get_ememy_debuff_time('Ослабление доспеха') == 0) and
         (self.parent:can_cast_on_enemy('Ослабление доспеха'))) then
         Keystroke:show(3)
         return
     end
 
-    if ((self.parent:get_ememy_debuff_time('Ослабление доспеха', true) <= 3) and
+    if ((self.parent:get_ememy_debuff_time('Ослабление доспеха') <= 3) and
         (self.parent:can_cast_on_enemy('Ослабление доспеха')) and
         (self.parent:check_combo_points(4))) then
         Keystroke:show(3)

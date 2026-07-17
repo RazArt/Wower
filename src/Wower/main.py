@@ -39,7 +39,8 @@ while True:
                         keyboard.release(42)
 
                 if (image.getpixel((1, 0))[2] == 1):
+                    sleep(0.1)
                     mouse.click()
         except:
             pass
-    sleep(0.1)
+    sleep(0.05)

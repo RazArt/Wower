@@ -74,7 +74,7 @@ function HelloWorld.war:can_cast(spellname)
     if (not (select(1, IsUsableSpell(spellname)))) then return false end
     if (UnitCastingInfo('player')) then return false end
     if (UnitChannelInfo('player')) then return false end
-    if (self:get_spell_cooldown(spellname) > 0) then return false end
+    if (self:get_spell_cooldown(spellname) > 0.3) then return false end
     return true
 end
 
@@ -94,18 +94,62 @@ end
 
 function HelloWorld.war:get_ememy_debuff_time(spellname, player)
     player = player or false
-    local _, _, _, _, _, _, expirationTime, unitCaster = UnitDebuff('target', spellname)
-    if ((player) and (unitCaster ~= 'player')) then return 0 end
-    if (expirationTime == nil) then return 0 end
-    return expirationTime - GetTime()
+    for i = 1, 40 do
+        local name, _, _, _, _, _, expirationTime, unitCaster = UnitDebuff('target', i)
+        if (name == spellname) then
+            if (((player) and (unitCaster == 'player')) or (not player)) then
+                if (expirationTime == 0) then return 99999 end
+                if (expirationTime == nil) then return 0 end
+                return expirationTime - GetTime()
+            end
+        end
+    end
+
+    return 0
 end
 
-function HelloWorld.war:get_player_buff_time(spellname)
+function HelloWorld.war:get_ememy_debuff_count(spellname, player)
     player = player or false
-    local _, _, _, _, _, _, expirationTime, unitCaster = UnitBuff('player', spellname)
-    if ((player) and (unitCaster ~= 'player')) then return 0 end
-    if (expirationTime == nil) then return 0 end
-    return expirationTime - GetTime()
+    for i = 1, 40 do
+        local name, _, _, count, _, _, _, unitCaster = UnitDebuff('target', i)
+        if (name == spellname) then
+            if (((player) and (unitCaster == 'player')) or (not player)) then
+                return count
+            end
+        end
+    end
+
+    return 0
+end
+
+function HelloWorld.war:get_player_buff_time(spellname, player)
+    player = player or false
+    for i = 1, 40 do
+        local name, _, _, _, _, _, expirationTime, unitCaster = UnitBuff('player', i)
+        if (name == spellname) then
+            if (((player) and (unitCaster == 'player')) or (not player)) then
+                if (expirationTime == 0) then return 99999 end
+                if (expirationTime == nil) then return 0 end
+                return expirationTime - GetTime()
+            end
+        end
+    end
+
+    return 0
+end
+
+function HelloWorld.war:get_player_buff_count(spellname, player)
+    player = player or false
+    for i = 1, 40 do
+        local name, _, _, count, _, _, _, unitCaster = UnitBuff('player', i)
+        if (name == spellname) then
+            if (((player) and (unitCaster == 'player')) or (not player)) then
+                return count
+            end
+        end
+    end
+
+    return 0
 end
 
 function HelloWorld.war:is_enemy_cast()

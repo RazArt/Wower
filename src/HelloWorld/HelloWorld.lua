@@ -1,3 +1,7 @@
+function tester(item)
+    print(tester.name)
+end
+
 HelloWorld:register_event('PLAYER_LOGIN')
 function HelloWorld:PLAYER_LOGIN()
     HelloWorld()
@@ -10,9 +14,6 @@ function HelloWorld:PLAYER_LOGIN()
         Keystroke:_update(elapsed)
     end)
 
-    self:create_timer(15, function()
-        print(123123123)
-    end, 'hide')
 end
 
 function HelloWorld:get_route()
