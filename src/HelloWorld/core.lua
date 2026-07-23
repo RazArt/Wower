@@ -22,7 +22,7 @@ function Module(name, parent) -- Module class
         obj._runing = false
         obj._cooldown = false
         obj._timers = {}
-        obj._debug = false
+        obj._debug = true
     end
 
     obj._event_frame = CreateFrame('Frame')
@@ -130,6 +130,18 @@ function Module(name, parent) -- Module class
             self:print('cooldown < off >')
             self.root._cooldown = false
         end, 'cooldown')
+    end
+
+    function obj:var_toggle(var)
+        if (rawget(self.vars, var) ~= nil) then
+            if (self.vars[var]) then
+                self:print('var_toggle <', var, '>', false)
+                self.vars[var] = false
+            else
+                self:print('var_toggle <', var, '>', true)
+                self.vars[var] = true
+            end
+        end
     end
 
     function obj:toggle()

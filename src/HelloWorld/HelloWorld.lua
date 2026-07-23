@@ -17,13 +17,13 @@ function HelloWorld:PLAYER_LOGIN()
 end
 
 function HelloWorld:get_route()
-    -- if (self:get_player_name() == 'Колотая') then
-    --     self:set_route('craft')
-    --     self.craft:stop()
-    -- else
-    --     self:set_route('war')
-    -- end
-    self:set_route('war')
+    if (self:get_player_name() == 'Колотая') then
+        self:set_route('craft')
+        self.craft:stop()
+    else
+        self:set_route('war')
+    end
+    -- self:set_route('war')
 end
 
 function HelloWorld:get_player_name()

@@ -19,28 +19,30 @@ while True:
         try:
             image = ImageGrab.grab()
             if (image.getpixel((0, 0)) == (31, 11, 12)):
-                key_code = image.getpixel((1, 0))[0] + image.getpixel((1, 0))[1]
-                key_modifiers = image.getpixel((2, 0))
+                for i in range(1, 2, 2):
+                    key_code = image.getpixel((i, 0))[0] + image.getpixel((i, 0))[1]
+                    key_modifiers = image.getpixel((i + 1, 0))
+                    # print(f'{i=} {key_code=}')
+                    if (key_code != 0):
+                        if (key_modifiers[0] == 1):
+                            keyboard.press(29)
+                        if (key_modifiers[1] == 1):
+                            keyboard.press(56)
+                        if (key_modifiers[2] == 1):
+                            keyboard.press(42)
 
-                if (key_code != 0):
-                    if (key_modifiers[0] == 1):
-                        keyboard.press(29)
-                    if (key_modifiers[1] == 1):
-                        keyboard.press(56)
-                    if (key_modifiers[2] == 1):
-                        keyboard.press(42)
+                        keyboard.send(key_code)
 
-                    keyboard.send(key_code)
-                    if (key_modifiers[0] == 1):
-                        keyboard.release(29)
-                    if (key_modifiers[1] == 1):
-                        keyboard.release(56)
-                    if (key_modifiers[2] == 1):
-                        keyboard.release(42)
+                        if (key_modifiers[0] == 1):
+                            keyboard.release(29)
+                        if (key_modifiers[1] == 1):
+                            keyboard.release(56)
+                        if (key_modifiers[2] == 1):
+                            keyboard.release(42)
 
-                if (image.getpixel((1, 0))[2] == 1):
-                    sleep(0.1)
-                    mouse.click()
+                    if (image.getpixel((i, 0))[2] == 1):
+                        sleep(0.1)
+                        mouse.click()
         except:
             pass
     sleep(0.05)

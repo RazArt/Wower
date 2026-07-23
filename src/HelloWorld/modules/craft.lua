@@ -1,5 +1,6 @@
 function HelloWorld.craft:init()
     self:set_route('crafting')
+    -- self:set_route('auction')
 end
 
 function HelloWorld.craft:get_bag_free_slots()

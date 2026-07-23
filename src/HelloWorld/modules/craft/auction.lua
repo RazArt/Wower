@@ -19,7 +19,7 @@ function HelloWorld.craft.auction:init()
 end
 
 function HelloWorld.craft.auction:step_1()
-    if (self.vars.open == false) then Keystroke:show(13, 0, 0, 0, 1) end
+    if (self.vars.open == false) then Keystroke:show(13, false, false, true) end
 end
 
 function HelloWorld.craft.auction:open_click()
@@ -73,7 +73,7 @@ end
 
 function HelloWorld.craft.auction:step_4()
     if (not self.vars.open) then self:set_route('step_1') end
-    if (self.vars.click_wait == true) then Keystroke:show(6, 0, 0, 0, 1) end
+    if (self.vars.click_wait == true) then Keystroke:show(6, false, false, true) end
 
     if (self.vars.lot_index > 0) then
         local name, _, count, _, _, _, _, _, buyoutPrice, _, _, owner, sold = GetAuctionItemInfo(
@@ -102,7 +102,7 @@ function HelloWorld.craft.auction:buy_click()
     self.vars.click_wait = false
     PlaceAuctionBid("list", self.vars.lot_index, self.vars.buyout_price)
     self.vars.lot_index = self.vars.lot_index - 1
-    self:add_cooldown(2)
+    self:add_cooldown(1)
 end
 
 function HelloWorld.craft.auction:AUCTION_HOUSE_CLOSED()

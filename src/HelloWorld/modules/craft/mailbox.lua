@@ -9,7 +9,7 @@ end
 
 function HelloWorld.craft.mailbox:step_1()
     if (self.vars.open == false) then
-        Keystroke:show(12, 0, 0, 0, 1)
+        Keystroke:show(12, false, false, true)
     else
         self:set_route('step_2')
     end

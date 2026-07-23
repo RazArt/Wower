@@ -15,14 +15,14 @@ end
 
 function HelloWorld.craft.crafting:update()
     if ((GetItemCount(34056) > 2) and (self:can_cast())) then
-        Keystroke:show(2, 0, 0, 0, 1)
+        Keystroke:show(2, false, false, true)
         self:add_cooldown(0.2)
     end
 end
 
 function HelloWorld.craft.crafting:step_1()
     if (GetItemCount(41512) > 0) then
-        if (self:can_cast()) then Keystroke:show(3, 0, 0, 0, 1) end
+        if (self:can_cast()) then Keystroke:show(3, false, false, true) end
     else
         self:set_route('step_2')
     end
@@ -31,7 +31,7 @@ end
 function HelloWorld.craft.crafting:step_2()
     if ((GetItemCount(41510) > 2) and (GetItemCount(38426) > 0) and
         (self.parent:get_bag_free_slots() > 1)) then
-        if (self:can_cast()) then Keystroke:show(4, 0, 0, 0, 1) end
+        if (self:can_cast()) then Keystroke:show(4, false, false, true) end
     else
         if (GetItemCount(41512) > 0) then
             self:set_route('step_1')
@@ -45,7 +45,7 @@ function HelloWorld.craft.crafting:step_3()
     if (self.parent:get_bag_free_slots() <= 2) then self:stop() end
 
     if (GetItemCount(33470) > 4) then
-        if (self:can_cast()) then Keystroke:show(5, 0, 0, 0, 1) end
+        if (self:can_cast()) then Keystroke:show(5, false, false, true) end
     else
         if (GetItemCount(41510) > 2 and (GetItemCount(38426) > 0)) then
             self:set_route('step_2')
