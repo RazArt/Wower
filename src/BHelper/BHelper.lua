@@ -1,6 +1,6 @@
-HelloWorld:register_event('PLAYER_LOGIN')
-function HelloWorld:PLAYER_LOGIN()
-    HelloWorld()
+BHelper:register_event('PLAYER_LOGIN')
+function BHelper:PLAYER_LOGIN()
+    BHelper()
     Keystroke()
 
     self.player.name = self:get_player_name()
@@ -16,17 +16,17 @@ function HelloWorld:PLAYER_LOGIN()
     self.state_frame:SetPoint('center', UIParent, 'center', 0, -160)
     self.state_frame.texture = self.state_frame:CreateTexture(nil, 'tooltip')
     self.state_frame.texture:SetAllPoints(self.state_frame)
-    self.state_frame.texture:SetTexture('Interface\\AddOns\\HelloWorld\\textures\\warning.tga')
+    self.state_frame.texture:SetTexture('Interface\\AddOns\\BHelper\\textures\\warning.tga')
     self.state_frame:Hide()
 
     CreateFrame('Frame'):SetScript('OnUpdate', function(self, elapsed)
-        HelloWorld:_update(elapsed)
+        BHelper:_update(elapsed)
         Keystroke:_update(elapsed)
     end)
 
 end
 
-function HelloWorld:get_route()
+function BHelper:get_route()
     if (self.player.name == 'Колотая') then
         self:set_route('craft')
         self.craft:stop()
@@ -36,11 +36,11 @@ function HelloWorld:get_route()
     -- self:set_route('war')
 end
 
-function HelloWorld:get_player_name()
+function BHelper:get_player_name()
     return (select(1, UnitName('player')))
 end
 
-function HelloWorld:get_player_class()
+function BHelper:get_player_class()
     local classes = {
         warrior = '1',
         paladin = '2',
@@ -56,10 +56,30 @@ function HelloWorld:get_player_class()
     return (select(2, UnitClass('player'))):lower()
 end
 
-function HelloWorld:get_player_spec()
+function BHelper:get_player_spec()
     return GetSpecialization('player')
 end
 
-function HelloWorld:get_player_level()
+function BHelper:get_player_level()
     return UnitLevel('player')
 end
+
+local function commands(msg, editbox)
+    msg = msg .. '\n'
+    local args = {}
+
+    for arg in string.gmatch(msg, '([^%s]+)') do table.insert(args, arg) end
+
+    if ((args[1] == 'toggle') or (#args == 0)) then
+        BHelper:toggle()
+    elseif (args[1] == 'start') then
+        BHelper:start()
+    elseif (args[1] == 'stop') then
+        BHelper:stop()
+    else
+        BHelper:print('Неизвестная команда')
+    end
+end
+
+SLASH_BHELPER1, SLASH_BHELPER2 = '/bhelper', '/bh'
+SlashCmdList["BHELPER"] = commands

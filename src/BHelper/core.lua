@@ -176,6 +176,6 @@ function Module(name, parent) -- Module class
     return obj
 end
 
-HelloWorld = Module('HelloWorld')
+BHelper = Module('BHelper')
 Keystroke = Module('Keystroke')
 

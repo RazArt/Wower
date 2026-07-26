@@ -1,4 +1,4 @@
-function HelloWorld.craft.auction:init()
+function BHelper.craft.auction:init()
     self.vars.open = false
     self.vars.page = 0
     self.vars.change_page = true
@@ -18,23 +18,23 @@ function HelloWorld.craft.auction:init()
     self:set_route('step_1')
 end
 
-function HelloWorld.craft.auction:step_1()
+function BHelper.craft.auction:step_1()
     if (self.vars.open == false) then Keystroke:show_spell(13, false, false, true) end
 end
 
-function HelloWorld.craft.auction:open_click()
+function BHelper.craft.auction:open_click()
     if (self.vars.open == true) then return end
     self.vars.open = true
     SendChatMessage('.i au', 'SAY')
 end
 
-function HelloWorld.craft.auction:AUCTION_HOUSE_show_spell()
+function BHelper.craft.auction:AUCTION_HOUSE_show_spell()
     SortAuctionItems("list", "bid")
     self:set_route('step_2')
     self:add_cooldown(2)
 end
 
-function HelloWorld.craft.auction:step_2()
+function BHelper.craft.auction:step_2()
     if (not self.vars.open) then self:set_route('step_1') end
 
     if ((select(1, CanSendAuctionQuery())) == 1) then
@@ -45,11 +45,11 @@ function HelloWorld.craft.auction:step_2()
     end
 end
 
-function HelloWorld.craft.auction:AUCTION_ITEM_LIST_UPDATE()
+function BHelper.craft.auction:AUCTION_ITEM_LIST_UPDATE()
     if (self._route == 'step_3') then self.vars.list_updated = true end
 end
 
-function HelloWorld.craft.auction:step_3()
+function BHelper.craft.auction:step_3()
     if (not self.vars.open) then self:set_route('step_1') end
 
     if (self.vars.list_updated == true) then
@@ -71,7 +71,7 @@ function HelloWorld.craft.auction:step_3()
     end
 end
 
-function HelloWorld.craft.auction:step_4()
+function BHelper.craft.auction:step_4()
     if (not self.vars.open) then self:set_route('step_1') end
     if (self.vars.click_wait == true) then Keystroke:show_spell(6, false, false, true) end
 
@@ -80,7 +80,7 @@ function HelloWorld.craft.auction:step_4()
                                                                                   "list", self.vars
                                                                                       .lot_index)
         if ((name == self.vars.item_list[self.vars.item_num][1]) and
-            (HelloWorld:get_player_name() ~= owner) and (GetMoney() > buyoutPrice) and
+            (BHelper:get_player_name() ~= owner) and (GetMoney() > buyoutPrice) and
             (buyoutPrice > 0) and (sold == 0) and
             (buyoutPrice / count <= self.vars.item_list[self.vars.item_num][2])) then
             self.vars.buyout_price = buyoutPrice
@@ -96,7 +96,7 @@ function HelloWorld.craft.auction:step_4()
     end
 end
 
-function HelloWorld.craft.auction:buy_click()
+function BHelper.craft.auction:buy_click()
     if (self.vars.click_wait == false) then return end
 
     self.vars.click_wait = false
@@ -105,6 +105,6 @@ function HelloWorld.craft.auction:buy_click()
     self:add_cooldown(1)
 end
 
-function HelloWorld.craft.auction:AUCTION_HOUSE_CLOSED()
+function BHelper.craft.auction:AUCTION_HOUSE_CLOSED()
     self.vars.open = false
 end

@@ -1,6 +1,6 @@
 ## Interface: 30300
-## Title: Hello, World!
-## Notes: Test AddOn
+## Title: BHelper
+## Notes: BHelper
 
 core.lua
 modules\war.lua
@@ -19,4 +19,4 @@ modules\war\warlock.lua
 modules\craft\auction.lua
 modules\craft\crafting.lua
 modules\craft\mailbox.lua
-HelloWorld.lua
+BHelper.lua

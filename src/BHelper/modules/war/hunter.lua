@@ -1,10 +1,10 @@
-function HelloWorld.war.hunter:init()
+function BHelper.war.hunter:init()
     self.vars.mana_regeneration = false
     self.vars.mark = false
     self.vars.acrane_shot = false
 end
 
-function HelloWorld.war.hunter:rotation_1()
+function BHelper.war.hunter:rotation_1()
     if ((self.parent:get_mana_on_percent('player') < 20) and (not self.vars.mana_regeneration)) then
         self.vars.mana_regeneration = true
     elseif ((self.parent:get_mana_on_percent('player') > 60) and (self.vars.mana_regeneration)) then
@@ -91,7 +91,7 @@ function HelloWorld.war.hunter:rotation_1()
     end
 end
 
-function HelloWorld.war.hunter:rotation_2()
+function BHelper.war.hunter:rotation_2()
     if ((self.parent:get_mana_on_percent('player') < 20) and (not self.vars.mana_regeneration)) then
         self.vars.mana_regeneration = true
     elseif ((self.parent:get_mana_on_percent('player') > 60) and (self.vars.mana_regeneration)) then

@@ -1,4 +1,4 @@
-function HelloWorld.war.druid:rotation_1()
+function BHelper.war.druid:rotation_1()
     if (InCombatLockdown() ~= 1) then return end
 
     if (self.parent:get_player_buff_time('Облик кошки') > 0) then
@@ -116,7 +116,7 @@ function HelloWorld.war.druid:rotation_1()
     end
 end
 
-function HelloWorld.war.druid:rotation_2()
+function BHelper.war.druid:rotation_2()
     if (InCombatLockdown() ~= 1) then return end
 
     if (self.parent:get_player_buff_time('Облик кошки') > 0) then

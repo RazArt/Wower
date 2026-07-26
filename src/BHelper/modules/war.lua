@@ -1,8 +1,8 @@
-function HelloWorld.war:init()
+function BHelper.war:init()
     self:set_route(self.root:get_player_class())
 end
 
-function HelloWorld.war:general_update()
+function BHelper.war:general_update()
     if (not UnitExists('target')) then Keystroke:show(0, 1) end
 
     if ((self:get_health_on_percent() < 10) and (GetItemCount(33447) > 0) and
@@ -12,42 +12,42 @@ function HelloWorld.war:general_update()
         ((select(1, GetItemCooldown(33448))) == 0)) then Keystroke:show(9, 0, 0, 1, 0) end
 end
 
-function HelloWorld.war:get_health_on_percent()
+function BHelper.war:get_health_on_percent()
     return UnitHealth('player') / UnitHealthMax('player') * 100
 end
 
-function HelloWorld.war:get_mana_on_percent()
+function BHelper.war:get_mana_on_percent()
     return UnitMana('player') / UnitManaMax('player') * 100
 end
 
-function HelloWorld.war:get_health()
+function BHelper.war:get_health()
     return UnitHealth('player')
 end
 
-function HelloWorld.war:get_mana()
+function BHelper.war:get_mana()
     return UnitMana('player')
 end
 
-function HelloWorld.war:get_power()
+function BHelper.war:get_power()
     return UnitPower('player')
 end
 
-function HelloWorld.war:check_combo_points(count)
+function BHelper.war:check_combo_points(count)
     return (GetComboPoints('player', 'target') >= count)
 end
 
-function HelloWorld.war:get_spell_cooldown(spellname)
+function BHelper.war:get_spell_cooldown(spellname)
     local start, duration, _ = GetSpellCooldown(spellname)
     local cd_time = start + duration - GetTime() - 0.2
     return (cd_time < 0) and 0 or cd_time
 end
 
-function HelloWorld.war:is_spell_cooldown(spellname)
+function BHelper.war:is_spell_cooldown(spellname)
     local start, duration, _ = GetSpellCooldown(spellname)
     return (start + duration - GetTime() - 0.2 > 0) and true or false
 end
 
-function HelloWorld.war:is_player_cast()
+function BHelper.war:is_player_cast()
     local _, _, _, _, _, endTime = UnitCastingInfo('player')
     if (endTime ~= nil) then return (endTime / 1000 - GetTime() - 0.2 > 0) and true or false end
 
@@ -57,19 +57,19 @@ function HelloWorld.war:is_player_cast()
     return false
 end
 
-function HelloWorld.war:is_enemy_cast()
+function BHelper.war:is_enemy_cast()
     if (UnitCastingInfo('target')) then return true end
     if (UnitChannelInfo('target')) then return true end
 end
 
-function HelloWorld.war:can_cast(spellname)
+function BHelper.war:can_cast(spellname)
     if (not (select(1, IsUsableSpell(spellname)))) then return false end
     if (self:is_player_cast()) then return false end
     if (self:is_spell_cooldown(spellname)) then return false end
     return true
 end
 
-function HelloWorld.war:can_cast_on_enemy(spellname)
+function BHelper.war:can_cast_on_enemy(spellname)
     if (not self:can_cast(spellname)) then return false end
     if (UnitIsDeadOrGhost('target')) then return false end
     if (UnitCanAttack('player', 'target') ~= 1) then return false end
@@ -77,13 +77,13 @@ function HelloWorld.war:can_cast_on_enemy(spellname)
     return true
 end
 
-function HelloWorld.war:can_cast_on_point(spellname)
+function BHelper.war:can_cast_on_point(spellname)
     if (not self:can_cast(spellname)) then return false end
     if (UnitExists('mouseover') ~= 1) then return false end
     return true
 end
 
-function HelloWorld.war:get_ememy_debuff_time(spell, player)
+function BHelper.war:get_ememy_debuff_time(spell, player)
     player = player or false
     for i = 1, 40 do
         local name, _, _, _, _, _, expirationTime, unitCaster, _, _, spellId = UnitDebuff('target',
@@ -101,7 +101,7 @@ function HelloWorld.war:get_ememy_debuff_time(spell, player)
     return 0
 end
 
-function HelloWorld.war:get_ememy_debuff_count(spell, player)
+function BHelper.war:get_ememy_debuff_count(spell, player)
     player = player or false
     for i = 1, 40 do
         local name, _, _, count, _, _, _, unitCaster, _, _, spellId = UnitDebuff('target', i)
@@ -116,7 +116,7 @@ function HelloWorld.war:get_ememy_debuff_count(spell, player)
     return 0
 end
 
-function HelloWorld.war:get_player_buff_time(spell, player)
+function BHelper.war:get_player_buff_time(spell, player)
     player = player or false
     for i = 1, 40 do
         local name, _, _, _, _, _, expirationTime, unitCaster, _, _, spellId = UnitBuff('player', i)
@@ -133,7 +133,7 @@ function HelloWorld.war:get_player_buff_time(spell, player)
     return 0
 end
 
-function HelloWorld.war:get_player_buff_count(spell, player)
+function BHelper.war:get_player_buff_count(spell, player)
     player = player or false
     for i = 1, 40 do
         local name, _, _, count, _, _, _, unitCaster, _, _, spellId = UnitBuff('player', i)

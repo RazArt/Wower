@@ -1,9 +1,9 @@
-function HelloWorld.war.deathknight:heal()
+function BHelper.war.deathknight:heal()
     if ((self.parent:get_health_on_percent() < 30) and
         self.parent:can_cast('Кровь вампира')) then Keystroke:show_spell(61) end
 end
 
-function HelloWorld.war.deathknight:rotation_1()
+function BHelper.war.deathknight:rotation_1()
     self:heal()
 
     if ((self.parent:get_player_buff_time('Зимний горн') == 0) and
@@ -47,7 +47,7 @@ function HelloWorld.war.deathknight:rotation_1()
     end
 end
 
-function HelloWorld.war.deathknight:rotation_2()
+function BHelper.war.deathknight:rotation_2()
     self:heal()
 
     if ((self.parent:get_player_buff_time('Зимний горн') == 0) and

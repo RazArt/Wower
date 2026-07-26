@@ -1,4 +1,4 @@
-function HelloWorld.war.warrior:init()
+function BHelper.war.warrior:init()
     self.vars.attack_type = 1
     self.vars.battle_shout = false
     self.vars.commanding_shout = false
@@ -7,7 +7,7 @@ function HelloWorld.war.warrior:init()
     self:set_route('rotation_1')
 end
 
-function HelloWorld.war.warrior:rotation_1()
+function BHelper.war.warrior:rotation_1()
     if (InCombatLockdown() ~= 1) then return end
 
     if (self.vars.attack_type == 1) then

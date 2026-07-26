@@ -1,4 +1,4 @@
-function HelloWorld.craft.mailbox:init()
+function BHelper.craft.mailbox:init()
     self.vars.open = false
 
     self:register_event('MAIL_CLOSED')
@@ -7,7 +7,7 @@ function HelloWorld.craft.mailbox:init()
     self:set_route('step_1')
 end
 
-function HelloWorld.craft.mailbox:step_1()
+function BHelper.craft.mailbox:step_1()
     if (self.vars.open == false) then
         Keystroke:show_spell(12, false, false, true)
     else
@@ -15,18 +15,18 @@ function HelloWorld.craft.mailbox:step_1()
     end
 end
 
-function HelloWorld.craft.mailbox:open_click()
+function BHelper.craft.mailbox:open_click()
     if (self.vars.open == true) then return end
     self.vars.open = true
     SendChatMessage('.i m', 'SAY')
     self:add_cooldown(15)
 end
 
-function HelloWorld.craft.mailbox:MAIL_INBOX_UPDATE()
+function BHelper.craft.mailbox:MAIL_INBOX_UPDATE()
     self:add_cooldown(0.5)
 end
 
-function HelloWorld.craft.mailbox:step_2()
+function BHelper.craft.mailbox:step_2()
     if (not self.vars.open) then self:set_route('step_1') end
 
     if ((select(2, GetInboxNumItems())) > 0) then
@@ -64,6 +64,6 @@ function HelloWorld.craft.mailbox:step_2()
     end
 end
 
-function HelloWorld.craft.mailbox:MAIL_CLOSED()
+function BHelper.craft.mailbox:MAIL_CLOSED()
     self.vars.open = false
 end
