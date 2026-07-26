@@ -1,5 +1,7 @@
 function HelloWorld.war.hunter:init()
     self.vars.mana_regeneration = false
+    self.vars.mark = false
+    self.vars.acrane_shot = false
 end
 
 function HelloWorld.war.hunter:rotation_1()
@@ -13,7 +15,7 @@ function HelloWorld.war.hunter:rotation_1()
         (self.parent:get_player_buff_time('Дух дракондора') == 0) and
         (self.parent:get_player_buff_time('Дух дикой природы') == 0) and
         (self.parent:can_cast('Дух дракондора'))) then
-        Keystroke:show(10, false, false, true)
+        Keystroke:show_spell(4, false, false, true)
         return
     end
 
@@ -21,69 +23,70 @@ function HelloWorld.war.hunter:rotation_1()
         (self.parent:get_player_buff_time('Дух гадюки') == 0) and
         (self.parent:get_player_buff_time('Дух дикой природы') == 0) and
         (self.parent:can_cast('Дух гадюки'))) then
-        Keystroke:show(11, false, false, true)
+        Keystroke:show_spell(5, false, false, true)
         return
     end
 
     if ((self.parent:get_player_buff_time('Аура меткого выстрела') == 0) and
         (self.parent:can_cast('Аура меткого выстрела'))) then
-        Keystroke:show(9, false, false, true)
+        Keystroke:show_spell(3, false, false, true)
         return
     end
 
     if (self.parent:is_enemy_cast() and
         self.parent:can_cast_on_enemy('Глушащий выстрел')) then
-        Keystroke:show(11)
+        Keystroke:show_spell(34)
         return
     end
 
     if ((self.parent:get_ememy_debuff_time('Метка охотника') == 0) and
-        (self.parent:can_cast_on_enemy('Метка охотника')) and (IsShiftKeyDown() ~= 1)) then
-        Keystroke:show(8, false, false, true)
+        (self.parent:can_cast_on_enemy('Метка охотника')) and self.vars.mark) then
+        Keystroke:show_spell(2, false, false, true)
         return
     end
 
     if ((self.vars.mana_regeneration == false) and
         (self.parent:get_ememy_debuff_time('Укус змеи', true) == 0) and
         (self.parent:can_cast_on_enemy('Укус змеи'))) then
-        Keystroke:show(3)
+        Keystroke:show_spell(2, false, false, false, true)
         return
     end
 
     if ((self.vars.mana_regeneration == true) and
         (self.parent:get_ememy_debuff_time('Укус гадюки', true) == 0) and
         (self.parent:can_cast_on_enemy('Укус гадюки'))) then
-        Keystroke:show(4)
+        Keystroke:show_spell(3, false, false, false, true)
         return
     end
 
     if (self.parent:can_cast_on_enemy('Убийственный выстрел')) then
-        Keystroke:show(5)
+        Keystroke:show_spell(3)
         return
     end
 
     if (self.parent:can_cast_on_point('Бросок ловушки: взрывная ловушка')) then
-        Keystroke:show(9, true)
+        Keystroke:show_spell(7, true)
         return
     end
 
     if (self.parent:can_cast_on_enemy('Выстрел химеры')) then
-        Keystroke:show(6)
+        Keystroke:show_spell(4)
         return
     end
 
     if (self.parent:can_cast_on_enemy('Прицельный выстрел')) then
-        Keystroke:show(7)
+        Keystroke:show_spell(6)
         return
     end
 
-    -- if (self.parent:can_cast_on_enemy('Чародейский выстрел')) then
-    --     Keystroke:show(8)
-    --     return
-    -- end
+    if (self.parent:can_cast_on_enemy('Чародейский выстрел') and
+        self.vars.acrane_shot) then
+        Keystroke:show_spell(8)
+        return
+    end
 
     if (self.parent:can_cast_on_enemy('Верный выстрел')) then
-        Keystroke:show(10)
+        Keystroke:show_spell(5)
         return
     end
 end
@@ -99,7 +102,7 @@ function HelloWorld.war.hunter:rotation_2()
         (self.parent:get_player_buff_time('Дух дракондора') == 0) and
         (self.parent:get_player_buff_time('Дух дикой природы') == 0) and
         (self.parent:can_cast('Дух дракондора'))) then
-        Keystroke:show(10, false, false, true)
+        Keystroke:show_spell(4, false, false, true)
         return
     end
 
@@ -107,29 +110,29 @@ function HelloWorld.war.hunter:rotation_2()
         (self.parent:get_player_buff_time('Дух гадюки') == 0) and
         (self.parent:get_player_buff_time('Дух дикой природы') == 0) and
         (self.parent:can_cast('Дух гадюки'))) then
-        Keystroke:show(11, false, false, true)
+        Keystroke:show_spell(5, false, false, true)
         return
     end
 
     if ((self.parent:get_player_buff_time('Аура меткого выстрела') == 0) and
         (self.parent:can_cast('Аура меткого выстрела'))) then
-        Keystroke:show(9, false, false, true)
+        Keystroke:show_spell(3, false, false, true)
         return
     end
 
     if (self.parent:is_enemy_cast() and
         self.parent:can_cast_on_enemy('Глушащий выстрел')) then
-        Keystroke:show(11)
+        Keystroke:show_spell(34)
         return
     end
 
     if (self.parent:can_cast_on_point('Бросок ловушки: взрывная ловушка')) then
-        Keystroke:show(9, true)
+        Keystroke:show_spell(7, true)
         return
     end
 
     if (self.parent:can_cast_on_point('Град стрел')) then
-        Keystroke:show(33, true)
+        Keystroke:show_spell(33, true)
         return
     end
 end

@@ -10,19 +10,11 @@ function Module(name, parent) -- Module class
         obj.parent = obj
         obj.root = obj
 
-        obj.state_frame = CreateFrame('Frame')
-        obj.state_frame:SetSize(50, 50)
-        obj.state_frame:SetFrameStrata('tooltip')
-        obj.state_frame:SetPoint('center', UIParent, 'center', 0, -160)
-        obj.state_frame.texture = obj.state_frame:CreateTexture(nil, 'tooltip')
-        obj.state_frame.texture:SetAllPoints(obj.state_frame)
-        obj.state_frame.texture:SetTexture('Interface\\AddOns\\HelloWorld\\textures\\warning.tga')
-        obj.state_frame:Hide()
-
         obj._runing = false
         obj._cooldown = false
         obj._timers = {}
         obj._debug = true
+        obj.player = {}
     end
 
     obj._event_frame = CreateFrame('Frame')

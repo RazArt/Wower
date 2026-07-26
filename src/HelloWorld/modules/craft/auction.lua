@@ -19,7 +19,7 @@ function HelloWorld.craft.auction:init()
 end
 
 function HelloWorld.craft.auction:step_1()
-    if (self.vars.open == false) then Keystroke:show(13, false, false, true) end
+    if (self.vars.open == false) then Keystroke:show_spell(13, false, false, true) end
 end
 
 function HelloWorld.craft.auction:open_click()
@@ -28,7 +28,7 @@ function HelloWorld.craft.auction:open_click()
     SendChatMessage('.i au', 'SAY')
 end
 
-function HelloWorld.craft.auction:AUCTION_HOUSE_SHOW()
+function HelloWorld.craft.auction:AUCTION_HOUSE_show_spell()
     SortAuctionItems("list", "bid")
     self:set_route('step_2')
     self:add_cooldown(2)
@@ -73,7 +73,7 @@ end
 
 function HelloWorld.craft.auction:step_4()
     if (not self.vars.open) then self:set_route('step_1') end
-    if (self.vars.click_wait == true) then Keystroke:show(6, false, false, true) end
+    if (self.vars.click_wait == true) then Keystroke:show_spell(6, false, false, true) end
 
     if (self.vars.lot_index > 0) then
         local name, _, count, _, _, _, _, _, buyoutPrice, _, _, owner, sold = GetAuctionItemInfo(

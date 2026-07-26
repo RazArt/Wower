@@ -1,5 +1,5 @@
 function HelloWorld.war:init()
-    self:set_route(self:get_player_class())
+    self:set_route(self.root:get_player_class())
 end
 
 function HelloWorld.war:general_update()
@@ -10,30 +10,6 @@ function HelloWorld.war:general_update()
 
     if ((self:get_mana_on_percent() < 10) and (GetItemCount(33448) > 0) and
         ((select(1, GetItemCooldown(33448))) == 0)) then Keystroke:show(9, 0, 0, 1, 0) end
-end
-
-function HelloWorld.war:get_player_class()
-    local classes = {
-        warrior = '1',
-        paladin = '2',
-        hunter = '3',
-        rogue = '4',
-        priest = '5',
-        deathknight = '6',
-        shaman = '7',
-        mage = '8',
-        warlock = '9',
-        druid = '11'
-    }
-    return (select(2, UnitClass('player'))):lower()
-end
-
-function HelloWorld.war:get_player_spec()
-    return GetSpecialization('player')
-end
-
-function HelloWorld.war:get_player_level()
-    return UnitLevel('player')
 end
 
 function HelloWorld.war:get_health_on_percent()
@@ -61,20 +37,35 @@ function HelloWorld.war:check_combo_points(count)
 end
 
 function HelloWorld.war:get_spell_cooldown(spellname)
-    local start, duration, _ = GetSpellCooldown(spellname);
-    local cd_time = start + duration - GetTime()
-    if cd_time < 0 then
-        return 0
-    else
-        return cd_time
-    end
+    local start, duration, _ = GetSpellCooldown(spellname)
+    local cd_time = start + duration - GetTime() - 0.2
+    return (cd_time < 0) and 0 or cd_time
+end
+
+function HelloWorld.war:is_spell_cooldown(spellname)
+    local start, duration, _ = GetSpellCooldown(spellname)
+    return (start + duration - GetTime() - 0.2 > 0) and true or false
+end
+
+function HelloWorld.war:is_player_cast()
+    local _, _, _, _, _, endTime = UnitCastingInfo('player')
+    if (endTime ~= nil) then return (endTime / 1000 - GetTime() - 0.2 > 0) and true or false end
+
+    local _, _, _, _, _, endTime = UnitChannelInfo('player')
+    if (endTime ~= nil) then return (endTime / 1000 - GetTime() - 0.2 > 0) and true or false end
+
+    return false
+end
+
+function HelloWorld.war:is_enemy_cast()
+    if (UnitCastingInfo('target')) then return true end
+    if (UnitChannelInfo('target')) then return true end
 end
 
 function HelloWorld.war:can_cast(spellname)
     if (not (select(1, IsUsableSpell(spellname)))) then return false end
-    if (UnitCastingInfo('player')) then return false end
-    if (UnitChannelInfo('player')) then return false end
-    if (self:get_spell_cooldown(spellname) > 0.3) then return false end
+    if (self:is_player_cast()) then return false end
+    if (self:is_spell_cooldown(spellname)) then return false end
     return true
 end
 
@@ -157,8 +148,3 @@ function HelloWorld.war:get_player_buff_count(spell, player)
     return 0
 end
 
-function HelloWorld.war:is_enemy_cast()
-    if (UnitCastingInfo('target')) then return true end
-    if (UnitChannelInfo('target')) then return true end
-    return false
-end

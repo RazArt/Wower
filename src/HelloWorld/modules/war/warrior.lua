@@ -12,71 +12,71 @@ function HelloWorld.war.warrior:rotation_1()
 
     if (self.vars.attack_type == 1) then
         if (self.parent:can_cast('Удар героя')) then
-            Keystroke:show_2(3, false, true)
+            Keystroke:show_attack(2, false, false, true)
         end
     elseif (self.vars.attack_type == 2) then
         if (self.parent:can_cast('Рассекающий удар')) then
-            Keystroke:show_2(2, false, true)
+            Keystroke:show_attack(3, false, false, true)
         end
     end
 
     if ((self.parent:get_health_on_percent() < 30) and
         self.parent:can_cast('Безудержное восстановление')) then
-        Keystroke:show(9, false, true)
+        Keystroke:show_spell(62)
     end
 
     if ((self.parent:get_player_buff_time('Боевой крик') == 0) and
         (self.parent:can_cast('Боевой крик')) and (self.vars.battle_shout)) then
-        Keystroke:show(7, false, true)
+        Keystroke:show_spell(6, false, false, false, true)
         return
     end
 
     if ((self.parent:get_player_buff_time('Командирский крик') == 0) and
         (self.parent:can_cast('Командирский крик')) and (self.vars.commanding_shout)) then
-        Keystroke:show(8, false, true)
+        Keystroke:show_spell(7, false, false, false, true)
         return
     end
 
     if (self.parent:is_enemy_cast() and self.parent:can_cast_on_enemy('Зуботычина')) then
-        Keystroke:show(34)
+        Keystroke:show_spell(34)
         return
     end
 
     if (self.parent:can_cast('Ярость берсерка')) then
-        Keystroke:show(9)
+        Keystroke:show_spell(9)
         return
     end
 
     if ((self.parent:get_power() <= 30) and (self.parent:can_cast('Кровавая ярость'))) then
-        Keystroke:show(10)
+        Keystroke:show_spell(8)
         return
     end
 
     if (((self.parent:get_ememy_debuff_time('Раскол брони') <= 3) or
         (self.parent:get_ememy_debuff_count('Раскол брони') < 5)) and
         (self.parent:can_cast_on_enemy('Раскол брони')) and (self.vars.sunder)) then
-        Keystroke:show(33)
+        Keystroke:show_spell(33)
+        return
+    end
+
+    if (self.parent:can_cast_on_enemy('Кровожадность')) then
+        Keystroke:show_spell(3)
         return
     end
 
     if ((self.parent:get_player_buff_time('Сокрушить!') > 0) and
         (self.parent:can_cast_on_enemy('Мощный удар'))) then
-        Keystroke:show(6)
-        return
-    end
-
-    if (self.parent:can_cast_on_enemy('Кровожадность')) then
-        Keystroke:show(5)
+        Keystroke:show_spell(4)
         return
     end
 
     if (self.parent:can_cast('Вихрь')) then
-        Keystroke:show(4)
+        Keystroke:show_spell(2)
         return
     end
 
     if (self.parent:can_cast_on_enemy('Казнь')) then
-        Keystroke:show(7)
+        Keystroke:show_spell(5)
         return
     end
 end
