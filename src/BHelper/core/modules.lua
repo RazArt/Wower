@@ -1,4 +1,4 @@
-function Module(name, parent) -- Module class
+function BHelper:modules(name, parent)
     local obj = {}
 
     if (parent ~= nil) then
@@ -94,36 +94,6 @@ function Module(name, parent) -- Module class
         end
     end
 
-    function obj:create_timer(count, func, name, repeating)
-        name = name or ''
-        full_name = self.name .. '/' .. name
-        repeating = repeating or false
-
-        self:print('create_timer <', count, '>', full_name)
-
-        if (name ~= '') then self:delete_timer(name) end
-        table.insert(self.root._timers, {0, count, func, repeating, full_name})
-    end
-
-    function obj:delete_timer(name)
-        name = name or ''
-
-        for i = #self.root._timers, 1, -1 do
-            if (string.find(self.root._timers[i][5], '^' .. self.name .. '/' .. name)) then
-                table.remove(self.root._timers, i)
-            end
-        end
-    end
-
-    function obj:add_cooldown(count)
-        self:print('add_cooldown <', count, '>')
-        self.root._cooldown = true
-        self:create_timer(count, function()
-            self:print('cooldown < off >')
-            self.root._cooldown = false
-        end, 'cooldown')
-    end
-
     function obj:var_toggle(var)
         if (rawget(self.vars, var) ~= nil) then
             if (self.vars[var]) then
@@ -164,7 +134,7 @@ function Module(name, parent) -- Module class
         __index = function(self, name)
             if (name ~= '') then
                 self:print('create <', name, '>')
-                self[name] = Module(name, self)
+                self[name] = BHelper:modules(name, self)
                 return self[name]
             end
         end,
@@ -175,7 +145,3 @@ function Module(name, parent) -- Module class
 
     return obj
 end
-
-BHelper = Module('BHelper')
-Keystroke = Module('Keystroke')
-

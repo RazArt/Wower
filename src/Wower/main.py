@@ -18,30 +18,21 @@ while True:
     if (process_name == 'wow.exe'):
         try:
             image = ImageGrab.grab()
-            for i in range(1, 4):
-                pos = (i - 1) * 3
-                if (image.getpixel((pos, 0)) == (31, 11, 12)):
-                    key_code = image.getpixel((pos + 1, 0))[0] + image.getpixel((pos + 1, 0))[1]
-                    key_modifiers = image.getpixel((pos + 2, 0))
+            for i in range(0, 3):
+                pixel_color = image.getpixel((i, 0))
+                if (pixel_color[0] == 44):
+                    key_code = pixel_color[2]
 
                     if (key_code != 0):
-                        if (key_modifiers[0] == 1):
-                            keyboard.press(29)
-                        if (key_modifiers[1] == 1):
-                            keyboard.press(56)
-                        if (key_modifiers[2] == 1):
-                            keyboard.press(42)
-
+                        keyboard.press(29)
+                        keyboard.press(56)
+                        keyboard.press(42)
                         keyboard.send(key_code)
+                        keyboard.release(42)
+                        keyboard.release(56)
+                        keyboard.release(29)
 
-                        if (key_modifiers[0] == 1):
-                            keyboard.release(29)
-                        if (key_modifiers[1] == 1):
-                            keyboard.release(56)
-                        if (key_modifiers[2] == 1):
-                            keyboard.release(42)
-
-                    if (image.getpixel((pos + 1, 0))[2] == 1):
+                    if (pixel_color[3] == 1):
                         sleep(0.1)
                         mouse.click()
         except:
