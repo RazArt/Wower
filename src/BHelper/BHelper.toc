@@ -6,5 +6,21 @@ BHelper.lua
 
 core\timers.lua
 core\keybinds.lua
+core\macros.lua
 core\modules.lua
 core\common.lua
+
+modules\druid.lua
+modules\hunter.lua
+modules\rogue.lua
+modules\druid.lua
+modules\warrior.lua
+modules\paladin.lua
+modules\priest.lua
+modules\deathknight.lua
+modules\shaman.lua
+modules\mage.lua
+modules\warlock.lua
+modules\auction.lua
+modules\crafting.lua
+modules\mailbox.lua

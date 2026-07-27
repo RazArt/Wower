@@ -1,40 +1,51 @@
-import keyboard
-import mouse
-
+import win32gui
+import win32api
+import win32con
 from time import sleep
-from win32gui import GetForegroundWindow
-from win32process import GetWindowThreadProcessId
-from psutil import Process
-from PIL import ImageGrab
 
-keyboard._winkeyboard._setup_name_tables()
+
+def get_pixels_color(hwnd):
+    result = []
+    if (hwnd != 0):
+        hwndDC = win32gui.GetWindowDC(hwnd)
+        for i in range(0, 4):
+            ret = win32gui.GetPixel(hwndDC, i, 0)
+            r, g, b = ret & 0xff, (ret >> 8) & 0xff, (ret >> 16) & 0xff
+            result.append((r, g, b))
+        win32gui.ReleaseDC(hwnd, hwndDC)
+        return result
+
+
+def key_send(hwnd, key_code):
+    key_press(hwnd, 16)
+    key_press(hwnd, 17)
+    key_press(hwnd, 18)
+    key_press(hwnd, key_code)
+    key_release(hwnd, key_code)
+    key_release(hwnd, 18)
+    key_release(hwnd, 17)
+    key_release(hwnd, 16)
+
+
+def key_press(hwnd, key_code):
+    win32api.PostMessage(hwnd, win32con.WM_KEYDOWN, key_code, 0)
+
+
+def key_release(hwnd, key_code):
+    win32api.PostMessage(hwnd, win32con.WM_KEYUP, key_code, 0)
+
+
+hwnd_wow = 0
 
 while True:
+
     try:
-        process_name = Process(GetWindowThreadProcessId(GetForegroundWindow())[1]).name().lower()
+        pixel_color = get_pixels_color(hwnd_wow)
+        if (pixel_color[0] == (31, 11, 12)):
+            for i in range(1, 4):
+                if (pixel_color[i][0] == 44):
+                    key_send(hwnd_wow, pixel_color[i][1])
     except:
-        process_name = ''
+        hwnd_wow = win32gui.FindWindow(None, 'World of Warcraft')
 
-    if (process_name == 'wow.exe'):
-        try:
-            image = ImageGrab.grab()
-            for i in range(0, 3):
-                pixel_color = image.getpixel((i, 0))
-                if (pixel_color[0] == 44):
-                    key_code = pixel_color[2]
-
-                    if (key_code != 0):
-                        keyboard.press(29)
-                        keyboard.press(56)
-                        keyboard.press(42)
-                        keyboard.send(key_code)
-                        keyboard.release(42)
-                        keyboard.release(56)
-                        keyboard.release(29)
-
-                    if (pixel_color[3] == 1):
-                        sleep(0.1)
-                        mouse.click()
-        except:
-            pass
     sleep(0.05)

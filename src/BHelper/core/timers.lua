@@ -1,5 +1,4 @@
 BHelper.timers = {}
-BHelper.timers._timers = {}
 
 function BHelper.timers:update(elapsed)
     for i = #self._timers, 1, -1 do
@@ -17,25 +16,23 @@ end
 
 function BHelper.timers:create(count, func, name, repeating)
     name = name or ''
+    name = string.lower(name)
     repeating = repeating or false
 
-    if (name ~= '') then self:delete(string.lower(name)) end
-    table.insert(self._timers, {0, count, func, repeating, string.lower(name)})
+    if (name ~= '') then self:delete(name) end
+    table.insert(self._timers, {0, count, func, repeating, name})
 end
 
 function BHelper.timers:delete(name)
     name = name or ''
+    name = string.lower(name)
 
     for i = #self._timers, 1, -1 do
         if (string.find(self._timers[i][5], '^' .. name)) then table.remove(self._timers, i) end
     end
 end
 
--- function BHelper.timer:cooldown(count)
---     self:print('add_cooldown <', count, '>')
---     self._cooldown = true
---     self:create_timer(count, function()
---         self:print('cooldown < off >')
---         self._cooldown = false
---     end, 'cooldown')
--- end
+function BHelper.timers:init()
+    self._timers = {}
+end
+BHelper.timers:init()

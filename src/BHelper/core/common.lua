@@ -1,17 +1,45 @@
 BHelper.common = {}
 
-function BHelper.common:init()
-    self:set_route(self.root:get_player_class())
+-- function BHelper.common:init()
+--     self:set_route(self.root:get_player_class())
+-- end
+
+-- function BHelper.common:general_update()
+--     if (not UnitExists('target')) then Keystroke:show(0, 1) end
+
+--     if ((self:get_health_on_percent() < 10) and (GetItemCount(33447) > 0) and
+--         ((select(1, GetItemCooldown(33447))) == 0)) then Keystroke:show(10, 0, 0, 1, 0) end
+
+--     if ((self:get_mana_on_percent() < 10) and (GetItemCount(33448) > 0) and
+--         ((select(1, GetItemCooldown(33448))) == 0)) then Keystroke:show(9, 0, 0, 1, 0) end
+-- end
+
+function BHelper.common:get_player_name()
+    return (select(1, UnitName('player')))
 end
 
-function BHelper.common:general_update()
-    if (not UnitExists('target')) then Keystroke:show(0, 1) end
+function BHelper.common:get_player_class()
+    local classes = {
+        warrior = '1',
+        paladin = '2',
+        hunter = '3',
+        rogue = '4',
+        priest = '5',
+        deathknight = '6',
+        shaman = '7',
+        mage = '8',
+        warlock = '9',
+        druid = '11'
+    }
+    return (select(2, UnitClass('player'))):lower()
+end
 
-    if ((self:get_health_on_percent() < 10) and (GetItemCount(33447) > 0) and
-        ((select(1, GetItemCooldown(33447))) == 0)) then Keystroke:show(10, 0, 0, 1, 0) end
+function BHelper.common:get_player_spec()
+    return GetSpecialization('player')
+end
 
-    if ((self:get_mana_on_percent() < 10) and (GetItemCount(33448) > 0) and
-        ((select(1, GetItemCooldown(33448))) == 0)) then Keystroke:show(9, 0, 0, 1, 0) end
+function BHelper.common:get_player_level()
+    return UnitLevel('player')
 end
 
 function BHelper.common:get_health_on_percent()

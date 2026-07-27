@@ -1,80 +1,56 @@
 BHelper.keybinds = {}
 
-function BHelper.keybinds:init()
-    self._binds = {}
-
-    self._binds[2] = {key = '1'}
-    self._binds[3] = {key = '2'}
-    self._binds[4] = {key = '3'}
-    self._binds[5] = {key = '4'}
-    self._binds[6] = {key = '5'}
-    self._binds[7] = {key = '6'}
-    self._binds[8] = {key = '7'}
-    self._binds[9] = {key = '8'}
-    self._binds[10] = {key = '9'}
-    self._binds[11] = {key = '0'}
-    self._binds[16] = {key = 'Q'}
-    self._binds[17] = {key = 'W'}
-    self._binds[18] = {key = 'E'}
-    self._binds[19] = {key = 'R'}
-    self._binds[20] = {key = 'T'}
-    self._binds[21] = {key = 'Y'}
-    self._binds[22] = {key = 'U'}
-    self._binds[23] = {key = 'I'}
-    self._binds[24] = {key = 'O'}
-    self._binds[25] = {key = 'P'}
-
-    self:unbind_all()
-
-    self._base_frame = CreateFrame('Frame')
-    self._base_frame:SetScale(0.71)
-    self._base_frame:SetSize(3, 1)
-    self._base_frame:SetFrameStrata('tooltip')
-    self._base_frame:SetPoint('topleft', UIParent, 0, 0)
-    self._base_frame.frames = {}
-    for i = 1, 3 do
-        self._base_frame.frames[i] = CreateFrame('Frame', nil, self._base_frame)
-        local frame = self._base_frame.frames[i]
-        frame:SetSize(1, 1)
-        frame:SetPoint('topleft', self._base_frame, i - 1, 0)
-        frame.texture = frame:CreateTexture(nil, 'tooltip')
-        frame.texture:SetAllPoints(frame)
-        frame:Hide()
-    end
-end
-
-function BHelper.keybinds:bind(name, command, mouse_click)
-    name = string.lower(name)
-    mouse_click = mouse_click or false
-
-    for _, bind in pairs(self._binds) do
+function BHelper.keybinds:_bind(name, command, mouse_click)
+    for key, bind in pairs(self._binds) do
         if ((bind.name == nil) or (bind.name == name)) then
             bind.name = name
             bind.mouse_click = mouse_click and 1 or 0
-            SetBinding('ALT-CTRL-SHIFT-' .. bind.key, command)
+            SetBinding('ALT-CTRL-SHIFT-' .. key, command)
             break
         end
     end
 end
 
+function BHelper.keybinds:bind_spell(name, mouse_click)
+    name = string.lower(name)
+    command = 'spell ' .. name
+    mouse_click = mouse_click or false
+
+    self:_bind(name, command, mouse_click)
+end
+
+function BHelper.keybinds:bind_item(name)
+    name = string.lower(name)
+    command = 'item ' .. name
+
+    self:_bind(name, command, false)
+end
+
+function BHelper.keybinds:bind_macro(name)
+    name = string.lower(name)
+    command = 'macro ' .. name
+
+    self:_bind(name, command, false)
+end
+
 function BHelper.keybinds:unbind(name)
     name = string.lower(name)
 
-    for _, bind in pairs(self._binds) do
+    for key, bind in pairs(self._binds) do
         if (bind.name == name) then
             bind.name = nil
             bind.mouse_click = nil
-            SetBinding('ALT-CTRL-SHIFT-' .. bind.key)
+            SetBinding('ALT-CTRL-SHIFT-' .. key)
             break
         end
     end
 end
 
 function BHelper.keybinds:unbind_all()
-    for _, bind in pairs(self._binds) do
+    for key, bind in pairs(self._binds) do
         bind.name = nil
         bind.mouse_click = nil
-        SetBinding('ALT-CTRL-SHIFT-' .. bind.key)
+        SetBinding('ALT-CTRL-SHIFT-' .. key)
     end
 end
 
@@ -83,17 +59,24 @@ function BHelper.keybinds:_show(num, name)
 
     name = string.lower(name)
 
-    for scan_code, bind in pairs(self._binds) do
+    for key, bind in pairs(self._binds) do
         if (bind.name == name) then
-            local frame = self._base_frame.frames[num]
-            frame.texture:SetTexture(44 / 255, scan_code / 255, bind.mouse_click / 255)
-            frame:Show()
+            local flag = 44 / 255
+            local key = string.byte(key, 1) / 255
+            local mouse_click = bind.mouse_click / 255
 
-            -- BHelper.timers:create(0.05, function()
-            --     self._base_frame.blocks[num]:Hide()
-            -- end, 'hide_' .. num)
+            self._frames.frame[num].texture:SetTexture(flag, key, mouse_click)
+            self._frames.frame[num]:Show()
+
+            BHelper.timers:create(0.05, function()
+                self._frames.frame[num]:Hide()
+            end, 'keybinds_hide_' .. num)
+
+            break
         end
     end
+
+    BHelper.print('Заклинание <', name, '>не найдено')
 end
 
 function BHelper.keybinds:show_spell(name)
@@ -107,3 +90,34 @@ end
 function BHelper.keybinds:show_help(name)
     self:_show(3, name)
 end
+
+function BHelper.keybinds:init()
+    self._binds = {}
+
+    local keys = {
+        '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', 'Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I',
+        'O', 'P'
+    }
+    for _, key in ipairs(keys) do self._binds[key] = {} end
+
+    self:unbind_all()
+
+    self._frames = CreateFrame('Frame')
+    self._frames:SetScale(0.71)
+    self._frames:SetSize(4, 1)
+    self._frames:SetFrameStrata('tooltip')
+    self._frames:SetPoint('topleft', UIParent, 0, 0)
+    self._frames.texture = self._frames:CreateTexture(nil, 'tooltip')
+    self._frames.texture:SetAllPoints(self._frames)
+    self._frames.texture:SetTexture(31 / 255, 11 / 255, 12 / 255)
+    self._frames.frame = {}
+    for i = 1, 3 do
+        self._frames.frame[i] = CreateFrame('Frame', nil, self._frames)
+        self._frames.frame[i]:SetSize(1, 1)
+        self._frames.frame[i]:SetPoint('topleft', self._frames, i, 0)
+        self._frames.frame[i].texture = self._frames.frame[i]:CreateTexture(nil, 'tooltip')
+        self._frames.frame[i].texture:SetAllPoints(self._frames.frame[i])
+        self._frames.frame[i]:Hide()
+    end
+end
+BHelper.keybinds:init()

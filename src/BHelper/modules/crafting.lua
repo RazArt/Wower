@@ -9,18 +9,18 @@
 -- -- 34057 Кристалл пропасти
 -- -- 38426 Этерниевая нить
 -- -- 33470 Ледяная ткань
-function BHelper.craft.crafting:init()
+function BHelper.modules.crafting:init()
     self:set_route('step_1')
 end
 
-function BHelper.craft.crafting:update()
+function BHelper.modules.crafting:update()
     if ((GetItemCount(34056) > 2) and (self:can_cast())) then
         Keystroke:show_spell(2, false, false, true)
         self:add_cooldown(0.2)
     end
 end
 
-function BHelper.craft.crafting:step_1()
+function BHelper.modules.crafting:step_1()
     if (GetItemCount(41512) > 0) then
         if (self:can_cast()) then Keystroke:show_spell(3, false, false, true) end
     else
@@ -28,7 +28,7 @@ function BHelper.craft.crafting:step_1()
     end
 end
 
-function BHelper.craft.crafting:step_2()
+function BHelper.modules.crafting:step_2()
     if ((GetItemCount(41510) > 2) and (GetItemCount(38426) > 0) and
         (self.parent:get_bag_free_slots() > 1)) then
         if (self:can_cast()) then Keystroke:show_spell(4, false, false, true) end
@@ -41,7 +41,7 @@ function BHelper.craft.crafting:step_2()
     end
 end
 
-function BHelper.craft.crafting:step_3()
+function BHelper.modules.crafting:step_3()
     if (self.parent:get_bag_free_slots() <= 2) then self:stop() end
 
     if (GetItemCount(33470) > 4) then
@@ -55,13 +55,13 @@ function BHelper.craft.crafting:step_3()
     end
 end
 
-function BHelper.craft.crafting:can_cast()
+function BHelper.modules.crafting:can_cast()
     if (UnitCastingInfo('player')) then return false end
     if (UnitChannelInfo('player')) then return false end
     return true
 end
 
-function BHelper.craft.crafting:craft_item(name)
+function BHelper.modules.crafting:craft_item(name)
     for i = GetNumTradeSkills(), 1, -1 do
         if ((select(2, GetTradeSkillInfo(i)) == "header")) then ExpandTradeSkillSubClass(i) end
     end

@@ -1,8 +1,8 @@
-function BHelper.war.rogue:init()
+function BHelper.modules.rogue:init()
     self.vars.sunder = false
 end
 
-function BHelper.war.rogue:rotation_1()
+function BHelper.modules.rogue:rotation_1()
     if (InCombatLockdown() ~= 1) then return end
 
     if (self.parent:is_enemy_cast() and self.parent:can_cast_on_enemy('Пинок')) then
@@ -63,7 +63,7 @@ function BHelper.war.rogue:rotation_1()
     end
 end
 
-function BHelper.war.rogue:rotation_2()
+function BHelper.modules.rogue:rotation_2()
     if (InCombatLockdown() ~= 1) then return end
 
     if (self.parent:is_enemy_cast() and self.parent:can_cast_on_enemy('Пинок')) then
