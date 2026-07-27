@@ -1,5 +1,6 @@
 function BHelper.modules.druid:init()
     BHelper.keybinds:unbind_all()
+    BHelper.keybinds:bind_macro('BH: Цель')
     BHelper.keybinds:bind_spell('Калечение')
     BHelper.keybinds:bind_spell('Оглушить')
     BHelper.keybinds:bind_spell('Волшебный огонь (зверь)')
@@ -20,16 +21,31 @@ end
 function BHelper.modules.druid:macros()
     BHelper.macros:delete_all()
 
+    BHelper.macros:create('Цель',
+                          '/target [@focustarget,harm,nodead]\n/targetenemy [@focus,noexists]\n/targetenemy [@focus,harm]')
     BHelper.macros:create('Инвиз',
                           '#showtooltip Крадущийся зверь\n/bh stop\n/cast [form:0/1/2/4/5/6] !Облик кошки(Смена облика)\n/cast [form:3] Крадущийся зверь')
     BHelper.macros:create('Накинуться',
                           '#showtooltip\n/bh start\n/cast Накинуться')
-    BHelper.macros:create('Берсерк',
-                          '#showtooltip Берсерк\n/bh c 1\n/cast Берсерк\n/cast Берсерк(Расовая)')
     BHelper.macros:create('Чардж',
                           '#showtooltip\n/cast [form:1] Звериная атака - медведь\n/cast [form:3] Звериная атака - кошка')
+    BHelper.macros:create('Сало',
+                          '#showtooltip\n/cast [form:1/2] Оглушить\n/cast [form:3] Калечение')
+    BHelper.macros:create('Озарение',
+                          '#showtooltip Озарение\n/bh c 1\n/cast [@focus,help,nodead] Озарение\n/cast [@target,help,nodead] Озарение\n/cast [@mouseover,help,nodead] Озарение')
     BHelper.macros:create('Атака',
                           '#showtooltip\n/startattack\n/cast [form:0/2/4/5/6] !Облик кошки(Смена облика)\n/cast Волшебный огонь (зверь)')
+    BHelper.macros:create('Смерч', '#showtooltip Смерч\n/bh c 1\n/cast Смерч')
+    BHelper.macros:create('Дубовая кожа',
+                          '#showtooltip Дубовая кожа\n/bh c 1\n/cast Дубовая кожа')
+    BHelper.macros:create('Возрождение',
+                          '#showtooltip Возрождение\n/bh c 1\n/cast Возрождение')
+    BHelper.macros:create('Неистовое восстановление',
+                          '#showtooltip Неистовое восстановление\n/bh c 1\n/cast Неистовое восстановление')
+    BHelper.macros:create('Исступление',
+                          '#showtooltip Исступление\n/bh c 1\n/cast Исступление')
+    BHelper.macros:create('Берсерк',
+                          '#showtooltip Берсерк\n/bh c 1\n/cast Берсерк\n/cast Берсерк(Расовая)')
 
     BHelper.macros:create('S', '/startattack\n/bh sa rotation_single\n/bh')
     BHelper.macros:create('M', '/startattack\n/bh sa rotation_multiple\n/bh')
@@ -58,6 +74,8 @@ function BHelper.modules.druid:rotation_multiple()
 end
 
 function BHelper.modules.druid:cat_single()
+    if (UnitCanAttack('player', 'target') ~= 1) then BHelper.keybinds:show_spell('BH: Цель') end
+
     if (BHelper:is_enemy_cast() and BHelper:can_cast_on_enemy('Калечение')) then
         BHelper.keybinds:show_spell('Калечение')
         return
@@ -140,6 +158,8 @@ function BHelper.modules.druid:cat_single()
 end
 
 function BHelper.modules.druid:bear_single()
+    if (UnitCanAttack('player', 'target') ~= 1) then BHelper.keybinds:show_spell('BH: Цель') end
+
     if (BHelper:can_cast('Трепка')) then BHelper.keybinds:show_attack('Трепка') end
 
     if (BHelper:is_enemy_cast() and BHelper:can_cast_on_enemy('Оглушить')) then
@@ -172,6 +192,8 @@ function BHelper.modules.druid:bear_single()
 end
 
 function BHelper.modules.druid:cat_multiple()
+    if (UnitCanAttack('player', 'target') ~= 1) then BHelper.keybinds:show_spell('BH: Цель') end
+
     if ((BHelper:get_player_buff_time('Ясность мысли') == 0) and
         (BHelper:can_cast_on_enemy('Волшебный огонь (зверь)'))) then
         BHelper.keybinds:show_spell('Волшебный огонь (зверь)')
@@ -203,6 +225,8 @@ function BHelper.modules.druid:cat_multiple()
 end
 
 function BHelper.modules.druid:bear_multiple()
+    if (UnitCanAttack('player', 'target') ~= 1) then BHelper.keybinds:show_spell('BH: Цель') end
+
     if (BHelper:can_cast('Трепка')) then BHelper.keybinds:show_attack('Трепка') end
 
     if ((BHelper:get_player_buff_time('Ясность мысли') == 0) and

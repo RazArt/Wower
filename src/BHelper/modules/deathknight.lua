@@ -19,6 +19,8 @@ end
 function BHelper.modules.deathknight:macros()
     BHelper.macros:delete_all()
 
+    BHelper.macros:create('Цель',
+                          '/target [@focustarget,harm,nodead]\n/targetenemy [@focus,noexists]\n/targetenemy [@focus,harm]')
     BHelper.macros:create('Истерия',
                           '#showtooltip Истерия\n/bh c 1\n/cast [@focus,help,nodead] Истерия\n/cast [@target,help,nodead] Истерия\n/cast [@mouseover,help,nodead] Истерия')
     BHelper.macros:create('Смертельный союз',
@@ -77,6 +79,8 @@ function BHelper.modules.deathknight:rotation_single()
 
     if (InCombatLockdown() ~= 1) then return end
 
+    if (UnitCanAttack('player', 'target') ~= 1) then BHelper.keybinds:show_spell('BH: Цель') end
+
     if (BHelper:can_cast('Рунический удар')) then
         BHelper.keybinds:show_attack('Рунический удар')
     end
@@ -119,6 +123,8 @@ function BHelper.modules.deathknight:rotation_multiple()
     end
 
     if (InCombatLockdown() ~= 1) then return end
+
+    if (UnitCanAttack('player', 'target') ~= 1) then BHelper.keybinds:show_spell('BH: Цель') end
 
     if (BHelper:can_cast('Рунический удар')) then
         BHelper.keybinds:show_attack('Рунический удар')

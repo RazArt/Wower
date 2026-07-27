@@ -59,12 +59,12 @@ end
 
 function BHelper:toggle_var(var)
     if ((self.modules[self._module] ~= nil) and (self.modules[self._module].vars[var] ~= nil)) then
-        if (self.modules[self._module].vars[var][var]) then
+        if (self.modules[self._module].vars[var]) then
             self:print('var_toggle <', var, '>', false)
-            self.modules[self._module].vars[var][var] = false
+            self.modules[self._module].vars[var] = false
         else
             self:print('var_toggle <', var, '>', true)
-            self.modules[self._module].vars[var][var] = true
+            self.modules[self._module].vars[var] = true
         end
     end
 end
