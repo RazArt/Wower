@@ -1,6 +1,7 @@
 ## Interface: 30300
 ## Title: BHelper
 ## Notes: BHelper
+## SavedVariablesPerCharacter: BHelperDB
 
 BHelper.lua
 
@@ -9,6 +10,7 @@ core\keybinds.lua
 core\macros.lua
 core\modules.lua
 core\common.lua
+core\DB.lua
 
 modules\druid.lua
 modules\hunter.lua

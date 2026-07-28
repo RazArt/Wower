@@ -1,6 +1,7 @@
-function BHelper.modules.druid:init()
+function BHelper.modules.druid.main:init()
+    self.type = 'battle'
+
     BHelper.keybinds:unbind_all()
-    BHelper.keybinds:bind_macro('BH: Цель')
     BHelper.keybinds:bind_spell('Калечение')
     BHelper.keybinds:bind_spell('Оглушить')
     BHelper.keybinds:bind_spell('Волшебный огонь (зверь)')
@@ -18,42 +19,53 @@ function BHelper.modules.druid:init()
     BHelper.keybinds:bind_spell('Трепка')
 end
 
-function BHelper.modules.druid:macros()
+function BHelper.modules.druid.main:macros()
     BHelper.macros:delete_all()
 
-    BHelper.macros:create('Цель',
-                          '/target [@focustarget,harm,nodead]\n/targetenemy [@focus,noexists]\n/targetenemy [@focus,harm]')
-    BHelper.macros:create('Инвиз',
-                          '#showtooltip Крадущийся зверь\n/bh stop\n/cast [form:0/1/2/4/5/6] !Облик кошки(Смена облика)\n/cast [form:3] Крадущийся зверь')
     BHelper.macros:create('Накинуться',
-                          '#showtooltip\n/bh start\n/cast Накинуться')
+                          '#showtooltip\n/bh start\n/cast Накинуться', 88)
     BHelper.macros:create('Чардж',
-                          '#showtooltip\n/cast [form:1] Звериная атака - медведь\n/cast [form:3] Звериная атака - кошка')
-    BHelper.macros:create('Сало',
-                          '#showtooltip\n/cast [form:1/2] Оглушить\n/cast [form:3] Калечение')
-    BHelper.macros:create('Озарение',
-                          '#showtooltip Озарение\n/bh c 1\n/cast [@focus,help,nodead] Озарение\n/cast [@target,help,nodead] Озарение\n/cast [@mouseover,help,nodead] Озарение')
+                          '#showtooltip\n/cast [form:1] Звериная атака - медведь\n/cast [form:3] Звериная атака - кошка',
+                          15)
     BHelper.macros:create('Атака',
-                          '#showtooltip\n/startattack\n/cast [form:0/2/4/5/6] !Облик кошки(Смена облика)\n/cast Волшебный огонь (зверь)')
-    BHelper.macros:create('Смерч', '#showtooltip Смерч\n/bh c 1\n/cast Смерч')
-    BHelper.macros:create('Дубовая кожа',
-                          '#showtooltip Дубовая кожа\n/bh c 1\n/cast Дубовая кожа')
+                          '#showtooltip\n/startattack\n/cast [form:0/2/4/5/6] !Облик кошки(Смена облика)\n/cast Волшебный огонь (зверь)',
+                          16)
+    BHelper.macros:create('Сало',
+                          '#showtooltip\n/cast [form:1/2] Оглушить\n/cast [form:3] Калечение',
+                          17)
     BHelper.macros:create('Возрождение',
-                          '#showtooltip Возрождение\n/bh c 1\n/cast Возрождение')
-    BHelper.macros:create('Неистовое восстановление',
-                          '#showtooltip Неистовое восстановление\n/bh c 1\n/cast Неистовое восстановление')
-    BHelper.macros:create('Исступление',
-                          '#showtooltip Исступление\n/bh c 1\n/cast Исступление')
+                          '#showtooltip Возрождение\n/bh c 0.5\n/cast Возрождение',
+                          19)
+    BHelper.macros:create('Дубовая кожа',
+                          '#showtooltip Дубовая кожа\n/bh c 0.5\n/cast Дубовая кожа',
+                          20)
+    BHelper.macros:create('Смерч', '#showtooltip Смерч\n/bh c 0.5\n/cast Смерч', 21)
+    BHelper.macros:create('Озарение',
+                          '#showtooltip Озарение\n/bh c 0.5\n/cast [@focus,help,nodead] Озарение\n/cast [@target,help,nodead] Озарение\n/cast [@mouseover,help,nodead] Озарение',
+                          22)
+    BHelper.macros:create('Инвиз',
+                          '#showtooltip Крадущийся зверь\n/bh stop\n/cast [form:0/1/2/4/5/6] !Облик кошки(Смена облика)\n/cast [form:3] Крадущийся зверь',
+                          24)
     BHelper.macros:create('Берсерк',
-                          '#showtooltip Берсерк\n/bh c 1\n/cast Берсерк\n/cast Берсерк(Расовая)')
+                          '#showtooltip Берсерк\n/bh c 0.5\n/cast Берсерк\n/cast Берсерк(Расовая)',
+                          69)
+    BHelper.macros:put_to_panel('Берсерк', 81)
+    BHelper.macros:create('Неистовое восстановление',
+                          '#showtooltip Неистовое восстановление\n/bh c 0.5\n/cast Неистовое восстановление',
+                          70)
+    BHelper.macros:create('Исступление',
+                          '#showtooltip Исступление\n/bh c 0.5\n/cast Исступление',
+                          71)
+    BHelper.macros:create('Порыв', '#showtooltip Порыв\n/bh c 0.5\n/cast Порыв', 82)
+    BHelper.macros:create('Попятиться',
+                          '#showtooltip Попятиться\n/bh c 0.5\n/cast Попятиться',
+                          83)
 
-    BHelper.macros:create('S', '/startattack\n/bh sa rotation_single\n/bh')
-    BHelper.macros:create('M', '/startattack\n/bh sa rotation_multiple\n/bh')
+    BHelper.macros:create('S', '/startattack\n/bh sa rotation_single\n/bh', 13, false, 1093)
+    BHelper.macros:create('M', '/startattack\n/bh sa rotation_multiple\n/bh', 14, false, 1094)
 end
 
-function BHelper.modules.druid:rotation_single()
-    if (InCombatLockdown() ~= 1) then return end
-
+function BHelper.modules.druid.main:rotation_single()
     if (BHelper:get_player_buff_time('Облик кошки') > 0) then self:cat_single() end
 
     if ((BHelper:get_player_buff_time('Облик медведя') > 0) or
@@ -62,9 +74,7 @@ function BHelper.modules.druid:rotation_single()
     end
 end
 
-function BHelper.modules.druid:rotation_multiple()
-    if (InCombatLockdown() ~= 1) then return end
-
+function BHelper.modules.druid.main:rotation_multiple()
     if (BHelper:get_player_buff_time('Облик кошки') > 0) then self:cat_multiple() end
 
     if ((BHelper:get_player_buff_time('Облик медведя') > 0) or
@@ -73,9 +83,7 @@ function BHelper.modules.druid:rotation_multiple()
     end
 end
 
-function BHelper.modules.druid:cat_single()
-    if (UnitCanAttack('player', 'target') ~= 1) then BHelper.keybinds:show_spell('BH: Цель') end
-
+function BHelper.modules.druid.main:cat_single()
     if (BHelper:is_enemy_cast() and BHelper:can_cast_on_enemy('Калечение')) then
         BHelper.keybinds:show_spell('Калечение')
         return
@@ -118,9 +126,16 @@ function BHelper.modules.druid:cat_single()
     end
 
     if (BHelper:get_player_buff_time('Ясность мысли') > 0) then
-        if (BHelper:can_cast_on_enemy('Полоснуть')) then
-            BHelper.keybinds:show_spell('Полоснуть')
-            return
+        if (BHelper.vars._behind_of_target) then
+            if (BHelper:can_cast_on_enemy('Полоснуть')) then
+                BHelper.keybinds:show_spell('Полоснуть')
+                return
+            end
+        else
+            if (BHelper:can_cast_on_enemy('Увечье (кошка)')) then
+                BHelper.keybinds:show_spell('Увечье (кошка)')
+                return
+            end
         end
     end
 
@@ -151,15 +166,20 @@ function BHelper.modules.druid:cat_single()
         return
     end
 
-    if (BHelper:can_cast_on_enemy('Полоснуть')) then
-        BHelper.keybinds:show_spell('Полоснуть')
-        return
+    if (BHelper.vars._behind_of_target) then
+        if (BHelper:can_cast_on_enemy('Полоснуть')) then
+            BHelper.keybinds:show_spell('Полоснуть')
+            return
+        end
+    else
+        if (BHelper:can_cast_on_enemy('Увечье (кошка)')) then
+            BHelper.keybinds:show_spell('Увечье (кошка)')
+            return
+        end
     end
 end
 
-function BHelper.modules.druid:bear_single()
-    if (UnitCanAttack('player', 'target') ~= 1) then BHelper.keybinds:show_spell('BH: Цель') end
-
+function BHelper.modules.druid.main:bear_single()
     if (BHelper:can_cast('Трепка')) then BHelper.keybinds:show_attack('Трепка') end
 
     if (BHelper:is_enemy_cast() and BHelper:can_cast_on_enemy('Оглушить')) then
@@ -191,9 +211,7 @@ function BHelper.modules.druid:bear_single()
     end
 end
 
-function BHelper.modules.druid:cat_multiple()
-    if (UnitCanAttack('player', 'target') ~= 1) then BHelper.keybinds:show_spell('BH: Цель') end
-
+function BHelper.modules.druid.main:cat_multiple()
     if ((BHelper:get_player_buff_time('Ясность мысли') == 0) and
         (BHelper:can_cast_on_enemy('Волшебный огонь (зверь)'))) then
         BHelper.keybinds:show_spell('Волшебный огонь (зверь)')
@@ -224,9 +242,7 @@ function BHelper.modules.druid:cat_multiple()
     end
 end
 
-function BHelper.modules.druid:bear_multiple()
-    if (UnitCanAttack('player', 'target') ~= 1) then BHelper.keybinds:show_spell('BH: Цель') end
-
+function BHelper.modules.druid.main:bear_multiple()
     if (BHelper:can_cast('Трепка')) then BHelper.keybinds:show_attack('Трепка') end
 
     if ((BHelper:get_player_buff_time('Ясность мысли') == 0) and

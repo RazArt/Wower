@@ -1,25 +1,74 @@
 BHelper.macros = {}
 
-function BHelper.macros:create(name, command)
+function BHelper.macros:_get_name_prefix()
+    return 'BH: '
+end
+
+function BHelper.macros:get_formated_name(name)
+    return self:_get_name_prefix() .. string.lower(name)
+end
+
+function BHelper.macros:create(name, command, slot, global, icon)
+    slot = slot or 0
+    icon = icon or 1
+
     self:delete(name)
+    if (CreateMacro(self:get_formated_name(name), icon, command, not global and true or false) > 0) then
+        if (slot > 0) then self:put_to_panel(name, slot) end
+        return true
+    end
 
-    name = 'BH: ' .. string.lower(name)
-
-    return CreateMacro(name, 1, command, true)
+    return false
 end
 
-function BHelper.macros:delete(name)
-    name = 'BH: ' .. string.lower(name)
-
-    for i = 54, 37, -1 do
-        local macro_name = (select(1, GetMacroInfo(i)))
-        if ((macro_name ~= nil) and (macro_name == name)) then DeleteMacro(i) end
-    end
+function BHelper.macros:put_to_panel(name, slot)
+    PickupMacro(self:get_formated_name(name))
+    PlaceAction(slot)
+    ClearCursor()
 end
 
-function BHelper.macros:delete_all()
-    for i = 54, 37, -1 do
-        local macro_name = (select(1, GetMacroInfo(i)))
-        if ((macro_name ~= nil) and (string.find(macro_name, '^BH: '))) then DeleteMacro(i) end
+function BHelper.macros:delete(name, global)
+    if (global) then
+        for i = 36, 1, -1 do
+            local macro_name = (select(1, GetMacroInfo(i)))
+            if ((macro_name ~= nil) and (macro_name == self:get_formated_name(name))) then
+                DeleteMacro(i)
+                return true
+            end
+        end
+    else
+        for i = 54, 37, -1 do
+            local macro_name = (select(1, GetMacroInfo(i)))
+            if ((macro_name ~= nil) and (macro_name == self:get_formated_name(name))) then
+                DeleteMacro(i)
+                return true
+            end
+        end
     end
+
+    return false
+end
+
+function BHelper.macros:delete_all(global)
+    local result = false
+
+    if (global) then
+        for i = 36, 1, -1 do
+            local macro_name = (select(1, GetMacroInfo(i)))
+            if ((macro_name ~= nil) and (string.find(macro_name, '^' .. self:_get_name_prefix()))) then
+                DeleteMacro(i)
+                result = true
+            end
+        end
+    else
+        for i = 54, 37, -1 do
+            local macro_name = (select(1, GetMacroInfo(i)))
+            if ((macro_name ~= nil) and (string.find(macro_name, '^' .. self:_get_name_prefix()))) then
+                DeleteMacro(i)
+                result = true
+            end
+        end
+    end
+
+    return result
 end

@@ -1,5 +1,5 @@
 BHelper.modules = {}
--- Проверка баффа, дебафа, энергии, 
+
 function BHelper.modules:module()
     local obj = {}
 
@@ -13,12 +13,15 @@ function BHelper.modules:module()
 
     function obj:_update()
         if (self.update ~= nil) then self:update() end
-        if (self[self._action] ~= nil) then self[self._action](self) end
     end
 
     function obj:_macros()
         if (self.macros ~= nil) then self:macros() end
     end
+
+    -- function obj:get_profile()
+    --     return (self.profiles[BHelper:get_player_spec()])
+    -- end
 
     -- obj._event_frame = CreateFrame('Frame')
     -- obj._event_frame:SetScript('OnEvent', function(_, event, ...)

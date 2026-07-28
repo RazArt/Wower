@@ -3,12 +3,15 @@ BHelper.keybinds = {}
 function BHelper.keybinds:_bind(name, command, mouse_click)
     for key, bind in pairs(self._binds) do
         if ((bind.name == nil) or (bind.name == name)) then
-            bind.name = name
-            bind.mouse_click = mouse_click and 1 or 0
-            SetBinding('ALT-CTRL-SHIFT-' .. key, command)
-            break
+            if (SetBinding('ALT-CTRL-SHIFT-' .. key, command) ~= nil) then
+                bind.name = name
+                bind.mouse_click = mouse_click and 1 or 0
+                return true
+            end
         end
     end
+
+    return false
 end
 
 function BHelper.keybinds:bind_spell(name, mouse_click)
@@ -16,49 +19,53 @@ function BHelper.keybinds:bind_spell(name, mouse_click)
     command = 'spell ' .. name
     mouse_click = mouse_click or false
 
-    self:_bind(name, command, mouse_click)
+    if (self:_bind(name, command, mouse_click)) then
+        return true
+    else
+        return false
+    end
 end
 
-function BHelper.keybinds:bind_item(name)
+function BHelper.keybinds:bind_macro(name, mouse_click)
+    name = string.lower(BHelper.macros:get_formated_name(name))
+    command = 'macro ' .. name
+    mouse_click = mouse_click or false
+
+    if (self:_bind(name, command, mouse_click)) then
+        return true
+    else
+        return false
+    end
+end
+
+function BHelper.keybinds:bind_item(name, mouse_click)
     name = string.lower(name)
     command = 'item ' .. name
+    mouse_click = mouse_click or false
 
-    self:_bind(name, command, false)
-end
-
-function BHelper.keybinds:bind_macro(name)
-    name = string.lower(name)
-    command = 'macro ' .. name
-
-    self:_bind(name, command, false)
-end
-
-function BHelper.keybinds:unbind(name)
-    name = string.lower(name)
-
-    for key, bind in pairs(self._binds) do
-        if (bind.name == name) then
-            bind.name = nil
-            bind.mouse_click = nil
-            SetBinding('ALT-CTRL-SHIFT-' .. key)
-            break
-        end
+    if (self:_bind(name, command, mouse_click)) then
+        return true
+    else
+        return false
     end
 end
 
 function BHelper.keybinds:unbind_all()
+    local result = true
+
     for key, bind in pairs(self._binds) do
         bind.name = nil
         bind.mouse_click = nil
-        SetBinding('ALT-CTRL-SHIFT-' .. key)
+        if (SetBinding('ALT-CTRL-SHIFT-' .. key) == nil) then result = false end
     end
+
+    return result
 end
 
 function BHelper.keybinds:_show(num, name)
-    if (ACTIVE_CHAT_EDIT_BOX ~= nil) then return end
+    if (ACTIVE_CHAT_EDIT_BOX ~= nil) then return false end
 
     name = string.lower(name)
-
     for key, bind in pairs(self._binds) do
         if (bind.name == name) then
             local flag = 44 / 255
@@ -72,23 +79,43 @@ function BHelper.keybinds:_show(num, name)
                 self._frames.frame[num]:Hide()
             end, 'keybinds_hide_' .. num)
 
-            break
+            return true
         end
     end
 
-    BHelper.print('Заклинание <', name, '>не найдено')
+    return false
 end
 
 function BHelper.keybinds:show_spell(name)
-    self:_show(1, name)
+    if (self:_show(1, name)) then
+        return true
+    else
+        return false
+    end
+end
+
+function BHelper.keybinds:show_macro(name)
+    if (self:_show(1, BHelper.macros:get_formated_name(name))) then
+        return true
+    else
+        return false
+    end
 end
 
 function BHelper.keybinds:show_attack(name)
-    self:_show(2, name)
+    if (self:_show(2, name)) then
+        return true
+    else
+        return false
+    end
 end
 
 function BHelper.keybinds:show_help(name)
-    self:_show(3, name)
+    if (self:_show(3, name)) then
+        return true
+    else
+        return false
+    end
 end
 
 function BHelper.keybinds:init()

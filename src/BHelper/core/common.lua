@@ -1,5 +1,5 @@
 BHelper.common = {}
-
+BHelper.common.name = 'common'
 -- function BHelper.common:init()
 --     self:set_route(self.root:get_player_class())
 -- end
@@ -14,11 +14,36 @@ BHelper.common = {}
 --         ((select(1, GetItemCooldown(33448))) == 0)) then Keystroke:show(9, 0, 0, 1, 0) end
 -- end
 
+function BHelper.common:global_macros()
+    BHelper.macros:delete_all(true)
+    BHelper.macros:create('Цель',
+                          '/targetlasttarget [exists,harm,nodead]\n/target [@focustarget,harm,nodead]\n/targetenemy [@focus,noexists]\n/targetenemy [@focus,harm]',
+                          0, true, 711)
+    BHelper.macros:create('Аук', '/s .i au', 60, true, 1729)
+    BHelper.macros:create('Банк', '/s .i b', 59, true, 1728)
+    BHelper.macros:create('Почта', '/s .i m', 58, true, 1727)
+    BHelper.macros:create('Магазин', '/s .i v', 57, true, 1726)
+    BHelper.macros:create('Воскрешение', '/s .i massrevive', 56, true, 1725)
+    BHelper.macros:create('Макросы', '/macro', 55, true, 1124)
+    BHelper.macros:create('Тренер', '/s .t', 0, true, 1718)
+    BHelper.macros:create('Roll', '/macro', 52, true, 1645)
+    BHelper.macros:create('Reload', '/reload', 49, true, 1647)
+    BHelper.macros:create('Focus', '/focus', 53, true, 776)
+    BHelper.macros:create('Баджи',
+                          '/script local function buy (n,q) for i=1,100 do if n==GetMerchantItemInfo(i) then BuyMerchantItem(i,q) end end end buy (\'Эмблема героизма\',80)',
+                          0, true, 1579)
+end
+
 function BHelper.common:get_player_name()
-    return (select(1, UnitName('player')))
+    if (self.vars._player.name ~= nil) then return self.vars._player.name end
+
+    self.vars._player.name = (select(1, UnitName('player')))
+    return self.vars._player.name
 end
 
 function BHelper.common:get_player_class()
+    if (self.vars._player.class ~= nil) then return self.vars._player.class end
+
     local classes = {
         warrior = '1',
         paladin = '2',
@@ -31,7 +56,9 @@ function BHelper.common:get_player_class()
         warlock = '9',
         druid = '11'
     }
-    return (select(2, UnitClass('player'))):lower()
+
+    self.vars._player.class = (select(2, UnitClass('player'))):lower()
+    return self.vars._player.class
 end
 
 function BHelper.common:get_player_spec()
@@ -113,6 +140,16 @@ function BHelper.common:can_cast_on_point(spellname)
     return true
 end
 
+function BHelper.common:can_attack()
+    if (UnitCanAttack('player', 'target') ~= 1) then return false end
+
+    return true
+end
+
+function BHelper.common:get_combat_state()
+    return self._combat_state
+end
+
 function BHelper.common:get_ememy_debuff_time(spell, player)
     player = player or false
     for i = 1, 40 do
@@ -185,3 +222,8 @@ function BHelper.common:get_bag_free_slots()
     end
     return free_slots_count
 end
+
+function BHelper.common:init()
+    setmetatable(BHelper, {__index = BHelper.common})
+end
+BHelper.common:init()

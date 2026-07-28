@@ -1,27 +1,68 @@
 BHelper = {}
 
+-- 1 - 1 ветка PvE
+-- 2 - 1 ветка PvP
+-- 3 - 2 ветка PvE
+-- 4 - 2 ветка PvP
+-- 5 - 3 ветка PvE
+-- 6 - 4 ветка PvP
+
 BHelper._event_frame = CreateFrame('Frame')
 BHelper._event_frame:SetScript('OnEvent', function(_, event, ...)
     BHelper[event](BHelper, ...)
 end)
 BHelper._event_frame:RegisterEvent('PLAYER_LOGIN')
+BHelper._event_frame:RegisterEvent('PLAYER_REGEN_DISABLED')
+BHelper._event_frame:RegisterEvent('PLAYER_REGEN_ENABLED')
+BHelper._event_frame:RegisterEvent('UI_ERROR_MESSAGE')
+BHelper._event_frame:RegisterEvent('PLAYER_CONTROL_LOST')
+BHelper._event_frame:RegisterEvent('PLAYER_CONTROL_GAINED')
 
 function BHelper:PLAYER_LOGIN()
-    setmetatable(BHelper, {__index = BHelper.common})
-
-    self._debug = true
-    self._runing = false
-
-    BHelper:create_state_frame()
-
+    self:create_state_frame()
+    self:global_macros()
     self:set_module(self:get_player_class())
+
+    print(BHelper.DB().action)
 
     CreateFrame('Frame'):SetScript('OnUpdate', function(_, elapsed)
         self.timers:update(elapsed)
         if ((self.modules[self._module] ~= nil) and (self._runing) and (not self._cooldown)) then
             self.modules[self._module]:_update()
+            if (self.modules[self._module][self._action] ~= nil) then
+                self.modules[self._module][self._action](self.modules[self._module])
+            end
         end
     end)
+end
+
+function BHelper:UI_ERROR_MESSAGE(message)
+    if (message == SPELL_FAILED_NOT_BEHIND) then
+        self.vars._behind_of_target = false
+        self.timers:create(0.5, function()
+            self.vars._behind_of_target = true
+        end, 'behind_of_target')
+    end
+end
+
+function BHelper:PLAYER_REGEN_DISABLED()
+    self.vars._combat_state = true
+    self:start()
+end
+
+function BHelper:PLAYER_REGEN_ENABLED()
+    self.vars._combat_state = false
+    self:stop()
+end
+
+function BHelper:PLAYER_CONTROL_LOST()
+    print('FFFFFFFFFFFFFEEEEEEEAAAAAAAAAAAARRRRR')
+    self._cooldown = true
+end
+
+function BHelper:PLAYER_CONTROL_GAINED()
+    print('Играем дальше_________________________________')
+    self._cooldown = false
 end
 
 function BHelper:create_state_frame()
@@ -36,18 +77,22 @@ function BHelper:create_state_frame()
 end
 
 function BHelper:set_module(module)
-    if ((self.modules[module] ~= nil) and (self.modules[module] ~= self._module)) then
+    if ((self.modules[module] ~= nil) and (self._module ~= module)) then
         self:print('set_module <', module, '>')
         self._module = module
         self.modules[module]:_init()
+        self.modules[module]:_macros()
+        -- if (self.modules[self._module].rotation_single ~= nil) then
+        --     self:set_action('rotation_single')
+        -- end
     end
 end
 
 function BHelper:set_action(action)
     if ((self.modules[self._module] ~= nil) and (self.modules[self._module][action] ~= nil) and
-        (self.modules[self._module]._action ~= action)) then
+        (self._action ~= action)) then
         self:print('set_action <', action, '>')
-        self.modules[self._module]._action = action
+        self._action = action
     end
 end
 
@@ -78,6 +123,8 @@ function BHelper:toggle()
 end
 
 function BHelper:start()
+    if (not self.vars._combat_state) then return end
+
     self:print('start')
     self._runing = true
     self.state_frame:Show()
@@ -86,6 +133,7 @@ end
 function BHelper:stop()
     self:print('stop')
     self._runing = false
+    self._cooldown = false
     self.state_frame:Hide()
 end
 
@@ -135,3 +183,16 @@ SLASH_BHELPER1, SLASH_BHELPER2 = '/bhelper', '/bh'
 SlashCmdList["BHELPER"] = function(message)
     BHelper:commands(message)
 end
+
+function BHelper:init()
+    self._debug = true
+    self._runing = false
+    self._module = ''
+    self._action = ''
+
+    self.vars = {}
+    self.vars._player = {}
+    self.vars._combat_state = false
+    self.vars._behind_of_target = true
+end
+BHelper:init()

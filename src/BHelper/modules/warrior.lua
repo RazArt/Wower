@@ -6,7 +6,6 @@ function BHelper.modules.warrior:init()
     self.vars.sunder = false
 
     BHelper.keybinds:unbind_all()
-    BHelper.keybinds:bind_macro('BH: Цель')
     BHelper.keybinds:bind_spell('Удар героя')
     BHelper.keybinds:bind_spell('Рассекающий удар')
     BHelper.keybinds:bind_spell('Безудержное восстановление')
@@ -28,34 +27,31 @@ end
 function BHelper.modules.warrior:macros()
     BHelper.macros:delete_all()
 
-    BHelper.macros:create('Цель',
-                          '/target [@focustarget,harm,nodead]\n/targetenemy [@focus,noexists]\n/targetenemy [@focus,harm]')
-    BHelper.macros:create('Возмездие',
-                          '#showtooltip Возмездие\n/bh c 1\n/cast [stance:2/3] Боевая стойка\n/cast [stance:1] Возмездие')
     BHelper.macros:create('Деморализующий крик',
-                          '#showtooltip Деморализующий крик\n/bh tv demoralizing_shout')
+                          '#showtooltip Деморализующий крик\n/bh tv demoralizing_shout',
+                          41)
     BHelper.macros:create('Боевой крик',
-                          '#showtooltip Боевой крик\n/bh tv battle_shout')
+                          '#showtooltip Боевой крик\n/bh tv battle_shout', 42)
     BHelper.macros:create('Командирский крик',
-                          '#showtooltip Командирский крик\n/bh tv commanding_shout')
+                          '#showtooltip Командирский крик\n/bh tv commanding_shout',
+                          43)
     BHelper.macros:create('Раскол брони',
-                          '#showtooltip Раскол брони\n/bh tv sunder')
-    BHelper.macros:create('Жажда смерти',
-                          '#showtooltip\n/bh c 1\n/cast Жажда смерти')
-    BHelper.macros:create('Безрассудство',
-                          '#showtooltip\n/bh c 1\n/cast Безрассудство')
+                          '#showtooltip Раскол брони\n/bh tv sunder', 44)
     BHelper.macros:create('Берсерк(Расовая)',
-                          '#showtooltip\n/bh c 1\n/cast Берсерк(Расовая)')
+                          '#showtooltip\n/bh c 0.5\n/cast Берсерк(Расовая)', 93)
+    BHelper.macros:create('Жажда смерти',
+                          '#showtooltip\n/bh c 0.5\n/cast Жажда смерти', 94)
+    BHelper.macros:create('Безрассудство',
+                          '#showtooltip\n/bh c 0.5\n/cast Безрассудство', 95)
+    BHelper.macros:create('Возмездие',
+                          '#showtooltip Возмездие\n/bh c 0.5\n/cast [stance:2/3] Боевая стойка\n/cast [stance:1] Возмездие',
+                          96)
 
-    BHelper.macros:create('S', '/startattack\n/bh sv attack_type 1\n/bh')
-    BHelper.macros:create('M', '/startattack\n/bh sv attack_type 2\n/bh')
+    BHelper.macros:create('S', '/startattack\n/bh sv attack_type 1\n/bh', 13, false, 1093)
+    BHelper.macros:create('M', '/startattack\n/bh sv attack_type 2\n/bh', 14, false, 1094)
 end
 
 function BHelper.modules.warrior:rotation()
-    if (InCombatLockdown() ~= 1) then return end
-
-    if (UnitCanAttack('player', 'target') ~= 1) then BHelper.keybinds:show_spell('BH: Цель') end
-
     if (self.vars.attack_type == '1') then
         if (BHelper:can_cast('Удар героя')) then
             BHelper.keybinds:show_attack('Удар героя')

@@ -1,7 +1,7 @@
 function BHelper.modules.hunter:init()
     self.vars.mana_regeneration = false
-    self.vars.mark = false
-    self.vars.acrane_shot = false
+    self.vars.mark = true
+    self.vars.acrane_shot = true
 
     BHelper.keybinds:unbind_all()
     BHelper.keybinds:bind_macro('BH: Цель')
@@ -24,28 +24,34 @@ end
 
 function BHelper.modules.hunter:macros()
     BHelper.macros:delete_all()
-
-    BHelper.macros:create('Цель',
-                          '/target [@focustarget,harm,nodead]\n/targetenemy [@focus,noexists]\n/targetenemy [@focus,harm]')
-    BHelper.macros:create('Перенаправление',
-                          '#showtooltip Перенаправление\n/bh c 1\n/cast [@focus,help,nodead] Перенаправление\n/cast [@target,help,nodead] Перенаправление\n/cast [@mouseover,help,nodead] Перенаправление')
-    BHelper.macros:create('Атака', '/petattack [target=target]')
-    BHelper.macros:create('Назад', '/petfollow')
+    BHelper.macros:create('Атака', '/petattack [target=target]', 19, false, 827)
+    BHelper.macros:create('Назад', '/petfollow', 20, false, 824)
     BHelper.macros:create('Метка охотника',
-                          '#showtooltip Метка охотника\n/bh tv mark')
+                          '#showtooltip Метка охотника\n/bh tv mark', 41)
     BHelper.macros:create('Чародейский выстрел',
-                          '#showtooltip Чародейский выстрел\n/bh tv acrane_shot')
+                          '#showtooltip Чародейский выстрел\n/bh tv acrane_shot',
+                          42)
     BHelper.macros:create('Быстрая стрельба',
-                          '#showtooltip Быстрая стрельба\n/bh c 1\n/cast Берсерк\n/cast Быстрая стрельба\n/cast Зов дикой природы')
+                          '#showtooltip Быстрая стрельба\n/bh c 0.5\n/cast Берсерк\n/cast Быстрая стрельба\n/cast Зов дикой природы',
+                          9)
     BHelper.macros:create('Готовность',
-                          '#showtooltip Готовность\n/bh c 1\n/cast Готовность')
+                          '#showtooltip Готовность\n/bh c 0.5\n/cast Готовность',
+                          10)
     BHelper.macros:create('Притвориться мертвым',
-                          '#showtooltip Притвориться мертвым\n/bh c 1\n/cast Притвориться мертвым')
+                          '#showtooltip Притвориться мертвым\n/bh c 0.5\n/cast Притвориться мертвым',
+                          11)
     BHelper.macros:create('Сдерживание',
-                          '#showtooltip Сдерживание\n/bh c 1\n/cast Сдерживание')
-
-    BHelper.macros:create('S', '/startattack\n/bh sa rotation_single\n/bh')
-    BHelper.macros:create('M', '/startattack\n/bh sa rotation_multiple\n/bh')
+                          '#showtooltip Сдерживание\n/bh c 0.5\n/cast Сдерживание',
+                          12)
+    BHelper.macros:create('Перенаправление',
+                          '#showtooltip Перенаправление\n/bh c 0.5\n/cast [@focus,help,nodead] Перенаправление\n/cast [@target,help,nodead] Перенаправление\n/cast [@mouseover,help,nodead] Перенаправление',
+                          15)
+    BHelper.macros:create('S',
+                          '/petattack [target=target]\n/startattack\n/bh sa rotation_single\n/bh',
+                          13, false, 1093)
+    BHelper.macros:create('M',
+                          '/petattack [target=target]\n/startattack\n/bh sa rotation_multiple\n/bh',
+                          14, false, 1094)
 end
 
 function BHelper.modules.hunter:rotation_single()
@@ -92,8 +98,6 @@ function BHelper.modules.hunter:rotation_single()
         BHelper.keybinds:show_help('Команда "Взять!"')
         return
     end
-
-    if (UnitCanAttack('player', 'target') ~= 1) then BHelper.keybinds:show_spell('BH: Цель') end
 
     if ((self.vars.mana_regeneration == false) and
         (BHelper:get_ememy_debuff_time('Укус змеи', true) == 0) and

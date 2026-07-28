@@ -14,31 +14,25 @@ end
 
 function BHelper.modules.rogue:macros()
     BHelper.macros:delete_all()
-
-    BHelper.macros:create('Цель',
-                          '/target [@focustarget,harm,nodead]\n/targetenemy [@focus,noexists]\n/targetenemy [@focus,harm]')
     BHelper.macros:create('Ослабление доспеха',
-                          '#showtooltip Ослабление доспеха\n/bh tv sunder')
+                          '#showtooltip Ослабление доспеха\n/bh tv sunder', 41)
     BHelper.macros:create('Маленькие хитрости',
-                          '#showtooltip Маленькие хитрости\n/bh c 1\n/cancelaura Маленькие хитрости\n/cast [@focus,help,nodead] Маленькие хитрости\n/cast [@target,help,nodead] Маленькие хитрости\n/cast [@mouseover,help,nodead] Маленькие хитрости')
+                          '#showtooltip Маленькие хитрости\n/bh c 0.5\n/cancelaura Маленькие хитрости\n/cast [@focus,help,nodead] Маленькие хитрости\n/cast [@target,help,nodead] Маленькие хитрости\n/cast [@mouseover,help,nodead] Маленькие хитрости',
+                          15)
     BHelper.macros:create('Берсерк(Расовая)',
-                          '#showtooltip\n/bh c 1\n/cast Берсерк(Расовая)')
+                          '#showtooltip\n/bh c 0.5\n/cast Берсерк(Расовая)', 9)
     BHelper.macros:create('Шквал клинков',
-                          '#showtooltip\n/bh c 1\n/cast Шквал клинков')
+                          '#showtooltip\n/bh c 0.5\n/cast Шквал клинков', 10)
     BHelper.macros:create('Выброс адреналина',
-                          '#showtooltip\n/bh c 1\n/cast Выброс адреналина')
+                          '#showtooltip\n/bh c 0.5\n/cast Выброс адреналина', 11)
     BHelper.macros:create('Череда убийств',
-                          '#showtooltip\n/bh c 1\n/cast Череда убийств')
+                          '#showtooltip\n/bh c 0.5\n/cast Череда убийств', 12)
 
-    BHelper.macros:create('S', '/startattack\n/bh sa rotation_single\n/bh')
-    BHelper.macros:create('M', '/startattack\n/bh sa rotation_multiple\n/bh')
+    BHelper.macros:create('S', '/startattack\n/bh sa rotation_single\n/bh', 13, false, 1093)
+    BHelper.macros:create('M', '/startattack\n/bh sa rotation_multiple\n/bh', 14, false, 1094)
 end
 
 function BHelper.modules.rogue:rotation_single()
-    if (InCombatLockdown() ~= 1) then return end
-
-    if (UnitCanAttack('player', 'target') ~= 1) then BHelper.keybinds:show_spell('BH: Цель') end
-
     if (BHelper:is_enemy_cast() and BHelper:can_cast_on_enemy('Пинок')) then
         BHelper.keybinds:show_spell('Пинок')
         return
@@ -96,10 +90,6 @@ function BHelper.modules.rogue:rotation_single()
 end
 
 function BHelper.modules.rogue:rotation_multiple()
-    if (InCombatLockdown() ~= 1) then return end
-
-    if (UnitCanAttack('player', 'target') ~= 1) then BHelper.keybinds:show_spell('BH: Цель') end
-
     if (BHelper:is_enemy_cast() and BHelper:can_cast_on_enemy('Пинок')) then
         BHelper.keybinds:show_spell('Пинок')
     end
