@@ -1,7 +1,7 @@
-function BHelper.modules.hunter:init()
-    self.vars.mana_regeneration = false
-    self.vars.mark = true
-    self.vars.acrane_shot = true
+function BHelper.modules.hunter.default:init()
+    if (self.vars.mana_regeneration == nil) then self.vars.mana_regeneration = false end
+    if (self.vars.mark == nil) then self.vars.mark = true end
+    if (self.vars.acrane_shot == nil) then self.vars.acrane_shot = true end
 
     BHelper.keybinds:unbind_all()
     BHelper.keybinds:bind_macro('BH: Цель')
@@ -22,7 +22,7 @@ function BHelper.modules.hunter:init()
     BHelper.keybinds:bind_spell('Команда "Взять!"')
 end
 
-function BHelper.modules.hunter:macros()
+function BHelper.modules.hunter.default:macros()
     BHelper.macros:delete_all()
     BHelper.macros:create('Атака', '/petattack [target=target]', 19, false, 827)
     BHelper.macros:create('Назад', '/petfollow', 20, false, 824)
@@ -54,7 +54,7 @@ function BHelper.modules.hunter:macros()
                           14, false, 1094)
 end
 
-function BHelper.modules.hunter:rotation_single()
+function BHelper.modules.hunter.default:rotation_single()
     if ((BHelper:get_mana_on_percent('player') < 20) and (not self.vars.mana_regeneration)) then
         self.vars.mana_regeneration = true
     elseif ((BHelper:get_mana_on_percent('player') > 60) and (self.vars.mana_regeneration)) then
@@ -144,7 +144,7 @@ function BHelper.modules.hunter:rotation_single()
     end
 end
 
-function BHelper.modules.hunter:rotation_multiple()
+function BHelper.modules.hunter.default:rotation_multiple()
     if ((BHelper:get_mana_on_percent('player') < 20) and (not self.vars.mana_regeneration)) then
         self.vars.mana_regeneration = true
     elseif ((BHelper:get_mana_on_percent('player') > 60) and (self.vars.mana_regeneration)) then

@@ -1,5 +1,5 @@
-function BHelper.modules.rogue:init()
-    self.vars.sunder = false
+function BHelper.modules.rogue.default:init()
+    if (self.vars.sunder == nil) then self.vars.sunder = false end
 
     BHelper.keybinds:unbind_all()
     BHelper.keybinds:bind_macro('BH: Цель')
@@ -12,7 +12,7 @@ function BHelper.modules.rogue:init()
     BHelper.keybinds:bind_spell('Веер клинков')
 end
 
-function BHelper.modules.rogue:macros()
+function BHelper.modules.rogue.default:macros()
     BHelper.macros:delete_all()
     BHelper.macros:create('Ослабление доспеха',
                           '#showtooltip Ослабление доспеха\n/bh tv sunder', 41)
@@ -32,7 +32,7 @@ function BHelper.modules.rogue:macros()
     BHelper.macros:create('M', '/startattack\n/bh sa rotation_multiple\n/bh', 14, false, 1094)
 end
 
-function BHelper.modules.rogue:rotation_single()
+function BHelper.modules.rogue.default:rotation_single()
     if (BHelper:is_enemy_cast() and BHelper:can_cast_on_enemy('Пинок')) then
         BHelper.keybinds:show_spell('Пинок')
         return
@@ -89,7 +89,7 @@ function BHelper.modules.rogue:rotation_single()
     end
 end
 
-function BHelper.modules.rogue:rotation_multiple()
+function BHelper.modules.rogue.default:rotation_multiple()
     if (BHelper:is_enemy_cast() and BHelper:can_cast_on_enemy('Пинок')) then
         BHelper.keybinds:show_spell('Пинок')
     end

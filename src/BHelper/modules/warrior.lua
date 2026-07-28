@@ -1,9 +1,9 @@
-function BHelper.modules.warrior:init()
-    self.vars.attack_type = '1'
-    self.vars.battle_shout = false
-    self.vars.commanding_shout = false
-    self.vars.demoralizing_shout = false
-    self.vars.sunder = false
+function BHelper.modules.warrior.default:init()
+    if (self.vars.attack_type == nil) then self.vars.attack_type = '1' end
+    if (self.vars.battle_shout == nil) then self.vars.battle_shout = false end
+    if (self.vars.commanding_shout == nil) then self.vars.commanding_shout = false end
+    if (self.vars.demoralizing_shout == nil) then self.vars.demoralizing_shout = false end
+    if (self.vars.sunder == nil) then self.vars.sunder = false end
 
     BHelper.keybinds:unbind_all()
     BHelper.keybinds:bind_spell('Удар героя')
@@ -24,7 +24,7 @@ function BHelper.modules.warrior:init()
     BHelper:set_action('rotation')
 end
 
-function BHelper.modules.warrior:macros()
+function BHelper.modules.warrior.default:macros()
     BHelper.macros:delete_all()
 
     BHelper.macros:create('Деморализующий крик',
@@ -51,7 +51,7 @@ function BHelper.modules.warrior:macros()
     BHelper.macros:create('M', '/startattack\n/bh sv attack_type 2\n/bh', 14, false, 1094)
 end
 
-function BHelper.modules.warrior:rotation()
+function BHelper.modules.warrior.default:rotation()
     if (self.vars.attack_type == '1') then
         if (BHelper:can_cast('Удар героя')) then
             BHelper.keybinds:show_attack('Удар героя')

@@ -43,7 +43,7 @@ function BHelper.modules.mailbox:step_2()
                 TakeInboxMoney(1)
                 return
             end
-            if (hasItem ~= nil) then
+            if (hasItem) then
                 if (self.parent:get_bag_free_slots() - 3 >= hasItem) then
                     AutoLootMailItem(1)
                     return

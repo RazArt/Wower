@@ -1,9 +1,13 @@
 BHelper.keybinds = {}
 
 function BHelper.keybinds:_bind(name, command, mouse_click)
+    name = string.lower(name)
+    command = string.lower(command)
+    mouse_click = mouse_click or false
+
     for key, bind in pairs(self._binds) do
         if ((bind.name == nil) or (bind.name == name)) then
-            if (SetBinding('ALT-CTRL-SHIFT-' .. key, command) ~= nil) then
+            if (SetBinding('ALT-CTRL-SHIFT-' .. key, command)) then
                 bind.name = name
                 bind.mouse_click = mouse_click and 1 or 0
                 return true
@@ -15,11 +19,7 @@ function BHelper.keybinds:_bind(name, command, mouse_click)
 end
 
 function BHelper.keybinds:bind_spell(name, mouse_click)
-    name = string.lower(name)
-    command = 'spell ' .. name
-    mouse_click = mouse_click or false
-
-    if (self:_bind(name, command, mouse_click)) then
+    if (self:_bind(name, 'spell ' .. name, mouse_click)) then
         return true
     else
         return false
@@ -27,11 +27,7 @@ function BHelper.keybinds:bind_spell(name, mouse_click)
 end
 
 function BHelper.keybinds:bind_macro(name, mouse_click)
-    name = string.lower(BHelper.macros:get_formated_name(name))
-    command = 'macro ' .. name
-    mouse_click = mouse_click or false
-
-    if (self:_bind(name, command, mouse_click)) then
+    if (self:_bind(name, 'macro ' .. BHelper.macros:get_formated_name(name), mouse_click)) then
         return true
     else
         return false
@@ -39,11 +35,7 @@ function BHelper.keybinds:bind_macro(name, mouse_click)
 end
 
 function BHelper.keybinds:bind_item(name, mouse_click)
-    name = string.lower(name)
-    command = 'item ' .. name
-    mouse_click = mouse_click or false
-
-    if (self:_bind(name, command, mouse_click)) then
+    if (self:_bind(name, 'item ' .. name, mouse_click)) then
         return true
     else
         return false
@@ -63,7 +55,7 @@ function BHelper.keybinds:unbind_all()
 end
 
 function BHelper.keybinds:_show(num, name)
-    if (ACTIVE_CHAT_EDIT_BOX ~= nil) then return false end
+    if (ACTIVE_CHAT_EDIT_BOX) then return false end
 
     name = string.lower(name)
     for key, bind in pairs(self._binds) do
@@ -122,8 +114,8 @@ function BHelper.keybinds:init()
     self._binds = {}
 
     local keys = {
-        '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', 'Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I',
-        'O', 'P'
+        '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', 'Z', 'X', 'C', 'V', 'B', 'N', 'M', 'H',
+        'J', 'K', 'L'
     }
     for _, key in ipairs(keys) do self._binds[key] = {} end
 

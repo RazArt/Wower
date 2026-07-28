@@ -31,7 +31,7 @@ function BHelper.macros:delete(name, global)
     if (global) then
         for i = 36, 1, -1 do
             local macro_name = (select(1, GetMacroInfo(i)))
-            if ((macro_name ~= nil) and (macro_name == self:get_formated_name(name))) then
+            if ((macro_name) and (macro_name == self:get_formated_name(name))) then
                 DeleteMacro(i)
                 return true
             end
@@ -39,7 +39,7 @@ function BHelper.macros:delete(name, global)
     else
         for i = 54, 37, -1 do
             local macro_name = (select(1, GetMacroInfo(i)))
-            if ((macro_name ~= nil) and (macro_name == self:get_formated_name(name))) then
+            if ((macro_name) and (macro_name == self:get_formated_name(name))) then
                 DeleteMacro(i)
                 return true
             end
@@ -55,7 +55,7 @@ function BHelper.macros:delete_all(global)
     if (global) then
         for i = 36, 1, -1 do
             local macro_name = (select(1, GetMacroInfo(i)))
-            if ((macro_name ~= nil) and (string.find(macro_name, '^' .. self:_get_name_prefix()))) then
+            if ((macro_name) and (string.find(macro_name, '^' .. self:_get_name_prefix()))) then
                 DeleteMacro(i)
                 result = true
             end
@@ -63,7 +63,7 @@ function BHelper.macros:delete_all(global)
     else
         for i = 54, 37, -1 do
             local macro_name = (select(1, GetMacroInfo(i)))
-            if ((macro_name ~= nil) and (string.find(macro_name, '^' .. self:_get_name_prefix()))) then
+            if ((macro_name) and (string.find(macro_name, '^' .. self:_get_name_prefix()))) then
                 DeleteMacro(i)
                 result = true
             end

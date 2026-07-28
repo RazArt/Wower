@@ -1,18 +1,92 @@
 BHelper.common = {}
-BHelper.common.name = 'common'
--- function BHelper.common:init()
---     self:set_route(self.root:get_player_class())
--- end
 
--- function BHelper.common:general_update()
---     if (not UnitExists('target')) then Keystroke:show(0, 1) end
+function BHelper.common:is_module_exist(module)
+    if (rawget(BHelper.modules, module)) then return true end
+    return false
+end
 
---     if ((self:get_health_on_percent() < 10) and (GetItemCount(33447) > 0) and
---         ((select(1, GetItemCooldown(33447))) == 0)) then Keystroke:show(10, 0, 0, 1, 0) end
+function BHelper.common:is_action_exist(module, profile, action)
+    if (not self:is_module_exist(module)) then return false end
 
---     if ((self:get_mana_on_percent() < 10) and (GetItemCount(33448) > 0) and
---         ((select(1, GetItemCooldown(33448))) == 0)) then Keystroke:show(9, 0, 0, 1, 0) end
--- end
+    if (rawget(BHelper.modules[module], profile) and
+        rawget(BHelper.modules[module][profile], action)) then return true end
+    if (rawget(BHelper.modules[module], 'common') and
+        rawget(BHelper.modules[module]['common'], action)) then return true end
+
+    return false
+end
+
+function BHelper.common:set_module(module)
+    if ((self:is_module_exist(module)) and (BHelper.DB().module ~= module)) then
+        self:print('set_module <', module, '>')
+        BHelper.DB().module = module
+        self.modules[module]:_init()
+        self.modules[module]:_macros()
+        BHelper.DB:reload()
+    end
+end
+
+function BHelper.common:set_action(action)
+    local profile = BHelper.DB:get_profile()
+    local module = BHelper.DB().module
+    if ((self:is_action_exist(module, profile, action)) and (BHelper.DB().action ~= action)) then
+        self:print('set_action <', profile, '/', action, '>')
+        BHelper.DB().action = action
+    end
+end
+
+function BHelper.common:set_var(var, value)
+    if (BHelper.DB:get_vars()[var] ~= nil) then BHelper.DB:get_vars()[var] = value end
+end
+
+function BHelper.common:toggle_var(var)
+    -- print(var, BHelper.DB:get_vars()[var])
+    if (BHelper.DB:get_vars()[var] ~= nil) then
+        if (BHelper.DB:get_vars()[var]) then
+            self:print('var_toggle <', var, '>', false)
+            BHelper.DB:get_vars()[var] = false
+        else
+            self:print('var_toggle <', var, '>', true)
+            BHelper.DB:get_vars()[var] = true
+        end
+    end
+end
+
+function BHelper.common:toggle()
+    if (self._runing) then
+        self:stop()
+    else
+        self:start()
+    end
+end
+
+function BHelper.common:start()
+    if (not self.vars._combat_state) then return end
+
+    self:print('start')
+    self._runing = true
+    self.state_frame:Show()
+end
+
+function BHelper.common:stop()
+    self:print('stop')
+    self._runing = false
+    self._cooldown = false
+    self.state_frame:Hide()
+end
+
+function BHelper.common:print(...)
+    if (self._debug) then print('\124cffff00ffBHelper\124r', '->', ...) end
+end
+
+function BHelper.common:cooldown(count)
+    self:print('cooldown <', count, '>')
+    self._cooldown = true
+    self.timers:create(count, function()
+        self:print('cooldown < off >')
+        self._cooldown = false
+    end, 'cooldown')
+end
 
 function BHelper.common:global_macros()
     BHelper.macros:delete_all(true)
@@ -35,14 +109,14 @@ function BHelper.common:global_macros()
 end
 
 function BHelper.common:get_player_name()
-    if (self.vars._player.name ~= nil) then return self.vars._player.name end
+    if (self.vars._player.name) then return self.vars._player.name end
 
     self.vars._player.name = (select(1, UnitName('player')))
     return self.vars._player.name
 end
 
 function BHelper.common:get_player_class()
-    if (self.vars._player.class ~= nil) then return self.vars._player.class end
+    if (self.vars._player.class) then return self.vars._player.class end
 
     local classes = {
         warrior = '1',
@@ -106,10 +180,10 @@ end
 
 function BHelper.common:is_player_cast()
     local _, _, _, _, _, endTime = UnitCastingInfo('player')
-    if (endTime ~= nil) then return (endTime / 1000 - GetTime() - 0.2 > 0) and true or false end
+    if (endTime) then return (endTime / 1000 - GetTime() - 0.2 > 0) and true or false end
 
     local _, _, _, _, _, endTime = UnitChannelInfo('player')
-    if (endTime ~= nil) then return (endTime / 1000 - GetTime() - 0.2 > 0) and true or false end
+    if (endTime) then return (endTime / 1000 - GetTime() - 0.2 > 0) and true or false end
 
     return false
 end

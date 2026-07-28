@@ -1,6 +1,4 @@
-function BHelper.modules.druid.main:init()
-    self.type = 'battle'
-
+function BHelper.modules.druid.default:init()
     BHelper.keybinds:unbind_all()
     BHelper.keybinds:bind_spell('Калечение')
     BHelper.keybinds:bind_spell('Оглушить')
@@ -19,7 +17,7 @@ function BHelper.modules.druid.main:init()
     BHelper.keybinds:bind_spell('Трепка')
 end
 
-function BHelper.modules.druid.main:macros()
+function BHelper.modules.druid.default:macros()
     BHelper.macros:delete_all()
 
     BHelper.macros:create('Накинуться',
@@ -65,7 +63,7 @@ function BHelper.modules.druid.main:macros()
     BHelper.macros:create('M', '/startattack\n/bh sa rotation_multiple\n/bh', 14, false, 1094)
 end
 
-function BHelper.modules.druid.main:rotation_single()
+function BHelper.modules.druid.default:rotation_single()
     if (BHelper:get_player_buff_time('Облик кошки') > 0) then self:cat_single() end
 
     if ((BHelper:get_player_buff_time('Облик медведя') > 0) or
@@ -74,7 +72,7 @@ function BHelper.modules.druid.main:rotation_single()
     end
 end
 
-function BHelper.modules.druid.main:rotation_multiple()
+function BHelper.modules.druid.default:rotation_multiple()
     if (BHelper:get_player_buff_time('Облик кошки') > 0) then self:cat_multiple() end
 
     if ((BHelper:get_player_buff_time('Облик медведя') > 0) or
@@ -83,7 +81,7 @@ function BHelper.modules.druid.main:rotation_multiple()
     end
 end
 
-function BHelper.modules.druid.main:cat_single()
+function BHelper.modules.druid.default:cat_single()
     if (BHelper:is_enemy_cast() and BHelper:can_cast_on_enemy('Калечение')) then
         BHelper.keybinds:show_spell('Калечение')
         return
@@ -179,7 +177,7 @@ function BHelper.modules.druid.main:cat_single()
     end
 end
 
-function BHelper.modules.druid.main:bear_single()
+function BHelper.modules.druid.default:bear_single()
     if (BHelper:can_cast('Трепка')) then BHelper.keybinds:show_attack('Трепка') end
 
     if (BHelper:is_enemy_cast() and BHelper:can_cast_on_enemy('Оглушить')) then
@@ -211,7 +209,7 @@ function BHelper.modules.druid.main:bear_single()
     end
 end
 
-function BHelper.modules.druid.main:cat_multiple()
+function BHelper.modules.druid.default:cat_multiple()
     if ((BHelper:get_player_buff_time('Ясность мысли') == 0) and
         (BHelper:can_cast_on_enemy('Волшебный огонь (зверь)'))) then
         BHelper.keybinds:show_spell('Волшебный огонь (зверь)')
@@ -242,7 +240,7 @@ function BHelper.modules.druid.main:cat_multiple()
     end
 end
 
-function BHelper.modules.druid.main:bear_multiple()
+function BHelper.modules.druid.default:bear_multiple()
     if (BHelper:can_cast('Трепка')) then BHelper.keybinds:show_attack('Трепка') end
 
     if ((BHelper:get_player_buff_time('Ясность мысли') == 0) and

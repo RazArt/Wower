@@ -1,4 +1,4 @@
-function BHelper.modules.deathknight:init()
+function BHelper.modules.deathknight.default:init()
     BHelper.keybinds:unbind_all()
     BHelper.keybinds:bind_spell('Кровь вампира')
     BHelper.keybinds:bind_spell('Кровоотвод')
@@ -16,7 +16,7 @@ function BHelper.modules.deathknight:init()
     BHelper.keybinds:bind_spell('Вскипание крови')
 end
 
-function BHelper.modules.deathknight:macros()
+function BHelper.modules.deathknight.default:macros()
     BHelper.macros:delete_all()
     BHelper.macros:create('Истерия',
                           '#showtooltip Истерия\n/bh c 0.5\n/cast [@focus,help,nodead] Истерия\n/cast [@target,help,nodead] Истерия\n/cast [@mouseover,help,nodead] Истерия',
@@ -52,7 +52,7 @@ function BHelper.modules.deathknight:macros()
     BHelper.macros:create('M', '/startattack\n/bh sa rotation_multiple\n/bh', 14, false, 1094)
 end
 
-function BHelper.modules.deathknight:update()
+function BHelper.modules.deathknight.default:update()
     if ((BHelper:get_health_on_percent() < 30) and BHelper:can_cast('Кровь вампира')) then
         BHelper.keybinds:show_spell('Кровь вампира')
     end
@@ -81,7 +81,7 @@ function BHelper.modules.deathknight:update()
     end
 end
 
-function BHelper.modules.deathknight:rotation_single()
+function BHelper.modules.deathknight.default:rotation_single()
     if (BHelper:can_cast('Рунический удар')) then
         BHelper.keybinds:show_attack('Рунический удар')
     end
@@ -114,7 +114,7 @@ function BHelper.modules.deathknight:rotation_single()
     end
 end
 
-function BHelper.modules.deathknight:rotation_multiple()
+function BHelper.modules.deathknight.default:rotation_multiple()
     if (BHelper:can_cast('Рунический удар')) then
         BHelper.keybinds:show_attack('Рунический удар')
     end

@@ -3,25 +3,56 @@ BHelper.modules = {}
 function BHelper.modules:module()
     local obj = {}
 
-    obj.vars = {}
-
     function obj:_init()
-        self._action = ''
+        BHelper:print('_init')
+        self.vars = BHelper.DB:get_vars()
 
-        if (self.init ~= nil) then self:init() end
-    end
+        if ((rawget(self, 'common')) and (rawget(self['common'], 'init'))) then
+            self['common']:init()
+        end
 
-    function obj:_update()
-        if (self.update ~= nil) then self:update() end
+        local profile = BHelper.DB:get_profile()
+        if ((rawget(self, profile)) and (rawget(self[profile], 'init'))) then
+            self[profile]:init()
+        end
     end
 
     function obj:_macros()
-        if (self.macros ~= nil) then self:macros() end
+        if ((rawget(self, 'common')) and (rawget(self['common'], 'macros'))) then
+            self['common']:macros()
+        end
+
+        local profile = BHelper.DB:get_profile()
+        if ((rawget(self, profile)) and (rawget(self[profile], 'macros'))) then
+            self[profile]:macros()
+        end
     end
 
-    -- function obj:get_profile()
-    --     return (self.profiles[BHelper:get_player_spec()])
-    -- end
+    function obj:_update()
+        if ((rawget(self, 'common')) and (rawget(self['common'], 'update'))) then
+            self['common']:update()
+        end
+
+        local profile = BHelper.DB:get_profile()
+        if ((rawget(self, profile)) and (rawget(self[profile], 'update'))) then
+            self[profile]:update()
+        end
+        if ((rawget(self, profile)) and (rawget(self[profile], BHelper.DB().action))) then
+            self[profile][BHelper.DB().action](self[profile])
+        elseif ((rawget(self, 'common')) and (rawget(self['common'], BHelper.DB().action))) then
+            self['common'][BHelper.DB().action](self['common'])
+        end
+    end
+
+    setmetatable(obj, {
+        __index = function(self, name)
+            if ((name ~= '') and (name ~= 'vars')) then
+                self[name] = {}
+                setmetatable(self[name], {__index = self})
+                return self[name]
+            end
+        end
+    })
 
     -- obj._event_frame = CreateFrame('Frame')
     -- obj._event_frame:SetScript('OnEvent', function(_, event, ...)
@@ -58,7 +89,7 @@ BHelper.modules:init()
 -- function BHelper:modules(name, parent)
 --     local obj = {}
 
---     if (parent ~= nil) then
+--     if (parent) then
 --         obj.name = parent.name .. '/' .. name or name
 --         obj.parent = parent
 --         obj.root = obj.parent.root
@@ -117,7 +148,7 @@ BHelper.modules:init()
 --         if (self.root._cooldown) then return end
 
 --         if (type(rawget(self, 'update')) == 'function') then self:update() end
---         if (rawget(self, self._route) ~= nil) then
+--         if (rawget(self, self._route)) then
 --             if (type(rawget(self, self._route)) == 'table') then
 --                 self[self._route]:_update(elapsed)
 --             elseif (type(rawget(self, self._route)) == 'function') then
@@ -132,7 +163,7 @@ BHelper.modules:init()
 --             self:print('set_route < \'\' >')
 --             self._route = route
 --             caller:_uninit()
---         elseif ((self._route ~= route) and (rawget(self, route) ~= nil)) then
+--         elseif ((self._route ~= route) and (rawget(self, route))) then
 --             self:print('set_route <', route, '>')
 --             if (type(rawget(self, route)) == 'table') then
 --                 caller:_uninit()
@@ -146,7 +177,7 @@ BHelper.modules:init()
 --     end
 
 --     function obj:var_toggle(var)
---         if (rawget(self.vars, var) ~= nil) then
+--         if (rawget(self.vars, var)) then
 --             if (self.vars[var]) then
 --                 self:print('var_toggle <', var, '>', false)
 --                 self.vars[var] = false
