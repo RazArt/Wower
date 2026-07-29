@@ -3,7 +3,6 @@ function BHelper.modules.hunter.default:init()
     if (self.vars.mark == nil) then self.vars.mark = true end
     if (self.vars.acrane_shot == nil) then self.vars.acrane_shot = true end
 
-    BHelper.keybinds:unbind_all()
     BHelper.keybinds:bind_macro('BH: Цель')
     BHelper.keybinds:bind_spell('Дух дракондора')
     BHelper.keybinds:bind_spell('Дух гадюки')
@@ -23,9 +22,8 @@ function BHelper.modules.hunter.default:init()
 end
 
 function BHelper.modules.hunter.default:macros()
-    BHelper.macros:delete_all()
-    BHelper.macros:create('Атака', '/petattack [target=target]', 19, false, 827)
-    BHelper.macros:create('Назад', '/petfollow', 20, false, 824)
+    BHelper.macros:create('Атака', '/petattack [target=target]', 19, false, 970)
+    BHelper.macros:create('Назад', '/petfollow', 20, false, 973)
     BHelper.macros:create('Метка охотника',
                           '#showtooltip Метка охотника\n/bh tv mark', 41)
     BHelper.macros:create('Чародейский выстрел',
@@ -48,10 +46,10 @@ function BHelper.modules.hunter.default:macros()
                           15)
     BHelper.macros:create('S',
                           '/petattack [target=target]\n/startattack\n/bh sa rotation_single\n/bh',
-                          13, false, 1093)
+                          13, false, 1263)
     BHelper.macros:create('M',
                           '/petattack [target=target]\n/startattack\n/bh sa rotation_multiple\n/bh',
-                          14, false, 1094)
+                          14, false, 1264)
 end
 
 function BHelper.modules.hunter.default:rotation_single()
@@ -66,7 +64,7 @@ function BHelper.modules.hunter.default:rotation_single()
         (BHelper:get_player_buff_time('Дух дикой природы') == 0) and
         (BHelper:can_cast('Дух дракондора'))) then
         BHelper.keybinds:show_spell('Дух дракондора')
-        return
+        return true
     end
 
     if ((self.vars.mana_regeneration == true) and
@@ -74,73 +72,73 @@ function BHelper.modules.hunter.default:rotation_single()
         (BHelper:get_player_buff_time('Дух дикой природы') == 0) and
         (BHelper:can_cast('Дух гадюки'))) then
         BHelper.keybinds:show_spell('Дух гадюки')
-        return
+        return true
     end
 
     if ((BHelper:get_player_buff_time('Аура меткого выстрела') == 0) and
         (BHelper:can_cast('Аура меткого выстрела'))) then
         BHelper.keybinds:show_spell('Аура меткого выстрела')
-        return
+        return true
     end
 
     if (BHelper:is_enemy_cast() and BHelper:can_cast_on_enemy('Глушащий выстрел')) then
         BHelper.keybinds:show_spell('Глушащий выстрел')
-        return
+        return true
     end
 
     if ((BHelper:get_ememy_debuff_time('Метка охотника') == 0) and
         (BHelper:can_cast_on_enemy('Метка охотника')) and self.vars.mark) then
         BHelper.keybinds:show_spell('Метка охотника')
-        return
+        return true
     end
 
     if (BHelper:can_cast('Команда "Взять!"')) then
         BHelper.keybinds:show_help('Команда "Взять!"')
-        return
+        return true
     end
 
     if ((self.vars.mana_regeneration == false) and
         (BHelper:get_ememy_debuff_time('Укус змеи', true) == 0) and
         (BHelper:can_cast_on_enemy('Укус змеи'))) then
         BHelper.keybinds:show_spell('Укус змеи')
-        return
+        return true
     end
 
     if ((self.vars.mana_regeneration == true) and
         (BHelper:get_ememy_debuff_time('Укус гадюки', true) == 0) and
         (BHelper:can_cast_on_enemy('Укус гадюки'))) then
         BHelper.keybinds:show_spell('Укус гадюки')
-        return
+        return true
     end
 
     if (BHelper:can_cast_on_enemy('Убийственный выстрел')) then
         BHelper.keybinds:show_spell('Убийственный выстрел')
-        return
+        return true
     end
 
     if (BHelper:can_cast_on_point('Бросок ловушки: взрывная ловушка')) then
         BHelper.keybinds:show_spell('Бросок ловушки: взрывная ловушка')
-        return
+        return true
     end
 
     if (BHelper:can_cast_on_enemy('Выстрел химеры')) then
         BHelper.keybinds:show_spell('Выстрел химеры')
-        return
+        return true
     end
 
     if (BHelper:can_cast_on_enemy('Прицельный выстрел')) then
         BHelper.keybinds:show_spell('Прицельный выстрел')
-        return
+        return true
     end
 
     if (BHelper:can_cast_on_enemy('Чародейский выстрел') and self.vars.acrane_shot) then
         BHelper.keybinds:show_spell('Чародейский выстрел')
-        return
+        return true
     end
 
     if (BHelper:can_cast_on_enemy('Верный выстрел')) then
         BHelper.keybinds:show_spell('Верный выстрел')
-        return
+        return true
     end
 end
 
@@ -156,7 +154,7 @@ function BHelper.modules.hunter.default:rotation_multiple()
         (BHelper:get_player_buff_time('Дух дикой природы') == 0) and
         (BHelper:can_cast('Дух дракондора'))) then
         BHelper.keybinds:show_spell('Дух дракондора')
-        return
+        return true
     end
 
     if ((self.vars.mana_regeneration == true) and
@@ -164,27 +162,27 @@ function BHelper.modules.hunter.default:rotation_multiple()
         (BHelper:get_player_buff_time('Дух дикой природы') == 0) and
         (BHelper:can_cast('Дух гадюки'))) then
         BHelper.keybinds:show_spell('Дух гадюки')
-        return
+        return true
     end
 
     if ((BHelper:get_player_buff_time('Аура меткого выстрела') == 0) and
         (BHelper:can_cast('Аура меткого выстрела'))) then
         BHelper.keybinds:show_spell('Аура меткого выстрела')
-        return
+        return true
     end
 
     if (BHelper:is_enemy_cast() and BHelper:can_cast_on_enemy('Глушащий выстрел')) then
         BHelper.keybinds:show_spell('Глушащий выстрел')
-        return
+        return true
     end
 
     if (BHelper:can_cast_on_point('Бросок ловушки: взрывная ловушка')) then
         BHelper.keybinds:show_spell('Бросок ловушки: взрывная ловушка')
-        return
+        return true
     end
 
     if (BHelper:can_cast_on_point('Град стрел')) then
         BHelper.keybinds:show_spell('Град стрел')
-        return
+        return true
     end
 end

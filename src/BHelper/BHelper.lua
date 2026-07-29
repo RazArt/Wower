@@ -1,17 +1,11 @@
 BHelper = {}
 
--- 1 - 1 ветка PvE
--- 2 - 1 ветка PvP
--- 3 - 2 ветка PvE
--- 4 - 2 ветка PvP
--- 5 - 3 ветка PvE
--- 6 - 4 ветка PvP
-
 BHelper._event_frame = CreateFrame('Frame')
 BHelper._event_frame:SetScript('OnEvent', function(_, event, ...)
     BHelper[event](BHelper, ...)
 end)
 BHelper._event_frame:RegisterEvent('PLAYER_LOGIN')
+BHelper._event_frame:RegisterEvent('ACTIVE_TALENT_GROUP_CHANGED')
 BHelper._event_frame:RegisterEvent('PLAYER_REGEN_DISABLED')
 BHelper._event_frame:RegisterEvent('PLAYER_REGEN_ENABLED')
 BHelper._event_frame:RegisterEvent('UI_ERROR_MESSAGE')
@@ -19,28 +13,33 @@ BHelper._event_frame:RegisterEvent('PLAYER_CONTROL_LOST')
 BHelper._event_frame:RegisterEvent('PLAYER_CONTROL_GAINED')
 
 function BHelper:PLAYER_LOGIN()
-    BHelper.DB:init()
+    self.DB:init()
     self:create_state_frame()
-    self:global_macros()
 
-    self.modules[BHelper.DB().module]:_init()
-    self.modules[BHelper.DB().module]:_macros()
+    self:reload()
 
     CreateFrame('Frame'):SetScript('OnUpdate', function(_, elapsed)
         self.timers:update(elapsed)
-        if ((self:is_module_exist(self:DB().module)) and (self._runing) and (not self._cooldown)) then
-            self.modules[self:DB().module]:_update()
-        end
+        local module = self:get_module()
+        if ((module) and (self._runing) and (not self._cooldown)) then module:_update() end
     end)
 end
 
-function BHelper:UI_ERROR_MESSAGE(message)
-    if (message == SPELL_FAILED_NOT_BEHIND) then
-        self.vars._behind_of_target = false
-        self.timers:create(0.5, function()
-            self.vars._behind_of_target = true
-        end, 'behind_of_target')
-    end
+function BHelper:create_state_frame()
+    self.state_frame = CreateFrame('Frame')
+    self.state_frame:SetSize(50, 50)
+    self.state_frame:SetFrameStrata('tooltip')
+    self.state_frame:SetPoint('center', UIParent, 'center', 0, -160)
+    self.state_frame.texture = self.state_frame:CreateTexture(nil, 'tooltip')
+    self.state_frame.texture:SetAllPoints(self.state_frame)
+    self.state_frame.texture:SetTexture('Interface\\AddOns\\BHelper\\textures\\warning.tga')
+    self.state_frame:Hide()
+end
+
+function BHelper:ACTIVE_TALENT_GROUP_CHANGED()
+    self.timers:create(1, function()
+        self:reload()
+    end)
 end
 
 function BHelper:PLAYER_REGEN_DISABLED()
@@ -53,25 +52,21 @@ function BHelper:PLAYER_REGEN_ENABLED()
     self:stop()
 end
 
+function BHelper:UI_ERROR_MESSAGE(message)
+    if (message == SPELL_FAILED_NOT_BEHIND) then
+        self.vars._behind_of_target = false
+        self.timers:create(0.5, function()
+            self.vars._behind_of_target = true
+        end, 'behind_of_target')
+    end
+end
+
 function BHelper:PLAYER_CONTROL_LOST()
-    print('FFFFFFFFFFFFFEEEEEEEAAAAAAAAAAAARRRRR')
     self._cooldown = true
 end
 
 function BHelper:PLAYER_CONTROL_GAINED()
-    print('Играем дальше_________________________________')
     self._cooldown = false
-end
-
-function BHelper:create_state_frame()
-    self.state_frame = CreateFrame('Frame')
-    self.state_frame:SetSize(50, 50)
-    self.state_frame:SetFrameStrata('tooltip')
-    self.state_frame:SetPoint('center', UIParent, 'center', 0, -160)
-    self.state_frame.texture = self.state_frame:CreateTexture(nil, 'tooltip')
-    self.state_frame.texture:SetAllPoints(self.state_frame)
-    self.state_frame.texture:SetTexture('Interface\\AddOns\\BHelper\\textures\\warning.tga')
-    self.state_frame:Hide()
 end
 
 function BHelper:commands(msg)
@@ -94,6 +89,8 @@ function BHelper:commands(msg)
         self:set_module(args[2])
     elseif (args[1] == 'sa') then
         self:set_action(args[2])
+    elseif (args[1] == 'sp') then
+        self.DB:set_profile_name(args[2])
     elseif (args[1] == 'm') then
         self.modules[self._module]:_macros()
     elseif (args[1] == 'c') then

@@ -1,7 +1,6 @@
 function BHelper.modules.rogue.default:init()
     if (self.vars.sunder == nil) then self.vars.sunder = false end
 
-    BHelper.keybinds:unbind_all()
     BHelper.keybinds:bind_macro('BH: Цель')
     BHelper.keybinds:bind_spell('Пинок')
     BHelper.keybinds:bind_spell('Ослабление доспеха')
@@ -13,7 +12,6 @@ function BHelper.modules.rogue.default:init()
 end
 
 function BHelper.modules.rogue.default:macros()
-    BHelper.macros:delete_all()
     BHelper.macros:create('Ослабление доспеха',
                           '#showtooltip Ослабление доспеха\n/bh tv sunder', 41)
     BHelper.macros:create('Маленькие хитрости',
@@ -28,74 +26,75 @@ function BHelper.modules.rogue.default:macros()
     BHelper.macros:create('Череда убийств',
                           '#showtooltip\n/bh c 0.5\n/cast Череда убийств', 12)
 
-    BHelper.macros:create('S', '/startattack\n/bh sa rotation_single\n/bh', 13, false, 1093)
-    BHelper.macros:create('M', '/startattack\n/bh sa rotation_multiple\n/bh', 14, false, 1094)
+    BHelper.macros:create('S', '/startattack\n/bh sa rotation_single\n/bh', 13, false, 1263)
+    BHelper.macros:create('M', '/startattack\n/bh sa rotation_multiple\n/bh', 14, false, 1264)
 end
 
 function BHelper.modules.rogue.default:rotation_single()
     if (BHelper:is_enemy_cast() and BHelper:can_cast_on_enemy('Пинок')) then
         BHelper.keybinds:show_spell('Пинок')
-        return
+        return true
     end
 
     if (self.vars.sunder) then
         if ((BHelper:get_ememy_debuff_time('Ослабление доспеха') == 0) and
             (BHelper:can_cast_on_enemy('Ослабление доспеха'))) then
             BHelper.keybinds:show_spell('Ослабление доспеха')
-            return
+            return true
         end
 
         if ((BHelper:get_ememy_debuff_time('Ослабление доспеха') <= 3) and
             (BHelper:can_cast_on_enemy('Ослабление доспеха')) and
             (BHelper:check_combo_points(4))) then
             BHelper.keybinds:show_spell('Ослабление доспеха')
-            return
+            return true
         end
     end
 
     if ((BHelper:get_player_buff_time('Мясорубка') == 0) and
         (BHelper:can_cast('Мясорубка'))) then
         BHelper.keybinds:show_spell('Мясорубка')
-        return
+        return true
     end
 
     if ((BHelper:get_player_buff_time('Мясорубка') <= 3) and
         (BHelper:can_cast('Мясорубка')) and (BHelper:check_combo_points(5))) then
         BHelper.keybinds:show_spell('Мясорубка')
-        return
+        return true
     end
 
     if ((BHelper:get_ememy_debuff_time('Рваная рана', true) <= 2) and
         (BHelper:can_cast_on_enemy('Рваная рана')) and (BHelper:check_combo_points(5))) then
         BHelper.keybinds:show_spell('Рваная рана')
-        return
+        return true
     end
 
     if ((BHelper:get_ememy_debuff_time('Рваная рана', true) > 4) and
         (BHelper:can_cast_on_enemy('Потрошение')) and (BHelper:check_combo_points(3))) then
         BHelper.keybinds:show_spell('Потрошение')
-        return
+        return true
     end
 
     -- if ((BHelper:can_cast_on_enemy('Потрошение')) and
     --     (BHelper:check_combo_points(4))) then
     --     BHelper.keybinds:show_spell('Потрошение')
-    --     return
+    --     return true
     -- end
 
     if (BHelper:can_cast_on_enemy('Коварный удар')) then
         BHelper.keybinds:show_spell('Коварный удар')
-        return
+        return true
     end
 end
 
 function BHelper.modules.rogue.default:rotation_multiple()
     if (BHelper:is_enemy_cast() and BHelper:can_cast_on_enemy('Пинок')) then
         BHelper.keybinds:show_spell('Пинок')
+        return true
     end
 
     if (BHelper:can_cast('Веер клинков')) then
         BHelper.keybinds:show_spell('Веер клинков')
-        return
+        return true
     end
 end

@@ -1,78 +1,54 @@
 BHelper.DB = {}
 
 function BHelper.DB:reload()
-    self.profile = nil
     self.DB = nil
     self.vars = nil
-    self.module = nil
-    self.action = nil
+    self.profile_name = nil
 end
 
-function BHelper.DB:get_DB() -- удалять self.DB self.vars после смены спека, профиля
-    if (self.DB) then return self.DB end
-
-    local profile = self:get_profile()
-    if ((BHelperDB[profile] == nil) or (type(BHelperDB[profile]) ~= 'table')) then
-        BHelperDB[profile] = {}
+function BHelper.DB:get_DB()
+    if (self.DB == nil) then
+        local profile_name = self:get_profile_name()
+        if ((BHelperDB[profile_name] == nil) or (type(BHelperDB[profile_name]) ~= 'table')) then
+            BHelperDB[profile_name] = {}
+        end
+        self.DB = BHelperDB[profile_name]
     end
-
-    if (not BHelper:is_module_exist(BHelperDB[profile].module)) then
-        BHelperDB[profile].module = BHelper:get_player_class()
-    end
-
-    if (not BHelper:is_action_exist(BHelperDB[profile].module, profile, BHelperDB[profile].action)) then
-        BHelperDB[profile].action = ''
-    end
-
-    if ((BHelperDB[profile].type ~= 'battle') or (BHelperDB[profile].type ~= 'heal') or
-        (BHelperDB[profile].type ~= 'craft')) then BHelperDB[profile].type = 'battle' end
-
-    if ((BHelperDB[profile].vars == nil) or (type(BHelperDB[profile].vars) ~= 'table')) then
-        BHelperDB[profile].vars = {}
-    end
-
-    self.DB = BHelperDB[profile]
-
     return self.DB
 end
 
-function BHelper.DB:get_vars() -- удалять self.DB self.vars после смены спека, профиля, модуля
-    if (self.vars) then return self.vars end
-
-    local DB = self:get_DB()
-    if ((DB.vars[DB.module] == nil) or (type(DB.vars[DB.module]) ~= 'table')) then
-        DB.vars[DB.module] = {}
+function BHelper.DB:get_vars()
+    if (self.vars == nil) then
+        local DB = self:get_DB()
+        if ((DB.vars == nil) or (type(DB.vars) ~= 'table')) then DB.vars = {} end
+        if ((DB.vars[DB.module_name] == nil) or (type(DB.vars[DB.module_name]) ~= 'table')) then
+            DB.vars[DB.module_name] = {}
+        end
+        self.vars = DB.vars[DB.module_name]
     end
-
-    self.vars = DB.vars[DB.module]
-
     return self.vars
 end
 
-function BHelper.DB:get_profile()
-    if (self.profile) then return self.profile end
-
-    local profile = BHelperDB.selected_profiles[BHelper:get_player_spec()]
-    if (profile and string.match(profile, '^[_%w]+$')) then
-        self.profile = profile
-    else
-        BHelperDB.selected_profiles[BHelper:get_player_spec()] = self._default_profile
-        self.profile = self._default_profile
+function BHelper.DB:get_profile_name()
+    if (self.profile_name == nil) then
+        local profile_name = BHelperDB.selected_profiles[BHelper:get_player_spec()]
+        if ((profile_name) and (string.match(profile_name, '^[_%w]+$'))) then
+            self.profile_name = profile_name
+        else
+            self:set_profile_name(self._default_profile_name)
+            self.profile_name = self._default_profile_name
+        end
     end
-
-    return self.profile
+    return self.profile_name
 end
 
-function BHelper.DB:set_profile(profile)
-    profile = string.lower(profile)
-
-    if (string.match(profile, '^[_%w]+$')) then
-        BHelperDB.selected_profiles[BHelper:get_player_spec()] = profile
-        self:reload()
-
+function BHelper.DB:set_profile_name(profile_name)
+    profile_name = string.lower(profile_name)
+    if (string.match(profile_name, '^[_%w]+$')) then
+        BHelperDB.selected_profiles[BHelper:get_player_spec()] = profile_name
+        BHelper:reload()
         return true
     end
-
     return false
 end
 
@@ -83,11 +59,9 @@ function BHelper.DB:init()
         end
     })
 
-    self._default_profile = 'default'
-
+    self._default_profile_name = 'default'
     if ((BHelperDB == nil) or (type(BHelperDB) ~= 'table')) then BHelperDB = {} end
     if ((BHelperDB.selected_profiles == nil) or (type(BHelperDB.selected_profiles) ~= 'table')) then
-        BHelperDB.selected_profiles = {self._default_profile, self._default_profile}
+        BHelperDB.selected_profiles = {self._default_profile_name, self._default_profile_name}
     end
 end
-

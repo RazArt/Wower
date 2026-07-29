@@ -1,69 +1,62 @@
 BHelper.modules = {}
 
-function BHelper.modules:module()
+function BHelper.modules:module(profiles)
+    profiles = profiles or {}
     local obj = {}
+
+    obj.common = {}
+    for _, profile in pairs(profiles) do obj[profile] = {} end
 
     function obj:_init()
         BHelper:print('_init')
         self.vars = BHelper.DB:get_vars()
 
-        if ((rawget(self, 'common')) and (rawget(self['common'], 'init'))) then
-            self['common']:init()
-        end
-
-        local profile = BHelper.DB:get_profile()
-        if ((rawget(self, profile)) and (rawget(self[profile], 'init'))) then
-            self[profile]:init()
+        local profile_name = BHelper.DB:get_profile_name()
+        if ((self['common']) and (self['common']['init'])) then self['common'].init(self) end
+        if ((self[profile_name]) and (self[profile_name]['init'])) then
+            self[profile_name].init(self)
         end
     end
 
     function obj:_macros()
-        if ((rawget(self, 'common')) and (rawget(self['common'], 'macros'))) then
-            self['common']:macros()
-        end
-
-        local profile = BHelper.DB:get_profile()
-        if ((rawget(self, profile)) and (rawget(self[profile], 'macros'))) then
-            self[profile]:macros()
+        BHelper:print('_macros')
+        local profile_name = BHelper.DB:get_profile_name()
+        if ((self['common']) and (self['common']['macros'])) then self['common'].macros(self) end
+        if ((self[profile_name]) and (self[profile_name]['macros'])) then
+            self[profile_name].macros(self)
         end
     end
 
     function obj:_update()
-        if ((rawget(self, 'common')) and (rawget(self['common'], 'update'))) then
-            self['common']:update()
+        local stop_flag = false
+        local profile_name = BHelper.DB:get_profile_name()
+        if ((not stop_flag) and (self['common']) and (self['common']['update'])) then
+            stop_flag = self['common']:update(self)
         end
-
-        local profile = BHelper.DB:get_profile()
-        if ((rawget(self, profile)) and (rawget(self[profile], 'update'))) then
-            self[profile]:update()
+        if ((not stop_flag) and (self[profile_name]) and (self[profile_name]['update'])) then
+            stop_flag = self[profile_name].update(self)
         end
-        if ((rawget(self, profile)) and (rawget(self[profile], BHelper.DB().action))) then
-            self[profile][BHelper.DB().action](self[profile])
-        elseif ((rawget(self, 'common')) and (rawget(self['common'], BHelper.DB().action))) then
-            self['common'][BHelper.DB().action](self['common'])
+        if ((BHelper.DB().type == 'battle') and (not BHelper:can_attack())) then
+            stop_flag = BHelper.keybinds:show_macro('Цель')
         end
+        if (not stop_flag) then stop_flag = BHelper:get_action()(self) end
     end
 
     setmetatable(obj, {
         __index = function(self, name)
             if ((name ~= '') and (name ~= 'vars')) then
-                self[name] = {}
-                setmetatable(self[name], {__index = self})
-                return self[name]
+                local profile_name = BHelper.DB:get_profile_name()
+                if ((self[profile_name]) and (self[profile_name][name])) then
+                    return self[profile_name][name]
+                end
+                if ((self['common']) and (self['common'][name])) then
+                    return self['common'][name]
+                end
+                return nil
             end
+            return nil
         end
     })
-
-    -- obj._event_frame = CreateFrame('Frame')
-    -- obj._event_frame:SetScript('OnEvent', function(_, event, ...)
-    --     obj[event](obj, ...)
-    -- end)
-
-    -- function obj:register_event(event)
-    --     self:print('register_event <', event, '>')
-
-    --     self._event_frame:RegisterEvent(event)
-    -- end
 
     return obj
 end
@@ -73,133 +66,15 @@ function BHelper.modules:init()
     self.crafting = self:module()
     self.mailbox = self:module()
 
-    self.deathknight = self:module()
-    self.druid = self:module()
-    self.hunter = self:module()
-    self.mage = self:module()
-    self.paladin = self:module()
-    self.priest = self:module()
-    self.rogue = self:module()
-    self.shaman = self:module()
-    self.warlock = self:module()
-    self.warrior = self:module()
+    self.deathknight = self:module({'default'})
+    self.druid = self:module({'default', 'balance'})
+    self.hunter = self:module({'default'})
+    self.mage = self:module({'default'})
+    self.paladin = self:module({'default'})
+    self.priest = self:module({'default'})
+    self.rogue = self:module({'default'})
+    self.shaman = self:module({'default'})
+    self.warlock = self:module({'default'})
+    self.warrior = self:module({'default'})
 end
 BHelper.modules:init()
-
--- function BHelper:modules(name, parent)
---     local obj = {}
-
---     if (parent) then
---         obj.name = parent.name .. '/' .. name or name
---         obj.parent = parent
---         obj.root = obj.parent.root
---     else
---         obj.name = name
---         obj.parent = obj
---         obj.root = obj
-
---         obj._runing = false
---         obj._cooldown = false
---         obj._timers = {}
---         obj._debug = true
---         obj.player = {}
---     end
-
---     obj._event_frame = CreateFrame('Frame')
---     obj._event_frame._parent = obj
---     obj._event_frame:SetScript('OnEvent', function(self, event, ...)
---         self._parent[event](self._parent, ...)
---     end)
-
---     obj._route = ''
---     obj.vars = {}
-
---     function obj:register_event(event)
---         self:print('register_event <', event, '>')
-
---         self._event_frame:RegisterEvent(event)
---     end
-
---     function obj:_uninit()
---         self:print('uninit')
-
---         self.vars = {}
---         self:delete_timer()
---         self._event_frame:UnregisterAllEvents()
-
---         if (type(rawget(self, 'uninit')) == 'function') then self:uninit() end
---     end
-
---     function obj:_update(elapsed)
---         if (not self.root._runing) then return end
-
---         for i = #self.root._timers, 1, -1 do
---             self.root._timers[i][1] = self.root._timers[i][1] + elapsed
---             if self.root._timers[i][1] >= self.root._timers[i][2] then
---                 self.root._timers[i][3]()
---                 if (not self.root._timers[i][4]) then
---                     table.remove(self.root._timers, i)
---                 else
---                     self.root._timers[i][1] = 0
---                 end
---             end
---         end
-
---         if (self.root._cooldown) then return end
-
---         if (type(rawget(self, 'update')) == 'function') then self:update() end
---         if (rawget(self, self._route)) then
---             if (type(rawget(self, self._route)) == 'table') then
---                 self[self._route]:_update(elapsed)
---             elseif (type(rawget(self, self._route)) == 'function') then
---                 self[self._route](self)
---             end
---         end
---     end
-
---     function obj:set_route(route, caller)
---         caller = caller or self
---         if (route == '') then
---             self:print('set_route < \'\' >')
---             self._route = route
---             caller:_uninit()
---         elseif ((self._route ~= route) and (rawget(self, route))) then
---             self:print('set_route <', route, '>')
---             if (type(rawget(self, route)) == 'table') then
---                 caller:_uninit()
---                 self[route]:_init()
---             end
---             if ((type(rawget(self, route)) == 'function') and (route == '')) then
---                 self:_init()
---             end
---             self._route = route
---         end
---     end
-
---     function obj:var_toggle(var)
---         if (rawget(self.vars, var)) then
---             if (self.vars[var]) then
---                 self:print('var_toggle <', var, '>', false)
---                 self.vars[var] = false
---             else
---                 self:print('var_toggle <', var, '>', true)
---                 self.vars[var] = true
---             end
---         end
---     end
-
---     setmetatable(obj, {
---         __index = function(self, name)
---             if (name ~= '') then
---                 self:print('create <', name, '>')
---                 self[name] = BHelper:modules(name, self)
---                 return self[name]
---             end
---         end,
---         __call = function(self)
---             self:_init()
---         end
---     })
-
---     return obj
--- end

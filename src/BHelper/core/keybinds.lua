@@ -9,12 +9,11 @@ function BHelper.keybinds:_bind(name, command, mouse_click)
         if ((bind.name == nil) or (bind.name == name)) then
             if (SetBinding('ALT-CTRL-SHIFT-' .. key, command)) then
                 bind.name = name
-                bind.mouse_click = mouse_click and 1 or 0
+                bind.mouse_click = not mouse_click and 0 or 1
                 return true
             end
         end
     end
-
     return false
 end
 
@@ -27,7 +26,8 @@ function BHelper.keybinds:bind_spell(name, mouse_click)
 end
 
 function BHelper.keybinds:bind_macro(name, mouse_click)
-    if (self:_bind(name, 'macro ' .. BHelper.macros:get_formated_name(name), mouse_click)) then
+    name = BHelper.macros:get_formatted_name(name)
+    if (self:_bind(name, 'macro ' .. name, mouse_click)) then
         return true
     else
         return false
@@ -44,13 +44,11 @@ end
 
 function BHelper.keybinds:unbind_all()
     local result = true
-
     for key, bind in pairs(self._binds) do
         bind.name = nil
         bind.mouse_click = nil
         if (SetBinding('ALT-CTRL-SHIFT-' .. key) == nil) then result = false end
     end
-
     return result
 end
 
@@ -63,18 +61,14 @@ function BHelper.keybinds:_show(num, name)
             local flag = 44 / 255
             local key = string.byte(key, 1) / 255
             local mouse_click = bind.mouse_click / 255
-
             self._frames.frame[num].texture:SetTexture(flag, key, mouse_click)
             self._frames.frame[num]:Show()
-
             BHelper.timers:create(0.05, function()
                 self._frames.frame[num]:Hide()
             end, 'keybinds_hide_' .. num)
-
             return true
         end
     end
-
     return false
 end
 
@@ -87,7 +81,7 @@ function BHelper.keybinds:show_spell(name)
 end
 
 function BHelper.keybinds:show_macro(name)
-    if (self:_show(1, BHelper.macros:get_formated_name(name))) then
+    if (self:_show(1, BHelper.macros:get_formatted_name(name))) then
         return true
     else
         return false
@@ -113,12 +107,10 @@ end
 function BHelper.keybinds:init()
     self._binds = {}
 
-    local keys = {
-        '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', 'Z', 'X', 'C', 'V', 'B', 'N', 'M', 'H',
-        'J', 'K', 'L'
-    }
-    for _, key in ipairs(keys) do self._binds[key] = {} end
-
+    for _, key in ipairs({
+        '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', 'T', 'Y', 'U', 'I', 'O', 'P', 'H', 'J',
+        'K', 'L', 'Z', 'X', 'C', 'V', 'B', 'N', 'M'
+    }) do self._binds[key] = {} end
     self:unbind_all()
 
     self._frames = CreateFrame('Frame')

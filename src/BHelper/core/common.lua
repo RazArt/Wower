@@ -1,53 +1,85 @@
 BHelper.common = {}
 
-function BHelper.common:is_module_exist(module)
-    if (rawget(BHelper.modules, module)) then return true end
-    return false
-end
+function BHelper.common:reload()
+    self.DB:reload()
+    self:print('loaded ->', self.DB:get_profile_name(), self.DB().module_name, self.DB().action_name)
+    self:global_macros()
 
-function BHelper.common:is_action_exist(module, profile, action)
-    if (not self:is_module_exist(module)) then return false end
+    BHelper.keybinds:unbind_all()
+    BHelper.macros:delete_all()
 
-    if (rawget(BHelper.modules[module], profile) and
-        rawget(BHelper.modules[module][profile], action)) then return true end
-    if (rawget(BHelper.modules[module], 'common') and
-        rawget(BHelper.modules[module]['common'], action)) then return true end
-
-    return false
-end
-
-function BHelper.common:set_module(module)
-    if ((self:is_module_exist(module)) and (BHelper.DB().module ~= module)) then
-        self:print('set_module <', module, '>')
-        BHelper.DB().module = module
-        self.modules[module]:_init()
-        self.modules[module]:_macros()
-        BHelper.DB:reload()
+    local module = self:get_module()
+    if (module) then
+        module:_init()
+        module:_macros()
+        if (self.DB().type == 'battle') then self.keybinds:bind_macro('Цель') end
     end
 end
 
-function BHelper.common:set_action(action)
-    local profile = BHelper.DB:get_profile()
-    local module = BHelper.DB().module
-    if ((self:is_action_exist(module, profile, action)) and (BHelper.DB().action ~= action)) then
-        self:print('set_action <', profile, '/', action, '>')
-        BHelper.DB().action = action
+function BHelper.common:get_module()
+    local module_name = self.DB().module_name
+    if (rawget(self.modules, module_name)) then
+        return self.modules[module_name]
+    else
+        return nil
+    end
+end
+
+function BHelper.common:set_module(module_name)
+    if ((rawget(self.modules, module_name)) and (self.DB().module_name ~= module_name)) then
+        self:print('set_module -> ', module_name)
+        self.DB().action_name = nil
+        self.DB().module_name = module_name
+        self:reload()
+    end
+end
+
+function BHelper.common:get_action()
+    local module = self:get_module()
+    local profile_name = self.DB:get_profile_name()
+    local action_name = self.DB().action_name
+
+    if (module) then
+        if ((module[profile_name]) and (module[profile_name][action_name])) then
+            return module[profile_name][action_name]
+        end
+        if ((module['common']) and (module['common'][action_name])) then
+            return module['common'][action_name]
+        end
+        return nil
+    else
+        return nil
+    end
+end
+
+function BHelper.common:set_action(action_name)
+    local module = self:get_module()
+    local profile_name = self.DB:get_profile_name()
+
+    if ((module) and (self.DB().action_name ~= action_name)) then
+        if (((module[profile_name]) and (module[profile_name][action_name])) or
+            ((module['common']) and (module['common'][action_name]))) then
+            self:print('set_action -> ', action_name)
+            self.DB().action_name = action_name
+        end
+        return nil
+    else
+        return nil
     end
 end
 
 function BHelper.common:set_var(var, value)
-    if (BHelper.DB:get_vars()[var] ~= nil) then BHelper.DB:get_vars()[var] = value end
+    if (self.DB:get_vars()[var] ~= nil) then self.DB:get_vars()[var] = value end
 end
 
 function BHelper.common:toggle_var(var)
-    -- print(var, BHelper.DB:get_vars()[var])
-    if (BHelper.DB:get_vars()[var] ~= nil) then
-        if (BHelper.DB:get_vars()[var]) then
+    if (self.DB:get_vars()[var] ~= nil) then
+        if (self.DB:get_vars()[var]) then
             self:print('var_toggle <', var, '>', false)
-            BHelper.DB:get_vars()[var] = false
+            self.DB:get_vars()[var] = false
         else
             self:print('var_toggle <', var, '>', true)
-            BHelper.DB:get_vars()[var] = true
+            self.DB:get_vars()[var] = true
         end
     end
 end
@@ -93,19 +125,19 @@ function BHelper.common:global_macros()
     BHelper.macros:create('Цель',
                           '/targetlasttarget [exists,harm,nodead]\n/target [@focustarget,harm,nodead]\n/targetenemy [@focus,noexists]\n/targetenemy [@focus,harm]',
                           0, true, 711)
-    BHelper.macros:create('Аук', '/s .i au', 60, true, 1729)
-    BHelper.macros:create('Банк', '/s .i b', 59, true, 1728)
-    BHelper.macros:create('Почта', '/s .i m', 58, true, 1727)
-    BHelper.macros:create('Магазин', '/s .i v', 57, true, 1726)
-    BHelper.macros:create('Воскрешение', '/s .i massrevive', 56, true, 1725)
-    BHelper.macros:create('Макросы', '/macro', 55, true, 1124)
-    BHelper.macros:create('Тренер', '/s .t', 0, true, 1718)
-    BHelper.macros:create('Roll', '/macro', 52, true, 1645)
-    BHelper.macros:create('Reload', '/reload', 49, true, 1647)
-    BHelper.macros:create('Focus', '/focus', 53, true, 776)
+    BHelper.macros:create('Аук', '/s .i au', 60, true, 1935)
+    BHelper.macros:create('Банк', '/s .i b', 59, true, 1933)
+    BHelper.macros:create('Почта', '/s .i m', 58, true, 1931)
+    BHelper.macros:create('Магазин', '/s .i v', 57, true, 1929)
+    BHelper.macros:create('Воскрешение', '/s .i massrevive', 56, true, 1927)
+    BHelper.macros:create('Макросы', '/macro', 55, true, 1123)
+    BHelper.macros:create('Тренер', '/s .t', 0, true, 1930)
+    BHelper.macros:create('Roll', '/macro', 52, true, 1836)
+    BHelper.macros:create('Reload', '/reload', 49, true, 1838)
+    BHelper.macros:create('Focus', '/focus', 53, true, 921)
     BHelper.macros:create('Баджи',
                           '/script local function buy (n,q) for i=1,100 do if n==GetMerchantItemInfo(i) then BuyMerchantItem(i,q) end end end buy (\'Эмблема героизма\',80)',
-                          0, true, 1579)
+                          0, true, 1374)
 end
 
 function BHelper.common:get_player_name()
