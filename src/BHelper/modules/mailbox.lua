@@ -1,33 +1,33 @@
-function BHelper.modules.mailbox:init()
+function BHelper.modules.mailbox.common:init()
     self.vars.open = false
 
     self:register_event('MAIL_CLOSED')
     self:register_event('MAIL_INBOX_UPDATE')
 
-    self:set_route('step_1')
+    BHelper:set_action('step_1')
 end
 
-function BHelper.modules.mailbox:step_1()
+function BHelper.modules.mailbox.common:step_1()
     if (self.vars.open == false) then
-        Keystroke:show_spell(12, false, false, true)
+        BHelper.keybinds:show_spell(12, false, false, true)
     else
-        self:set_route('step_2')
+        BHelper:set_action('step_2')
     end
 end
 
-function BHelper.modules.mailbox:open_click()
+function BHelper.modules.mailbox.common:open_click()
     if (self.vars.open == true) then return end
     self.vars.open = true
     SendChatMessage('.i m', 'SAY')
-    self:add_cooldown(15)
+    BHelper:cooldown(15)
 end
 
-function BHelper.modules.mailbox:MAIL_INBOX_UPDATE()
-    self:add_cooldown(0.5)
+function BHelper.modules.mailbox.common:MAIL_INBOX_UPDATE()
+    BHelper:cooldown(0.5)
 end
 
-function BHelper.modules.mailbox:step_2()
-    if (not self.vars.open) then self:set_route('step_1') end
+function BHelper.modules.mailbox.common:step_2()
+    if (not self.vars.open) then BHelper:set_action('step_1') end
 
     if ((select(2, GetInboxNumItems())) > 0) then
         if ((select(1, GetInboxNumItems())) > 0) then
@@ -48,7 +48,7 @@ function BHelper.modules.mailbox:step_2()
                     AutoLootMailItem(1)
                     return
                 else
-                    self.parent:set_route('crafting', self)
+                    self.parent:set_action('crafting', self)
                     CloseMail()
                 end
             else
@@ -59,11 +59,11 @@ function BHelper.modules.mailbox:step_2()
             CheckInbox()
         end
     else
-        self.parent:set_route('crafting', self)
+        self.parent:set_action('crafting', self)
         CloseMail()
     end
 end
 
-function BHelper.modules.mailbox:MAIL_CLOSED()
+function BHelper.modules.mailbox.common:MAIL_CLOSED()
     self.vars.open = false
 end

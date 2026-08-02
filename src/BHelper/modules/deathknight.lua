@@ -45,9 +45,6 @@ function BHelper.modules.deathknight.default:macros()
                           22)
     BHelper.macros:create('Смерть и разложение',
                           '#showtooltip\n/bh c 0.5\n/cast Смерть и разложение', 2)
-
-    BHelper.macros:create('S', '/startattack\n/bh sa rotation_single\n/bh', 13, false, 1263)
-    BHelper.macros:create('M', '/startattack\n/bh sa rotation_multiple\n/bh', 14, false, 1264)
 end
 
 function BHelper.modules.deathknight.default:update()

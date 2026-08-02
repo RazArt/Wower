@@ -1,18 +1,22 @@
 BHelper.common = {}
 
 function BHelper.common:reload()
-    self.DB:reload()
     self:print('loaded ->', self.DB:get_profile_name(), self.DB().module_name, self.DB().action_name)
     self:global_macros()
 
-    BHelper.keybinds:unbind_all()
-    BHelper.macros:delete_all()
-
     local module = self:get_module()
     if (module) then
+        self.DB:reload()
+        BHelper.keybinds:unbind_all()
+        BHelper.macros:delete_all()
         module:_init()
         module:_macros()
-        if (self.DB().type == 'battle') then self.keybinds:bind_macro('Цель') end
+        if ((BHelper.DB().type ~= 'heal') and (BHelper.DB().type ~= 'craft')) then
+            self.keybinds:bind_macro('Цель')
+        end
+    else
+        self:set_module(self:get_player_class())
+        self:reload()
     end
 end
 
@@ -26,6 +30,7 @@ function BHelper.common:get_module()
 end
 
 function BHelper.common:set_module(module_name)
+    print()
     if ((rawget(self.modules, module_name)) and (self.DB().module_name ~= module_name)) then
         self:print('set_module -> ', module_name)
         self.DB().action_name = nil
@@ -55,7 +60,6 @@ end
 function BHelper.common:set_action(action_name)
     local module = self:get_module()
     local profile_name = self.DB:get_profile_name()
-
     if ((module) and (self.DB().action_name ~= action_name)) then
         if (((module[profile_name]) and (module[profile_name][action_name])) or
             ((module['common']) and (module['common'][action_name]))) then
@@ -93,7 +97,9 @@ function BHelper.common:toggle()
 end
 
 function BHelper.common:start()
-    if (not self.vars._combat_state) then return end
+    if ((self.DB().type ~= 'heal') and (self.DB().type ~= 'craft') and (not self.vars._combat_state)) then
+        return
+    end
 
     self:print('start')
     self._runing = true
@@ -132,17 +138,19 @@ function BHelper.common:global_macros()
     BHelper.macros:create('Воскрешение', '/s .i massrevive', 56, true, 1927)
     BHelper.macros:create('Макросы', '/macro', 55, true, 1123)
     BHelper.macros:create('Тренер', '/s .t', 0, true, 1930)
-    BHelper.macros:create('Roll', '/macro', 52, true, 1836)
+    BHelper.macros:create('Roll', '/roll', 52, true, 1836)
     BHelper.macros:create('Reload', '/reload', 49, true, 1838)
     BHelper.macros:create('Focus', '/focus', 53, true, 921)
     BHelper.macros:create('Баджи',
                           '/script local function buy (n,q) for i=1,100 do if n==GetMerchantItemInfo(i) then BuyMerchantItem(i,q) end end end buy (\'Эмблема героизма\',80)',
                           0, true, 1374)
+
+    BHelper.macros:create('S', '/startattack\n/bh sa rotation_single\n/bh', 13, true, 1263)
+    BHelper.macros:create('M', '/startattack\n/bh sa rotation_multiple\n/bh', 14, true, 1264)
 end
 
 function BHelper.common:get_player_name()
     if (self.vars._player.name) then return self.vars._player.name end
-
     self.vars._player.name = (select(1, UnitName('player')))
     return self.vars._player.name
 end
@@ -278,6 +286,39 @@ function BHelper.common:get_ememy_debuff_count(spell, player)
     player = player or false
     for i = 1, 40 do
         local name, _, _, count, _, _, _, unitCaster, _, _, spellId = UnitDebuff('target', i)
+        if (((type(spell) == 'string') and (spell == name)) or
+            ((type(spell) == 'number') and (spell == spellId))) then
+            if (((player) and (unitCaster == 'player')) or (not player)) then
+                return count
+            end
+        end
+    end
+
+    return 0
+end
+
+function BHelper.common:get_player_debuff_time(spell, player)
+    player = player or false
+    for i = 1, 40 do
+        local name, _, _, _, _, _, expirationTime, unitCaster, _, _, spellId = UnitDebuff('player',
+                                                                                          i)
+        if (((type(spell) == 'string') and (spell == name)) or
+            ((type(spell) == 'number') and (spell == spellId))) then
+            if (((player) and (unitCaster == 'player')) or (not player)) then
+                if (expirationTime == 0) then return 99999 end
+                if (expirationTime == nil) then return 0 end
+                return expirationTime - GetTime()
+            end
+        end
+    end
+
+    return 0
+end
+
+function BHelper.common:get_player_debuff_count(spell, player)
+    player = player or false
+    for i = 1, 40 do
+        local name, _, _, count, _, _, _, unitCaster, _, _, spellId = UnitDebuff('player', i)
         if (((type(spell) == 'string') and (spell == name)) or
             ((type(spell) == 'number') and (spell == spellId))) then
             if (((player) and (unitCaster == 'player')) or (not player)) then

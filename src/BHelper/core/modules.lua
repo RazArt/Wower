@@ -28,6 +28,7 @@ function BHelper.modules:module(profiles)
     end
 
     function obj:_update()
+
         local stop_flag = false
         local profile_name = BHelper.DB:get_profile_name()
         if ((not stop_flag) and (self['common']) and (self['common']['update'])) then
@@ -36,20 +37,22 @@ function BHelper.modules:module(profiles)
         if ((not stop_flag) and (self[profile_name]) and (self[profile_name]['update'])) then
             stop_flag = self[profile_name].update(self)
         end
-        if ((BHelper.DB().type == 'battle') and (not BHelper:can_attack())) then
+        if ((BHelper.DB().type ~= 'heal') and (BHelper.DB().type ~= 'craft') and
+            (not BHelper:can_attack())) then
             stop_flag = BHelper.keybinds:show_macro('Цель')
         end
-        if (not stop_flag) then stop_flag = BHelper:get_action()(self) end
+        local action = BHelper:get_action()
+        if ((not stop_flag) and (action)) then stop_flag = action(self) end
     end
 
     setmetatable(obj, {
         __index = function(self, name)
-            if ((name ~= '') and (name ~= 'vars')) then
+            if ((name ~= '') and (name ~= 'vars') and (BHelperDB ~= nil)) then
                 local profile_name = BHelper.DB:get_profile_name()
-                if ((self[profile_name]) and (self[profile_name][name])) then
+                if ((rawget(self, profile_name)) and (rawget(self[profile_name], name))) then
                     return self[profile_name][name]
                 end
-                if ((self['common']) and (self['common'][name])) then
+                if ((rawget(self, 'common')) and (rawget(self['common'], name))) then
                     return self['common'][name]
                 end
                 return nil
@@ -69,7 +72,7 @@ function BHelper.modules:init()
     self.deathknight = self:module({'default'})
     self.druid = self:module({'default', 'balance'})
     self.hunter = self:module({'default'})
-    self.mage = self:module({'default'})
+    self.mage = self:module({'default', 'ffb'})
     self.paladin = self:module({'default'})
     self.priest = self:module({'default'})
     self.rogue = self:module({'default'})

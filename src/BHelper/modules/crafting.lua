@@ -9,59 +9,89 @@
 -- -- 34057 Кристалл пропасти
 -- -- 38426 Этерниевая нить
 -- -- 33470 Ледяная ткань
-function BHelper.modules.crafting:init()
-    self:set_route('step_1')
+function BHelper.modules.crafting.common:init()
+    BHelper.DB().type = 'craft'
+
+    BHelper.keybinds:bind_macro('Субстанция')
+    BHelper.keybinds:bind_macro('Распыление')
+    BHelper.keybinds:bind_macro('Брасы')
+    BHelper.keybinds:bind_macro('Рулоны')
+    BHelper.keybinds:bind_macro('Купить')
+    BHelper.keybinds:bind_macro('Аукцион')
+    BHelper.keybinds:bind_macro('Почта')
+    BHelper.keybinds:bind_macro('Нитки')
+    BHelper.keybinds:bind_macro('Start')
+
+    BHelper:set_action('step_1')
 end
 
-function BHelper.modules.crafting:update()
+-- function BHelper.modules.crafting.common:macros()
+--     BHelper.macros:create('Субстанция',
+--                           '#showtooltip\n/use Малая космическая субстанция')
+--     BHelper.macros:create('Распыление',
+--                           '#showtooltip\n/cast Распыление\n/use Ледотканые напульсники')
+--     BHelper.macros:create('Брасы',
+--                           '/run CloseTradeSkill()\n/cast Портняжное дело\n/run BHelper.modules.crafting.common:craft_item(\'Ледотканые напульсники\')')
+--     BHelper.macros:create('Рулоны',
+--                           '/run CloseTradeSkill()\n/cast Портняжное дело\n/run BHelper.modules.crafting.common:craft_item(\'Рулон ледяной ткани\')')
+--     BHelper.macros:create('Купить', '/run HelloWorld.craft.auction:buy_click()')
+--     BHelper.macros:create('Открыть Аукцион',
+--                           '/run HelloWorld.craft.auction:open_click()')
+--     BHelper.macros:create('Открыть Почта', '/run HelloWorld.craft.mailbox:open_click()')
+--     BHelper.macros:create('Нитки', '/run BuyMerchantItem(6, 20)')
+
+--     BHelper.macros:create('Start', '/bh', 13, false, 1263)
+-- end
+
+function BHelper.modules.crafting.common:update()
     if ((GetItemCount(34056) > 2) and (self:can_cast())) then
-        Keystroke:show_spell(2, false, false, true)
-        self:add_cooldown(0.2)
+        BHelper.keybinds:show_macro('Субстанция')
+        BHelper:cooldown(0.2)
     end
 end
 
-function BHelper.modules.crafting:step_1()
+function BHelper.modules.crafting.common:step_1()
     if (GetItemCount(41512) > 0) then
-        if (self:can_cast()) then Keystroke:show_spell(3, false, false, true) end
+        if (self:can_cast()) then BHelper.keybinds:show_macro('Распыление') end
     else
-        self:set_route('step_2')
+        BHelper:set_action('step_2')
     end
 end
 
-function BHelper.modules.crafting:step_2()
+function BHelper.modules.crafting.common:step_2()
     if ((GetItemCount(41510) > 2) and (GetItemCount(38426) > 0) and
-        (self.parent:get_bag_free_slots() > 1)) then
-        if (self:can_cast()) then Keystroke:show_spell(4, false, false, true) end
+        (BHelper:get_bag_free_slots() > 1)) then
+        if (self:can_cast()) then BHelper.keybinds:show_macro('Брасы') end
     else
         if (GetItemCount(41512) > 0) then
-            self:set_route('step_1')
+            BHelper:set_action('step_1')
         else
-            self:set_route('step_3')
+            BHelper:set_action('step_3')
         end
     end
 end
 
-function BHelper.modules.crafting:step_3()
-    if (self.parent:get_bag_free_slots() <= 2) then self:stop() end
+function BHelper.modules.crafting.common:step_3()
+    if (BHelper:get_bag_free_slots() <= 2) then BHelper:stop() end
 
     if (GetItemCount(33470) > 4) then
-        if (self:can_cast()) then Keystroke:show_spell(5, false, false, true) end
+        if (self:can_cast()) then BHelper.keybinds:show_macro('Рулоны') end
     else
         if (GetItemCount(41510) > 2 and (GetItemCount(38426) > 0)) then
-            self:set_route('step_2')
+            BHelper:set_action('step_2')
         else
-            self.parent:set_route('auction', self)
+            -- BHelper:set_action('auction', self)
         end
     end
 end
 
-function BHelper.modules.crafting:can_cast()
+function BHelper.modules.crafting.common:can_cast()
     if (UnitCastingInfo('player')) then return false end
     if (UnitChannelInfo('player')) then return false end
     return true
 end
 
-function BHelper.modules.crafting:craft_item(name)
+function BHelper.modules.crafting.common:craft_item(name)
     for i = GetNumTradeSkills(), 1, -1 do
         if ((select(2, GetTradeSkillInfo(i)) == "header")) then ExpandTradeSkillSubClass(i) end
     end

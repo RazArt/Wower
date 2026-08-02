@@ -22,8 +22,8 @@ function BHelper.modules.hunter.default:init()
 end
 
 function BHelper.modules.hunter.default:macros()
-    BHelper.macros:create('Атака', '/petattack [target=target]', 19, false, 970)
-    BHelper.macros:create('Назад', '/petfollow', 20, false, 973)
+    BHelper.macros:create('Атака', '/petattack [target=target]', 19, false, 973)
+    BHelper.macros:create('Назад', '/petfollow', 20, false, 970)
     BHelper.macros:create('Метка охотника',
                           '#showtooltip Метка охотника\n/bh tv mark', 41)
     BHelper.macros:create('Чародейский выстрел',
@@ -46,10 +46,10 @@ function BHelper.modules.hunter.default:macros()
                           15)
     BHelper.macros:create('S',
                           '/petattack [target=target]\n/startattack\n/bh sa rotation_single\n/bh',
-                          13, false, 1263)
+                          13, true, 1263)
     BHelper.macros:create('M',
                           '/petattack [target=target]\n/startattack\n/bh sa rotation_multiple\n/bh',
-                          14, false, 1264)
+                          14, true, 1264)
 end
 
 function BHelper.modules.hunter.default:rotation_single()

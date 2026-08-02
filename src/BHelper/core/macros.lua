@@ -8,7 +8,7 @@ function BHelper.macros:create(name, command, slot, global, icon)
     slot = slot or 0
     icon = icon or 1
 
-    self:delete(name)
+    self:delete(name, global)
     if (CreateMacro(self:get_formatted_name(name), icon, command, not global and true or false) > 0) then
         if (slot > 0) then self:put_to_panel(name, slot) end
         return true

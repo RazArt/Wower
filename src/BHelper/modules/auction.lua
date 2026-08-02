@@ -1,4 +1,4 @@
-function BHelper.modules.auction:init()
+function BHelper.modules.auction.common:init()
     self.vars.open = false
     self.vars.page = 0
     self.vars.change_page = true
@@ -15,65 +15,65 @@ function BHelper.modules.auction:init()
     self:register_event('AUCTION_HOUSE_SHOW')
     self:register_event('AUCTION_HOUSE_CLOSED')
 
-    self:set_route('step_1')
+    BHelper:set_action('step_1')
 end
 
-function BHelper.modules.auction:step_1()
-    if (self.vars.open == false) then Keystroke:show_spell(13, false, false, true) end
+function BHelper.modules.auction.common:step_1()
+    if (self.vars.open == false) then BHelper.keybinds:show_spell(13, false, false, true) end
 end
 
-function BHelper.modules.auction:open_click()
+function BHelper.modules.auction.common:open_click()
     if (self.vars.open == true) then return end
     self.vars.open = true
     SendChatMessage('.i au', 'SAY')
 end
 
-function BHelper.modules.auction:AUCTION_HOUSE_show_spell()
+function BHelper.modules.auction.common:AUCTION_HOUSE_show_spell()
     SortAuctionItems("list", "bid")
-    self:set_route('step_2')
-    self:add_cooldown(2)
+    BHelper:set_action('step_2')
+    BHelper:cooldown(2)
 end
 
-function BHelper.modules.auction:step_2()
-    if (not self.vars.open) then self:set_route('step_1') end
+function BHelper.modules.auction.common:step_2()
+    if (not self.vars.open) then BHelper:set_action('step_1') end
 
     if ((select(1, CanSendAuctionQuery())) == 1) then
         QueryAuctionItems(self.vars.item_list[self.vars.item_num][1], 0, 0, 0, 0, 0, self.vars.page,
                           false, 0, 0)
-        self:set_route('step_3')
-        self:add_cooldown(1)
+        BHelper:set_action('step_3')
+        BHelper:cooldown(1)
     end
 end
 
-function BHelper.modules.auction:AUCTION_ITEM_LIST_UPDATE()
+function BHelper.modules.auction.common:AUCTION_ITEM_LIST_UPDATE()
     if (self._route == 'step_3') then self.vars.list_updated = true end
 end
 
-function BHelper.modules.auction:step_3()
-    if (not self.vars.open) then self:set_route('step_1') end
+function BHelper.modules.auction.common:step_3()
+    if (not self.vars.open) then BHelper:set_action('step_1') end
 
     if (self.vars.list_updated == true) then
         local batch = (select(1, GetNumAuctionItems('list')))
         self.vars.list_updated = false
         self.vars.lot_index = batch
         if (batch > 0) then
-            self:set_route('step_4')
+            BHelper:set_action('step_4')
         else
             if (self.vars.item_num < #self.vars.item_list) then
                 self.vars.item_num = self.vars.item_num + 1
                 self.vars.page = 0
-                self:set_route('step_2')
+                BHelper:set_action('step_2')
             else
                 CloseAuctionHouse()
-                self.parent:set_route('mailbox', self)
+                self.parent:set_action('mailbox', self)
             end
         end
     end
 end
 
-function BHelper.modules.auction:step_4()
-    if (not self.vars.open) then self:set_route('step_1') end
-    if (self.vars.click_wait == true) then Keystroke:show_spell(6, false, false, true) end
+function BHelper.modules.auction.common:step_4()
+    if (not self.vars.open) then BHelper:set_action('step_1') end
+    if (self.vars.click_wait == true) then BHelper.keybinds:show_spell(6, false, false, true) end
 
     if (self.vars.lot_index > 0) then
         local name, _, count, _, _, _, _, _, buyoutPrice, _, _, owner, sold = GetAuctionItemInfo(
@@ -92,19 +92,19 @@ function BHelper.modules.auction:step_4()
     else
         if (self.vars.change_page) then self.vars.page = self.vars.page + 1 end
         self.vars.change_page = true
-        self:set_route('step_2')
+        BHelper:set_action('step_2')
     end
 end
 
-function BHelper.modules.auction:buy_click()
+function BHelper.modules.auction.common:buy_click()
     if (self.vars.click_wait == false) then return end
 
     self.vars.click_wait = false
     PlaceAuctionBid("list", self.vars.lot_index, self.vars.buyout_price)
     self.vars.lot_index = self.vars.lot_index - 1
-    self:add_cooldown(1)
+    BHelper:cooldown(1)
 end
 
-function BHelper.modules.auction:AUCTION_HOUSE_CLOSED()
+function BHelper.modules.auction.common:AUCTION_HOUSE_CLOSED()
     self.vars.open = false
 end

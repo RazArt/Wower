@@ -25,9 +25,6 @@ function BHelper.modules.rogue.default:macros()
                           '#showtooltip\n/bh c 0.5\n/cast Выброс адреналина', 11)
     BHelper.macros:create('Череда убийств',
                           '#showtooltip\n/bh c 0.5\n/cast Череда убийств', 12)
-
-    BHelper.macros:create('S', '/startattack\n/bh sa rotation_single\n/bh', 13, false, 1263)
-    BHelper.macros:create('M', '/startattack\n/bh sa rotation_multiple\n/bh', 14, false, 1264)
 end
 
 function BHelper.modules.rogue.default:rotation_single()

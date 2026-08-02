@@ -1,5 +1,6 @@
 function BHelper.modules.druid.default:init()
     BHelper.DB().type = 'battle'
+    if (self.vars.silence == nil) then self.vars.silence = true end
 
     BHelper.keybinds:bind_spell('Калечение')
     BHelper.keybinds:bind_spell('Оглушить')
@@ -40,26 +41,30 @@ function BHelper.modules.druid.default:macros()
     BHelper.macros:create('Озарение',
                           '#showtooltip Озарение\n/bh c 0.5\n/cast [@focus,help,nodead] Озарение\n/cast [@target,help,nodead] Озарение\n/cast [@mouseover,help,nodead] Озарение',
                           22)
+    BHelper.macros:create('Инстинкты выживания',
+                          '#showtooltip Инстинкты выживания\n/bh stop\n/cast Инстинкты выживания',
+                          23)
     BHelper.macros:create('Инвиз',
                           '#showtooltip Крадущийся зверь\n/bh stop\n/cast [form:0/1/2/4/5/6] !Облик кошки(Смена облика)\n/cast [form:3] Крадущийся зверь',
                           24)
     BHelper.macros:create('Берсерк',
-                          '#showtooltip Берсерк\n/bh c 0.5\n/cast Берсерк\n/cast Берсерк(Расовая)',
+                          '#showtooltip Берсерк\n/bh c 0.5\n/cast Берсерк\n/use Знак превосходства',
                           69)
+    BHelper.macros:create('Берсерк(Расовая)',
+                          '#showtooltip Берсерк(Расовая)\n/bh c 0.5\n/cast Берсерк(Расовая)',
+                          70)
     BHelper.macros:put_to_panel('Берсерк', 81)
+    BHelper.macros:put_to_panel('Берсерк(Расовая)', 82)
     BHelper.macros:create('Неистовое восстановление',
                           '#showtooltip Неистовое восстановление\n/bh c 0.5\n/cast Неистовое восстановление',
-                          70)
+                          71)
     BHelper.macros:create('Исступление',
                           '#showtooltip Исступление\n/bh c 0.5\n/cast Исступление',
-                          71)
-    BHelper.macros:create('Порыв', '#showtooltip Порыв\n/bh c 0.5\n/cast Порыв', 82)
+                          72)
+    BHelper.macros:create('Порыв', '#showtooltip Порыв\n/bh c 0.5\n/cast Порыв', 83)
     BHelper.macros:create('Попятиться',
                           '#showtooltip Попятиться\n/bh c 0.5\n/cast Попятиться',
-                          83)
-
-    BHelper.macros:create('S', '/startattack\n/bh sa rotation_single\n/bh', 13, false, 1263)
-    BHelper.macros:create('M', '/startattack\n/bh sa rotation_multiple\n/bh', 14, false, 1264)
+                          84)
 end
 
 function BHelper.modules.druid.default:rotation_single()
@@ -81,7 +86,8 @@ function BHelper.modules.druid.default:rotation_multiple()
 end
 
 function BHelper.modules.druid.default:cat_single()
-    if (BHelper:is_enemy_cast() and BHelper:can_cast_on_enemy('Калечение')) then
+    if (BHelper:is_enemy_cast() and BHelper:can_cast_on_enemy('Калечение') and
+        self.vars.silence) then
         BHelper.keybinds:show_spell('Калечение')
         return true
     end
@@ -179,7 +185,8 @@ end
 function BHelper.modules.druid.default:bear_single()
     if (BHelper:can_cast('Трепка')) then BHelper.keybinds:show_attack('Трепка') end
 
-    if (BHelper:is_enemy_cast() and BHelper:can_cast_on_enemy('Оглушить')) then
+    if (BHelper:is_enemy_cast() and BHelper:can_cast_on_enemy('Оглушить') and
+        self.vars.silence) then
         BHelper.keybinds:show_spell('Оглушить')
         return true
     end
