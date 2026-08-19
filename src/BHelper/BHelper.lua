@@ -13,9 +13,9 @@ BHelper._event_frame:RegisterEvent('PLAYER_CONTROL_LOST')
 BHelper._event_frame:RegisterEvent('PLAYER_CONTROL_GAINED')
 
 function BHelper:PLAYER_LOGIN()
+    self.vars.player_name = self:get_player_name()
     self.DB:init()
     self:create_state_frame()
-
     self:reload()
 
     CreateFrame('Frame'):SetScript('OnUpdate', function(_, elapsed)
@@ -54,9 +54,9 @@ end
 
 function BHelper:UI_ERROR_MESSAGE(message)
     if (message == SPELL_FAILED_NOT_BEHIND) then
-        self.vars._behind_of_target = false
+        self.vars.behind_of_target = false
         self.timers:create(0.5, function()
-            self.vars._behind_of_target = true
+            self.vars.behind_of_target = true
         end, 'behind_of_target')
     end
 end
@@ -114,6 +114,6 @@ function BHelper:init()
     self.vars = {}
     self.vars._player = {}
     self.vars._combat_state = false
-    self.vars._behind_of_target = true
+    self.vars.behind_of_target = true
 end
 BHelper:init()

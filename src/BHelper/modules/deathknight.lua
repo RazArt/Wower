@@ -1,4 +1,9 @@
 function BHelper.modules.deathknight.default:init()
+    BHelper.DB().type = 'battle'
+    BHelper.DB().only_combat_start = true
+
+    if (self.vars.silence == nil) then self.vars.silence = true end
+
     BHelper.keybinds:bind_spell('Кровь вампира')
     BHelper.keybinds:bind_spell('Кровоотвод')
     BHelper.keybinds:bind_spell('Захват рун')
@@ -17,34 +22,34 @@ end
 
 function BHelper.modules.deathknight.default:macros()
     BHelper.macros:create('Истерия',
-                          '#showtooltip Истерия\n/bh c 0.5\n/cast [@focus,help,nodead] Истерия\n/cast [@target,help,nodead] Истерия\n/cast [@mouseover,help,nodead] Истерия',
+                          '#showtooltip Истерия\n/bh c 0.2\n/cast [@focus,help,nodead] Истерия\n/cast [@target,help,nodead] Истерия\n/cast [@mouseover,help,nodead] Истерия',
                           23)
     BHelper.macros:create('Смертельный союз',
                           '#showtooltip Смертельный союз\n/castsequence reset=120 Воскрешение мертвых, Смертельный союз')
     BHelper.macros:create('Незыблемость льда',
-                          '#showtooltip\n/bh c 0.5\n/cast Незыблемость льда', 7)
+                          '#showtooltip\n/bh c 0.2\n/cast Незыблемость льда', 7)
     BHelper.macros:create('Антимагический панцирь',
-                          '#showtooltip\n/bh c 0.5\n/cast Антимагический панцирь',
+                          '#showtooltip\n/bh c 0.2\n/cast Антимагический панцирь',
                           8)
     BHelper.macros:create('Кровь вампира',
-                          '#showtooltip\n/bh c 0.5\n/cast Кровь вампира', 9)
+                          '#showtooltip\n/bh c 0.2\n/cast Кровь вампира', 9)
     BHelper.macros:create('Захват рун',
-                          '#showtooltip\n/bh c 0.5\n/cast Захват рун', 10)
+                          '#showtooltip\n/bh c 0.2\n/cast Захват рун', 10)
     BHelper.macros:create('Кровоотвод',
-                          '#showtooltip\n/bh c 0.5\n/cast Кровоотвод', 11)
+                          '#showtooltip\n/bh c 0.2\n/cast Кровоотвод', 11)
     BHelper.macros:create('Хватка смерти',
-                          '#showtooltip\n/bh c 0.5\n/cast Хватка смерти', 15)
+                          '#showtooltip\n/bh c 0.2\n/cast Хватка смерти', 15)
     BHelper.macros:create('Темная власть',
-                          '#showtooltip\n/bh c 0.5\n/cast Темная власть', 16)
+                          '#showtooltip\n/bh c 0.2\n/cast Темная власть', 16)
     BHelper.macros:create('Ледяные оковы',
-                          '#showtooltip\n/bh c 0.5\n/cast Ледяные оковы', 19)
+                          '#showtooltip\n/bh c 0.2\n/cast Ледяные оковы', 19)
     BHelper.macros:create('Войско мертвых',
-                          '#showtooltip\n/bh c 0.5\n/cast Войско мертвых', 21)
+                          '#showtooltip\n/bh c 0.2\n/cast Войско мертвых', 21)
     BHelper.macros:create('Усиление рунического оружия',
-                          '#showtooltip\n/bh c 0.5\n/cast Усиление рунического оружия',
+                          '#showtooltip\n/bh c 0.2\n/cast Усиление рунического оружия',
                           22)
     BHelper.macros:create('Смерть и разложение',
-                          '#showtooltip\n/bh c 0.5\n/cast Смерть и разложение', 2)
+                          '#showtooltip\n/bh c 0.2\n/cast Смерть и разложение', 2)
 end
 
 function BHelper.modules.deathknight.default:update()
@@ -74,6 +79,7 @@ function BHelper.modules.deathknight.default:update()
     end
 
     if ((BHelper:get_player_buff_time('Зимний горн') == 0) and
+        (BHelper:get_player_buff_time('Тотем силы земли') == 0) and
         (BHelper:can_cast('Зимний горн'))) then
         BHelper.keybinds:show_spell('Зимний горн')
         return true
@@ -85,15 +91,16 @@ function BHelper.modules.deathknight.default:rotation_single()
         BHelper.keybinds:show_attack('Рунический удар')
     end
 
-    if (BHelper:is_enemy_cast() and BHelper:can_cast_on_enemy('Заморозка разума')) then
+    if (BHelper:is_enemy_cast() and BHelper:can_cast_on_enemy('Заморозка разума') and
+        (self.vars.silence)) then
         BHelper.keybinds:show_spell('Заморозка разума')
         return true
     end
 
-    if (BHelper:is_enemy_cast() and BHelper:can_cast_on_enemy('Удушение')) then
-        BHelper.keybinds:show_spell('Удушение')
-        return true
-    end
+    -- if (BHelper:is_enemy_cast() and BHelper:can_cast_on_enemy('Удушение')) then
+    --     BHelper.keybinds:show_spell('Удушение')
+    --     return true
+    -- end
 
     if (BHelper:can_cast_on_enemy('Ледяное прикосновение')) then
         BHelper.keybinds:show_spell('Ледяное прикосновение')
@@ -123,10 +130,10 @@ function BHelper.modules.deathknight.default:rotation_multiple()
         return true
     end
 
-    if (BHelper:is_enemy_cast() and BHelper:can_cast_on_enemy('Удушение')) then
-        BHelper.keybinds:show_spell('Удушение')
-        return true
-    end
+    -- if (BHelper:is_enemy_cast() and BHelper:can_cast_on_enemy('Удушение')) then
+    --     BHelper.keybinds:show_spell('Удушение')
+    --     return true
+    -- end
 
     if ((BHelper:get_ememy_debuff_time('Озноб', true) == 0) and
         (BHelper:can_cast_on_enemy('Ледяное прикосновение'))) then

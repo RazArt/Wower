@@ -7,6 +7,15 @@ function BHelper.modules:module(profiles)
     obj.common = {}
     for _, profile in pairs(profiles) do obj[profile] = {} end
 
+    obj._event_frame = CreateFrame('Frame')
+    obj._event_frame:SetScript('OnEvent', function(_, event, ...)
+        obj[event](obj, ...)
+    end)
+
+    function obj:register_event(event)
+        self._event_frame:RegisterEvent(event)
+    end
+
     function obj:_init()
         BHelper:print('_init')
         self.vars = BHelper.DB:get_vars()
@@ -28,18 +37,17 @@ function BHelper.modules:module(profiles)
     end
 
     function obj:_update()
-
         local stop_flag = false
         local profile_name = BHelper.DB:get_profile_name()
+        if ((not stop_flag) and (BHelper.DB().type ~= 'heal') and (BHelper.DB().type ~= 'craft') and
+            (not BHelper:can_attack())) then
+            stop_flag = BHelper.keybinds:show_macro('Цель')
+        end
         if ((not stop_flag) and (self['common']) and (self['common']['update'])) then
             stop_flag = self['common']:update(self)
         end
         if ((not stop_flag) and (self[profile_name]) and (self[profile_name]['update'])) then
             stop_flag = self[profile_name].update(self)
-        end
-        if ((BHelper.DB().type ~= 'heal') and (BHelper.DB().type ~= 'craft') and
-            (not BHelper:can_attack())) then
-            stop_flag = BHelper.keybinds:show_macro('Цель')
         end
         local action = BHelper:get_action()
         if ((not stop_flag) and (action)) then stop_flag = action(self) end
@@ -72,7 +80,7 @@ function BHelper.modules:init()
     self.deathknight = self:module({'default'})
     self.druid = self:module({'default', 'balance'})
     self.hunter = self:module({'default'})
-    self.mage = self:module({'default', 'ffb'})
+    self.mage = self:module({'default', 'ttw'})
     self.paladin = self:module({'default'})
     self.priest = self:module({'default'})
     self.rogue = self:module({'default'})

@@ -97,9 +97,7 @@ function BHelper.common:toggle()
 end
 
 function BHelper.common:start()
-    if ((self.DB().type ~= 'heal') and (self.DB().type ~= 'craft') and (not self.vars._combat_state)) then
-        return
-    end
+    if ((self.DB().only_combat_start) and (not self.vars._combat_state)) then return end
 
     self:print('start')
     self._runing = true
@@ -137,7 +135,7 @@ function BHelper.common:global_macros()
     BHelper.macros:create('Магазин', '/s .i v', 57, true, 1929)
     BHelper.macros:create('Воскрешение', '/s .i massrevive', 56, true, 1927)
     BHelper.macros:create('Макросы', '/macro', 55, true, 1123)
-    BHelper.macros:create('Тренер', '/s .t', 0, true, 1930)
+    BHelper.macros:create('Тренер', '/s .i t', 0, true, 1930)
     BHelper.macros:create('Roll', '/roll', 52, true, 1836)
     BHelper.macros:create('Reload', '/reload', 49, true, 1838)
     BHelper.macros:create('Focus', '/focus', 53, true, 921)
@@ -214,7 +212,12 @@ function BHelper.common:get_spell_cooldown(spellname)
 end
 
 function BHelper.common:is_spell_cooldown(spellname)
-    local start, duration, _ = GetSpellCooldown(spellname)
+    local start, duration = GetSpellCooldown(spellname)
+    return (start + duration - GetTime() - 0.2 > 0) and true or false
+end
+
+function BHelper.common:is_item_cooldown(item)
+    local start, duration = GetItemCooldown(item)
     return (start + duration - GetTime() - 0.2 > 0) and true or false
 end
 
@@ -231,6 +234,12 @@ end
 function BHelper.common:is_enemy_cast()
     if (UnitCastingInfo('target')) then return true end
     if (UnitChannelInfo('target')) then return true end
+end
+
+function BHelper.common:can_use_item(item)
+    if (GetItemCount(item) == 0) then return false end
+    if (self:is_item_cooldown(item)) then return false end
+    return true
 end
 
 function BHelper.common:can_cast(spellname)
@@ -262,6 +271,55 @@ end
 
 function BHelper.common:get_combat_state()
     return self._combat_state
+end
+
+function BHelper.common:is_player_moving()
+    if (GetUnitSpeed('player') > 0) then
+        return true
+    else
+        return false
+    end
+end
+
+function BHelper.common:is_player_is_target()
+    if (UnitName("playertargettarget") == self.vars.player_name) then
+        return true
+    else
+        return false
+    end
+end
+
+function BHelper.common:is_player_hight_treat()
+    local threat = (select(3, UnitDetailedThreatSituation('player', 'target')))
+
+    if ((threat ~= nil) and (threat >= 100)) then
+        return true
+    else
+        return false
+    end
+end
+
+function BHelper.common:is_target_boss()
+    if ((UnitClassification('target') == 'worldboss') or UnitLevel('target') == -1) then
+        return true
+    else
+        return false
+    end
+end
+
+function BHelper.common:exist_heroism_buff()
+    if ((self:get_player_buff_time('Героизм') > 0) or
+        (self:get_player_buff_time('Жажда крови') > 0)) then
+        return true
+    else
+        return false
+    end
+end
+
+function BHelper.common:is_burst_mode()
+    if (self:is_target_boss()) then return true end
+    if (self:is_target_boss()) then return true end
+    return false
 end
 
 function BHelper.common:get_ememy_debuff_time(spell, player)

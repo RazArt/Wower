@@ -1,14 +1,21 @@
 BHelper.keybinds = {}
 
-function BHelper.keybinds:_bind(name, command, mouse_click)
+function BHelper.keybinds:_bind_exist(class, name)
+    for key, bind in pairs(self._binds) do
+        if ((bind.class == class) and (bind.name == name)) then return key end
+    end
+end
+
+function BHelper.keybinds:_bind(class, name, mouse_click)
     name = string.lower(name)
-    command = string.lower(command)
+    class = string.lower(class)
     mouse_click = mouse_click or false
 
     for key, bind in pairs(self._binds) do
-        if ((bind.name == nil) or (bind.name == name)) then
+        if ((bind.name == nil) or ((bind.name == name) and (bind.class == class))) then
             if (SetBinding('ALT-CTRL-SHIFT-' .. key, command)) then
                 bind.name = name
+                bind.class = class
                 bind.mouse_click = not mouse_click and 0 or 1
                 return true
             end
@@ -17,30 +24,30 @@ function BHelper.keybinds:_bind(name, command, mouse_click)
     return false
 end
 
-function BHelper.keybinds:bind_spell(name, mouse_click)
-    if (self:_bind(name, 'spell ' .. name, mouse_click)) then
-        return true
-    else
-        return false
-    end
-end
+-- function BHelper.keybinds:_bind_macro(name, mouse_click)
+--     -- name = BHelper.macros:get_formatted_name(name)
+--     if (self:_bind(name, 'macro ' .. name, mouse_click)) then
+--         return true
+--     else
+--         return false
+--     end
+-- end
 
-function BHelper.keybinds:bind_macro(name, mouse_click)
-    name = BHelper.macros:get_formatted_name(name)
-    if (self:_bind(name, 'macro ' .. name, mouse_click)) then
-        return true
-    else
-        return false
-    end
-end
+-- function BHelper.keybinds:_bind_spell(name, mouse_click)
+--     if (self:_bind(name, 'spell ' .. name, mouse_click)) then
+--         return true
+--     else
+--         return false
+--     end
+-- end
 
-function BHelper.keybinds:bind_item(name, mouse_click)
-    if (self:_bind(name, 'item ' .. name, mouse_click)) then
-        return true
-    else
-        return false
-    end
-end
+-- function BHelper.keybinds:_bind_item(name, mouse_click)
+--     if (self:_bind(name, 'item ' .. name, mouse_click)) then
+--         return true
+--     else
+--         return false
+--     end
+-- end
 
 function BHelper.keybinds:unbind_all()
     local result = true
@@ -72,6 +79,15 @@ function BHelper.keybinds:_show(num, name)
     return false
 end
 
+function BHelper.keybinds:show_macro(name)
+    name = BHelper.macros:get_formatted_name(name)
+    if (self:_show(1, BHelper.macros:get_formatted_name(name))) then
+        return true
+    else
+        return false
+    end
+end
+
 function BHelper.keybinds:show_spell(name)
     if (self:_show(1, name)) then
         return true
@@ -80,8 +96,8 @@ function BHelper.keybinds:show_spell(name)
     end
 end
 
-function BHelper.keybinds:show_macro(name)
-    if (self:_show(1, BHelper.macros:get_formatted_name(name))) then
+function BHelper.keybinds:show_item(name)
+    if (self:_show(1, name)) then
         return true
     else
         return false

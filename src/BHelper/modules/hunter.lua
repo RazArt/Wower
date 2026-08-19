@@ -1,4 +1,7 @@
 function BHelper.modules.hunter.default:init()
+    BHelper.DB().type = 'battle'
+    BHelper.DB().only_combat_start = true
+
     if (self.vars.mana_regeneration == nil) then self.vars.mana_regeneration = false end
     if (self.vars.mark == nil) then self.vars.mark = true end
     if (self.vars.acrane_shot == nil) then self.vars.acrane_shot = true end
@@ -30,19 +33,19 @@ function BHelper.modules.hunter.default:macros()
                           '#showtooltip Чародейский выстрел\n/bh tv acrane_shot',
                           42)
     BHelper.macros:create('Быстрая стрельба',
-                          '#showtooltip Быстрая стрельба\n/bh c 0.5\n/cast Берсерк\n/cast Быстрая стрельба\n/cast Зов дикой природы',
+                          '#showtooltip Быстрая стрельба\n/bh c 0.2\n/cast Берсерк\n/cast Быстрая стрельба\n/cast Зов дикой природы',
                           9)
     BHelper.macros:create('Готовность',
-                          '#showtooltip Готовность\n/bh c 0.5\n/cast Готовность',
+                          '#showtooltip Готовность\n/bh c 0.2\n/cast Готовность',
                           10)
     BHelper.macros:create('Притвориться мертвым',
-                          '#showtooltip Притвориться мертвым\n/bh c 0.5\n/cast Притвориться мертвым',
+                          '#showtooltip Притвориться мертвым\n/bh c 0.2\n/cast Притвориться мертвым',
                           11)
     BHelper.macros:create('Сдерживание',
-                          '#showtooltip Сдерживание\n/bh c 0.5\n/cast Сдерживание',
+                          '#showtooltip Сдерживание\n/bh c 0.2\n/cast Сдерживание',
                           12)
     BHelper.macros:create('Перенаправление',
-                          '#showtooltip Перенаправление\n/bh c 0.5\n/cast [@focus,help,nodead] Перенаправление\n/cast [@target,help,nodead] Перенаправление\n/cast [@mouseover,help,nodead] Перенаправление',
+                          '#showtooltip Перенаправление\n/bh c 0.2\n/cast [@focus,help,nodead] Перенаправление\n/cast [@target,help,nodead] Перенаправление\n/cast [@mouseover,help,nodead] Перенаправление',
                           15)
     BHelper.macros:create('S',
                           '/petattack [target=target]\n/startattack\n/bh sa rotation_single\n/bh',

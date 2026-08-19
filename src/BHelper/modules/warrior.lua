@@ -1,4 +1,7 @@
 function BHelper.modules.warrior.default:init()
+    BHelper.DB().type = 'battle'
+    BHelper.DB().only_combat_start = true
+
     if (self.vars.attack_type == nil) then self.vars.attack_type = '1' end
     if (self.vars.battle_shout == nil) then self.vars.battle_shout = false end
     if (self.vars.commanding_shout == nil) then self.vars.commanding_shout = false end
@@ -35,13 +38,13 @@ function BHelper.modules.warrior.default:macros()
     BHelper.macros:create('Раскол брони',
                           '#showtooltip Раскол брони\n/bh tv sunder', 44)
     BHelper.macros:create('Берсерк(Расовая)',
-                          '#showtooltip\n/bh c 0.5\n/cast Берсерк(Расовая)', 93)
+                          '#showtooltip\n/bh c 0.2\n/cast Берсерк(Расовая)', 93)
     BHelper.macros:create('Жажда смерти',
-                          '#showtooltip\n/bh c 0.5\n/cast Жажда смерти', 94)
+                          '#showtooltip\n/bh c 0.2\n/cast Жажда смерти', 94)
     BHelper.macros:create('Безрассудство',
-                          '#showtooltip\n/bh c 0.5\n/cast Безрассудство', 95)
+                          '#showtooltip\n/bh c 0.2\n/cast Безрассудство', 95)
     BHelper.macros:create('Возмездие',
-                          '#showtooltip Возмездие\n/bh c 0.5\n/cast [stance:2/3] Боевая стойка\n/cast [stance:1] Возмездие',
+                          '#showtooltip Возмездие\n/bh c 0.2\n/cast [stance:2/3] Боевая стойка\n/cast [stance:1] Возмездие',
                           96)
 
     BHelper.macros:create('S', '/startattack\n/bh sv attack_type 1\n/bh', 13, true, 1263)
@@ -73,6 +76,9 @@ function BHelper.modules.warrior.default:rotation()
     end
 
     if ((BHelper:get_player_buff_time('Боевой крик') == 0) and
+        (BHelper:get_player_buff_time('Благословение могущества') == 0) and
+        (BHelper:get_player_buff_time(
+            'Великое благословение могущества') == 0) and
         (BHelper:can_cast('Боевой крик')) and (self.vars.battle_shout)) then
         BHelper.keybinds:show_spell('Боевой крик')
         return true
