@@ -80,17 +80,17 @@ end
 
 function BHelper.modules.druid.default:update()
     if (BHelper:get_player_buff_time('Облик кошки') > 0) then
-        -- if ((BHelper:is_player_is_target() or BHelper:is_player_hight_treat()) and
-        --     (BHelper:can_cast('Попятиться'))) then
-        --     BHelper.keybinds:show_spell('Попятиться')
-        --     return true
-        -- end
+        if ((BHelper:is_player_is_target() or BHelper:is_player_hight_treat()) and
+            (BHelper:can_cast('Попятиться'))) then
+            BHelper.keybinds:show_spell('Попятиться')
+            return true
+        end
 
-        -- if ((BHelper:is_player_is_target()) and (not BHelper:can_cast('Попятиться')) and
-        --     (BHelper:can_cast('Облик лютого медведя'))) then
-        --     BHelper.keybinds:show_spell('Облик лютого медведя')
-        --     return true
-        -- end
+        if ((BHelper:is_player_is_target()) and (not BHelper:can_cast('Попятиться')) and
+            (BHelper:can_cast('Облик лютого медведя'))) then
+            BHelper.keybinds:show_spell('Облик лютого медведя')
+            return true
+        end
 
         if (BHelper:is_burst_mode()) then
             if ((BHelper:get_player_buff_time('Тигриное неистовство') == 0) and
@@ -102,7 +102,7 @@ function BHelper.modules.druid.default:update()
 
             if ((BHelper:get_player_buff_time(50334) > 0) and
                 (BHelper:can_use_item('Знак превосходства'))) then
-                BHelper.keybinds:show_help('Знак превосходства')
+                BHelper.keybinds:show_item('Знак превосходства')
                 return true
             end
 

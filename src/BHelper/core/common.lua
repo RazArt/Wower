@@ -317,7 +317,7 @@ function BHelper.common:exist_heroism_buff()
 end
 
 function BHelper.common:is_burst_mode()
-    if (self:is_target_boss()) then return true end
+    if (self:exist_heroism_buff()) then return true end
     if (self:is_target_boss()) then return true end
     return false
 end

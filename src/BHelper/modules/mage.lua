@@ -183,7 +183,7 @@ end
 
 function BHelper.modules.mage.ttw:update()
     if ((BHelper:get_mana_on_percent() < 80) and (BHelper:can_use_item('Сапфир маны'))) then
-        BHelper.keybinds:show_help('Сапфир маны')
+        BHelper.keybinds:show_item('Сапфир маны')
         return true
     end
 
@@ -198,12 +198,6 @@ function BHelper.modules.mage.ttw:update()
         BHelper.keybinds:show_spell('Чародейская гениальность')
         return true
     end
-
-    -- if ((BHelper:get_player_buff_time('Усиление магии') == 0) and
-    --     (BHelper:can_cast('Усиление магии'))) then
-    --     BHelper.keybinds:show_spell('Усиление магии')
-    --     return true
-    -- end
 end
 
 function BHelper.modules.mage.ttw:rotation_single()
