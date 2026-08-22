@@ -11,6 +11,7 @@ BHelper._event_frame:RegisterEvent('PLAYER_REGEN_ENABLED')
 BHelper._event_frame:RegisterEvent('UI_ERROR_MESSAGE')
 BHelper._event_frame:RegisterEvent('PLAYER_CONTROL_LOST')
 BHelper._event_frame:RegisterEvent('PLAYER_CONTROL_GAINED')
+BHelper._event_frame:RegisterEvent('UNIT_TARGET')
 
 function BHelper:PLAYER_LOGIN()
     self.vars.player_name = self:get_player_name()
@@ -50,6 +51,15 @@ end
 function BHelper:PLAYER_REGEN_ENABLED()
     self.vars._combat_state = false
     self:stop()
+end
+
+function BHelper:UNIT_TARGET(unit)
+    if (unit == 'player') then
+        self.vars.cooldown_target = true
+        self.timers:create(0.2, function()
+            self.vars.cooldown_target = false
+        end, 'cooldown_target')
+    end
 end
 
 function BHelper:UI_ERROR_MESSAGE(message)
@@ -94,6 +104,7 @@ function BHelper:commands(msg)
     elseif (args[1] == 'm') then
         self.modules[self._module]:_macros()
     elseif (args[1] == 'c') then
+        if (args[2] == nil) then args[2] = 0.2 end
         self:cooldown(tonumber(args[2]))
     else
         self:print('Неизвестная команда')

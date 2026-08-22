@@ -25,6 +25,13 @@ function BHelper.modules:module(profiles)
         if ((self[profile_name]) and (self[profile_name]['init'])) then
             self[profile_name].init(self)
         end
+
+        if ((BHelper.DB().type ~= 'heal') and (BHelper.DB().type ~= 'craft')) then
+            BHelper.keybinds:bind_macro('Цель')
+        end
+        if ((BHelper.DB().type ~= 'heal') and (BHelper.DB().type ~= 'craft')) then
+            BHelper.keybinds:bind_macro('Stop')
+        end
     end
 
     function obj:_macros()
@@ -40,13 +47,14 @@ function BHelper.modules:module(profiles)
         local stop_flag = false
         local profile_name = BHelper.DB:get_profile_name()
         if ((not stop_flag) and (BHelper.DB().type ~= 'heal') and (BHelper.DB().type ~= 'craft') and
-            (not BHelper:can_attack())) then
+            (not BHelper:can_attack()) and (not BHelper.vars.cooldown_target)) then
             stop_flag = BHelper.keybinds:show_macro('Цель')
         end
         if ((not stop_flag) and (self['common']) and (self['common']['update'])) then
             stop_flag = self['common']:update(self)
         end
         if ((not stop_flag) and (self[profile_name]) and (self[profile_name]['update'])) then
+
             stop_flag = self[profile_name].update(self)
         end
         local action = BHelper:get_action()

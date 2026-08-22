@@ -38,13 +38,13 @@ function BHelper.modules.warrior.default:macros()
     BHelper.macros:create('Раскол брони',
                           '#showtooltip Раскол брони\n/bh tv sunder', 44)
     BHelper.macros:create('Берсерк(Расовая)',
-                          '#showtooltip\n/bh c 0.2\n/cast Берсерк(Расовая)', 93)
+                          '#showtooltip\n/bh c\n/cast Берсерк(Расовая)', 93)
     BHelper.macros:create('Жажда смерти',
-                          '#showtooltip\n/bh c 0.2\n/cast Жажда смерти', 94)
+                          '#showtooltip\n/bh c\n/cast Жажда смерти', 94)
     BHelper.macros:create('Безрассудство',
-                          '#showtooltip\n/bh c 0.2\n/cast Безрассудство', 95)
+                          '#showtooltip\n/bh c\n/cast Безрассудство', 95)
     BHelper.macros:create('Возмездие',
-                          '#showtooltip Возмездие\n/bh c 0.2\n/cast [stance:2/3] Боевая стойка\n/cast [stance:1] Возмездие',
+                          '#showtooltip Возмездие\n/bh c\n/cast [stance:2/3] Боевая стойка\n/cast [stance:1] Возмездие',
                           96)
 
     BHelper.macros:create('S', '/startattack\n/bh sv attack_type 1\n/bh', 13, true, 1263)

@@ -18,16 +18,16 @@ function BHelper.modules.rogue.default:macros()
     BHelper.macros:create('Ослабление доспеха',
                           '#showtooltip Ослабление доспеха\n/bh tv sunder', 41)
     BHelper.macros:create('Маленькие хитрости',
-                          '#showtooltip Маленькие хитрости\n/bh c 0.2\n/cancelaura Маленькие хитрости\n/cast [@focus,help,nodead] Маленькие хитрости\n/cast [@target,help,nodead] Маленькие хитрости\n/cast [@mouseover,help,nodead] Маленькие хитрости',
+                          '#showtooltip Маленькие хитрости\n/bh c\n/cancelaura Маленькие хитрости\n/cast [@focus,help,nodead] Маленькие хитрости\n/cast [@target,help,nodead] Маленькие хитрости\n/cast [@mouseover,help,nodead] Маленькие хитрости',
                           15)
     BHelper.macros:create('Берсерк(Расовая)',
-                          '#showtooltip\n/bh c 0.2\n/cast Берсерк(Расовая)', 9)
+                          '#showtooltip\n/bh c\n/cast Берсерк(Расовая)', 9)
     BHelper.macros:create('Шквал клинков',
-                          '#showtooltip\n/bh c 0.2\n/cast Шквал клинков', 10)
+                          '#showtooltip\n/bh c\n/cast Шквал клинков', 10)
     BHelper.macros:create('Выброс адреналина',
-                          '#showtooltip\n/bh c 0.2\n/cast Выброс адреналина', 11)
+                          '#showtooltip\n/bh c\n/cast Выброс адреналина', 11)
     BHelper.macros:create('Череда убийств',
-                          '#showtooltip\n/bh c 0.2\n/cast Череда убийств', 12)
+                          '#showtooltip\n/bh c\n/cast Череда убийств', 12)
 end
 
 function BHelper.modules.rogue.default:rotation_single()

@@ -50,7 +50,8 @@ function BHelper.keybinds:unbind_all()
     return result
 end
 
-function BHelper.keybinds:_show(num, class, name)
+function BHelper.keybinds:_show(num, class, name, time_count)
+    time_count = time_count or 0.05
     if (ACTIVE_CHAT_EDIT_BOX) then return false end
 
     local key = self:_get_bind_key(class, name)
@@ -62,30 +63,30 @@ function BHelper.keybinds:_show(num, class, name)
     self._frames.frame[num].texture:SetTexture(flag, key, mouse_click)
     self._frames.frame[num]:Show()
 
-    BHelper.timers:create(0.05, function()
+    BHelper.timers:create(time_count, function()
         self._frames.frame[num]:Hide()
     end, 'keybinds_hide_' .. num)
     return true
 end
 
-function BHelper.keybinds:show_macro(name)
-    return self:_show(1, 'macro', name)
+function BHelper.keybinds:show_macro(name, time_count)
+    return self:_show(1, 'macro', name, time_count)
 end
 
-function BHelper.keybinds:show_spell(name)
-    return self:_show(1, 'spell', name)
+function BHelper.keybinds:show_spell(name, time_count)
+    return self:_show(1, 'spell', name, time_count)
 end
 
-function BHelper.keybinds:show_item(name)
-    return self:_show(1, 'item', name)
+function BHelper.keybinds:show_item(name, time_count)
+    return self:_show(1, 'item', name, time_count)
 end
 
-function BHelper.keybinds:show_attack(name)
-    return self:_show(2, 'spell', name)
+function BHelper.keybinds:show_attack(name, time_count)
+    return self:_show(2, 'spell', name, time_count)
 end
 
-function BHelper.keybinds:show_help(name)
-    return self:_show(3, 'spell', name)
+function BHelper.keybinds:show_help(name, time_count)
+    return self:_show(3, 'spell', name, time_count)
 end
 
 function BHelper.keybinds:init()

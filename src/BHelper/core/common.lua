@@ -7,13 +7,10 @@ function BHelper.common:reload()
     local module = self:get_module()
     if (module) then
         self.DB:reload()
-        BHelper.keybinds:unbind_all()
-        BHelper.macros:delete_all()
+        self.keybinds:unbind_all()
+        self.macros:delete_all()
         module:_init()
         module:_macros()
-        if ((BHelper.DB().type ~= 'heal') and (BHelper.DB().type ~= 'craft')) then
-            self.keybinds:bind_macro('Цель')
-        end
     else
         self:set_module(self:get_player_class())
         self:reload()
@@ -97,9 +94,19 @@ function BHelper.common:toggle()
 end
 
 function BHelper.common:start()
-    if ((self.DB().only_combat_start) and (not self.vars._combat_state)) then return end
+    -- print(self.DB().only_combat_start)
+    -- print(self.vars._combat_state)
+    -- print(self:enemy_in_combat())
+    if ((self.DB().only_combat_start) and (not self.vars._combat_state) and
+        (not self:enemy_in_combat())) then return end
 
     self:print('start')
+
+    self.vars.cooldown_berserker = true
+    self.timers:create(5, function()
+        self.vars.cooldown_berserker = false
+    end, 'cooldown_berserker')
+
     self._runing = true
     self.state_frame:Show()
 end
@@ -109,6 +116,7 @@ function BHelper.common:stop()
     self._runing = false
     self._cooldown = false
     self.state_frame:Hide()
+    self.keybinds:show_macro('Stop', 0.1)
 end
 
 function BHelper.common:print(...)
@@ -125,26 +133,27 @@ function BHelper.common:cooldown(count)
 end
 
 function BHelper.common:global_macros()
-    BHelper.macros:delete_all(true)
-    BHelper.macros:create('Цель',
-                          '/targetlasttarget [exists,harm,nodead]\n/target [@focustarget,harm,nodead]\n/targetenemy [@focus,noexists]\n/targetenemy [@focus,harm]',
-                          0, true, 711)
-    BHelper.macros:create('Аук', '/s .i au', 60, true, 1935)
-    BHelper.macros:create('Банк', '/s .i b', 59, true, 1933)
-    BHelper.macros:create('Почта', '/s .i m', 58, true, 1931)
-    BHelper.macros:create('Магазин', '/s .i v', 57, true, 1929)
-    BHelper.macros:create('Воскрешение', '/s .i massrevive', 56, true, 1927)
-    BHelper.macros:create('Макросы', '/macro', 55, true, 1123)
-    BHelper.macros:create('Тренер', '/s .i t', 0, true, 1930)
-    BHelper.macros:create('Roll', '/roll', 52, true, 1836)
-    BHelper.macros:create('Reload', '/reload', 49, true, 1838)
-    BHelper.macros:create('Focus', '/focus', 53, true, 921)
-    BHelper.macros:create('Баджи',
-                          '/script local function buy (n,q) for i=1,100 do if n==GetMerchantItemInfo(i) then BuyMerchantItem(i,q) end end end buy (\'Эмблема героизма\',80)',
-                          0, true, 1374)
+    self.macros:delete_all(true)
+    self.macros:create('Цель',
+                       '/targetlasttarget [exists,harm,nodead]\n/target [@focustarget,harm,nodead]\n/targetenemy [@focus,noexists]\n/targetenemy [@focus,harm]',
+                       0, true, 711)
+    self.macros:create('Stop', '/stopcasting\n/stopattack\n/petfollow\n/cleartarget', 0, true)
+    self.macros:create('Аук', '/s .i au', 60, true, 1935)
+    self.macros:create('Банк', '/s .i b', 59, true, 1933)
+    self.macros:create('Почта', '/s .i m', 58, true, 1931)
+    self.macros:create('Магазин', '/s .i v', 57, true, 1929)
+    self.macros:create('Воскрешение', '/s .i massrevive', 56, true, 1927)
+    self.macros:create('Макросы', '/macro', 55, true, 1123)
+    self.macros:create('Тренер', '/s .i t', 0, true, 1930)
+    self.macros:create('Roll', '/roll', 52, true, 1836)
+    self.macros:create('Reload', '/reload', 49, true, 1838)
+    self.macros:create('Focus', '/focus', 53, true, 921)
+    self.macros:create('Баджи',
+                       '/script local function buy (n,q) for i=1,100 do if n==GetMerchantItemInfo(i) then BuyMerchantItem(i,q) end end end buy (\'Эмблема героизма\',80)',
+                       0, true, 1374)
 
-    BHelper.macros:create('S', '/startattack\n/bh sa rotation_single\n/bh', 13, true, 1263)
-    BHelper.macros:create('M', '/startattack\n/bh sa rotation_multiple\n/bh', 14, true, 1264)
+    self.macros:create('S', '/startattack\n/bh sa rotation_single\n/bh', 13, true, 1263)
+    self.macros:create('M', '/startattack\n/bh sa rotation_multiple\n/bh', 14, true, 1264)
 end
 
 function BHelper.common:get_player_name()
@@ -236,10 +245,26 @@ function BHelper.common:is_enemy_cast()
     if (UnitChannelInfo('target')) then return true end
 end
 
+function BHelper.common:enemy_in_combat()
+    if (UnitCanAttack('player', 'target') ~= 1) then return false end
+    if (UnitCanAttack('target', 'targettarget') == 1) then return true end
+    if (UnitAffectingCombat('target') ~= nil) then return true end
+    return false
+end
+
 function BHelper.common:can_use_item(item)
-    if (GetItemCount(item) == 0) then return false end
+    if (self:get_item_count(item) == 0) then return false end
     if (self:is_item_cooldown(item)) then return false end
     return true
+end
+
+function BHelper.common:is_equipped_item(item)
+    if (not IsEquippedItem(item)) then return false end
+    return true
+end
+
+function BHelper.common:get_item_count(item)
+    return GetItemCount(item)
 end
 
 function BHelper.common:can_cast(spellname)
@@ -252,7 +277,7 @@ end
 function BHelper.common:can_cast_on_enemy(spellname)
     if (not self:can_cast(spellname)) then return false end
     if (UnitIsDeadOrGhost('target')) then return false end
-    if (UnitCanAttack('player', 'target') ~= 1) then return false end
+    if (not self:can_attack()) then return false end
     if (IsSpellInRange(spellname, 'target') ~= 1) then return false end
     return true
 end
@@ -265,7 +290,11 @@ end
 
 function BHelper.common:can_attack()
     if (UnitCanAttack('player', 'target') ~= 1) then return false end
-
+    if (self:get_ememy_debuff_time('Спячка') > 0) then return false end
+    if (self:get_ememy_debuff_time('Смерч') > 0) then return false end
+    if (self:get_ememy_debuff_time('Превращение') > 0) then return false end
+    if (self:get_ememy_debuff_time('Страх') > 0) then return false end
+    if (self:get_ememy_debuff_time('Ослепление') > 0) then return false end
     return true
 end
 
@@ -274,14 +303,11 @@ function BHelper.common:get_combat_state()
 end
 
 function BHelper.common:is_player_moving()
-    if (GetUnitSpeed('player') > 0) then
-        return true
-    else
-        return false
-    end
+    if (GetUnitSpeed('player') > 0) then return true end
+    return false
 end
 
-function BHelper.common:is_player_is_target()
+function BHelper.common:player_is_target()
     if (UnitName("playertargettarget") == self.vars.player_name) then
         return true
     else
@@ -289,7 +315,7 @@ function BHelper.common:is_player_is_target()
     end
 end
 
-function BHelper.common:is_player_hight_treat()
+function BHelper.common:is_player_hight_treat() -- has
     local threat = (select(3, UnitDetailedThreatSituation('player', 'target')))
 
     if ((threat ~= nil) and (threat >= 100)) then
@@ -299,26 +325,27 @@ function BHelper.common:is_player_hight_treat()
     end
 end
 
-function BHelper.common:is_target_boss()
+function BHelper.common:target_is_boss()
     if ((UnitClassification('target') == 'worldboss') or UnitLevel('target') == -1) then
         return true
-    else
-        return false
     end
+    return false
+end
+
+function BHelper.common:target_is_player()
+    if (UnitIsPlayer('target')) then return true end
+    return false
 end
 
 function BHelper.common:exist_heroism_buff()
-    if ((self:get_player_buff_time('Героизм') > 0) or
-        (self:get_player_buff_time('Жажда крови') > 0)) then
-        return true
-    else
-        return false
-    end
+    if (self:get_player_buff_time('Героизм') > 0) then return true end
+    if (self:get_player_buff_time('Жажда крови') > 0) then return true end
+    return false
 end
 
 function BHelper.common:is_burst_mode()
     if (self:exist_heroism_buff()) then return true end
-    if (self:is_target_boss()) then return true end
+    if (self:target_is_boss()) then return true end
     return false
 end
 

@@ -22,34 +22,34 @@ end
 
 function BHelper.modules.deathknight.default:macros()
     BHelper.macros:create('Истерия',
-                          '#showtooltip Истерия\n/bh c 0.2\n/cast [@focus,help,nodead] Истерия\n/cast [@target,help,nodead] Истерия\n/cast [@mouseover,help,nodead] Истерия',
+                          '#showtooltip Истерия\n/bh c\n/cast [@focus,help,nodead] Истерия\n/cast [@target,help,nodead] Истерия\n/cast [@mouseover,help,nodead] Истерия',
                           23)
     BHelper.macros:create('Смертельный союз',
                           '#showtooltip Смертельный союз\n/castsequence reset=120 Воскрешение мертвых, Смертельный союз')
     BHelper.macros:create('Незыблемость льда',
-                          '#showtooltip\n/bh c 0.2\n/cast Незыблемость льда', 7)
+                          '#showtooltip\n/bh c\n/cast Незыблемость льда', 7)
     BHelper.macros:create('Антимагический панцирь',
-                          '#showtooltip\n/bh c 0.2\n/cast Антимагический панцирь',
+                          '#showtooltip\n/bh c\n/cast Антимагический панцирь',
                           8)
     BHelper.macros:create('Кровь вампира',
-                          '#showtooltip\n/bh c 0.2\n/cast Кровь вампира', 9)
-    BHelper.macros:create('Захват рун',
-                          '#showtooltip\n/bh c 0.2\n/cast Захват рун', 10)
-    BHelper.macros:create('Кровоотвод',
-                          '#showtooltip\n/bh c 0.2\n/cast Кровоотвод', 11)
+                          '#showtooltip\n/bh c\n/cast Кровь вампира', 9)
+    BHelper.macros:create('Захват рун', '#showtooltip\n/bh c\n/cast Захват рун',
+                          10)
+    BHelper.macros:create('Кровоотвод', '#showtooltip\n/bh c\n/cast Кровоотвод',
+                          11)
     BHelper.macros:create('Хватка смерти',
-                          '#showtooltip\n/bh c 0.2\n/cast Хватка смерти', 15)
+                          '#showtooltip\n/bh c\n/cast Хватка смерти', 15)
     BHelper.macros:create('Темная власть',
-                          '#showtooltip\n/bh c 0.2\n/cast Темная власть', 16)
+                          '#showtooltip\n/bh c\n/cast Темная власть', 16)
     BHelper.macros:create('Ледяные оковы',
-                          '#showtooltip\n/bh c 0.2\n/cast Ледяные оковы', 19)
+                          '#showtooltip\n/bh c\n/cast Ледяные оковы', 19)
     BHelper.macros:create('Войско мертвых',
-                          '#showtooltip\n/bh c 0.2\n/cast Войско мертвых', 21)
+                          '#showtooltip\n/bh c\n/cast Войско мертвых', 21)
     BHelper.macros:create('Усиление рунического оружия',
-                          '#showtooltip\n/bh c 0.2\n/cast Усиление рунического оружия',
+                          '#showtooltip\n/bh c\n/cast Усиление рунического оружия',
                           22)
     BHelper.macros:create('Смерть и разложение',
-                          '#showtooltip\n/bh c 0.2\n/cast Смерть и разложение', 2)
+                          '#showtooltip\n/bh c\n/cast Смерть и разложение', 2)
 end
 
 function BHelper.modules.deathknight.default:update()
