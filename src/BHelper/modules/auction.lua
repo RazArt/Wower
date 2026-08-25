@@ -15,7 +15,7 @@ function BHelper.modules.auction.common:init()
     self:register_event('AUCTION_HOUSE_SHOW')
     self:register_event('AUCTION_HOUSE_CLOSED')
 
-    BHelper:set_action('step_1')
+    BHelper.core.action:set('step_1')
 end
 
 function BHelper.modules.auction.common:step_1()
@@ -30,18 +30,18 @@ end
 
 function BHelper.modules.auction.common:AUCTION_HOUSE_show_spell()
     SortAuctionItems("list", "bid")
-    BHelper:set_action('step_2')
-    BHelper:cooldown(2)
+    BHelper.core.action:set('step_2')
+    BHelper.core:cooldown(2)
 end
 
 function BHelper.modules.auction.common:step_2()
-    if (not self.vars.open) then BHelper:set_action('step_1') end
+    if (not self.vars.open) then BHelper.core.action:set('step_1') end
 
     if ((select(1, CanSendAuctionQuery())) == 1) then
         QueryAuctionItems(self.vars.item_list[self.vars.item_num][1], 0, 0, 0, 0, 0, self.vars.page,
                           false, 0, 0)
-        BHelper:set_action('step_3')
-        BHelper:cooldown(1)
+        BHelper.core.action:set('step_3')
+        BHelper.core:cooldown(1)
     end
 end
 
@@ -50,29 +50,29 @@ function BHelper.modules.auction.common:AUCTION_ITEM_LIST_UPDATE()
 end
 
 function BHelper.modules.auction.common:step_3()
-    if (not self.vars.open) then BHelper:set_action('step_1') end
+    if (not self.vars.open) then BHelper.core.action:set('step_1') end
 
     if (self.vars.list_updated == true) then
         local batch = (select(1, GetNumAuctionItems('list')))
         self.vars.list_updated = false
         self.vars.lot_index = batch
         if (batch > 0) then
-            BHelper:set_action('step_4')
+            BHelper.core.action:set('step_4')
         else
             if (self.vars.item_num < #self.vars.item_list) then
                 self.vars.item_num = self.vars.item_num + 1
                 self.vars.page = 0
-                BHelper:set_action('step_2')
+                BHelper.core.action:set('step_2')
             else
                 CloseAuctionHouse()
-                self.parent:set_action('mailbox', self)
+                self.parent.core.action:set('mailbox', self)
             end
         end
     end
 end
 
 function BHelper.modules.auction.common:step_4()
-    if (not self.vars.open) then BHelper:set_action('step_1') end
+    if (not self.vars.open) then BHelper.core.action:set('step_1') end
     if (self.vars.click_wait == true) then BHelper.keybinds:show_spell(6, false, false, true) end
 
     if (self.vars.lot_index > 0) then
@@ -80,7 +80,7 @@ function BHelper.modules.auction.common:step_4()
                                                                                   "list", self.vars
                                                                                       .lot_index)
         if ((name == self.vars.item_list[self.vars.item_num][1]) and
-            (BHelper:get_player_name() ~= owner) and (GetMoney() > buyoutPrice) and
+            (BHelper.player:get_name() ~= owner) and (GetMoney() > buyoutPrice) and
             (buyoutPrice > 0) and (sold == 0) and
             (buyoutPrice / count <= self.vars.item_list[self.vars.item_num][2])) then
             self.vars.buyout_price = buyoutPrice
@@ -92,7 +92,7 @@ function BHelper.modules.auction.common:step_4()
     else
         if (self.vars.change_page) then self.vars.page = self.vars.page + 1 end
         self.vars.change_page = true
-        BHelper:set_action('step_2')
+        BHelper.core.action:set('step_2')
     end
 end
 
@@ -102,7 +102,7 @@ function BHelper.modules.auction.common:buy_click()
     self.vars.click_wait = false
     PlaceAuctionBid("list", self.vars.lot_index, self.vars.buyout_price)
     self.vars.lot_index = self.vars.lot_index - 1
-    BHelper:cooldown(1)
+    BHelper.core:cooldown(1)
 end
 
 function BHelper.modules.auction.common:AUCTION_HOUSE_CLOSED()

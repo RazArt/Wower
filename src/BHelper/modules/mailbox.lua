@@ -4,14 +4,14 @@ function BHelper.modules.mailbox.common:init()
     self:register_event('MAIL_CLOSED')
     self:register_event('MAIL_INBOX_UPDATE')
 
-    BHelper:set_action('step_1')
+    BHelper.core.action:set('step_1')
 end
 
 function BHelper.modules.mailbox.common:step_1()
     if (self.vars.open == false) then
         BHelper.keybinds:show_spell(12, false, false, true)
     else
-        BHelper:set_action('step_2')
+        BHelper.core.action:set('step_2')
     end
 end
 
@@ -19,15 +19,15 @@ function BHelper.modules.mailbox.common:open_click()
     if (self.vars.open == true) then return end
     self.vars.open = true
     SendChatMessage('.i m', 'SAY')
-    BHelper:cooldown(15)
+    BHelper.core:cooldown(15)
 end
 
 function BHelper.modules.mailbox.common:MAIL_INBOX_UPDATE()
-    BHelper:cooldown(0.5)
+    BHelper.core:cooldown(0.5)
 end
 
 function BHelper.modules.mailbox.common:step_2()
-    if (not self.vars.open) then BHelper:set_action('step_1') end
+    if (not self.vars.open) then BHelper.core.action:set('step_1') end
 
     if ((select(2, GetInboxNumItems())) > 0) then
         if ((select(1, GetInboxNumItems())) > 0) then
@@ -48,7 +48,7 @@ function BHelper.modules.mailbox.common:step_2()
                     AutoLootMailItem(1)
                     return
                 else
-                    self.parent:set_action('crafting', self)
+                    self.parent.core.action:set('crafting', self)
                     CloseMail()
                 end
             else
@@ -59,7 +59,7 @@ function BHelper.modules.mailbox.common:step_2()
             CheckInbox()
         end
     else
-        self.parent:set_action('crafting', self)
+        self.parent.core.action:set('crafting', self)
         CloseMail()
     end
 end

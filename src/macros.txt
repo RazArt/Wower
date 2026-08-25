@@ -1,8 +1,8 @@
 /run HelloWorld.war.hunter:set_route('rotation_1')
-/run HelloWorld.war.hunter:toggle()
+/run HelloWorld.war.hunter.core:toggle()
 
 /run HelloWorld.war.rogue:set_route('rotation_1')
-/run HelloWorld.war.rogue:toggle()
+/run HelloWorld.war.rogue.core:toggle()
 
 /run HelloWorld.war.druid:set_route('rotation_1')
-/run HelloWorld.war.druid:toggle()
+/run HelloWorld.war.druid.core:toggle()

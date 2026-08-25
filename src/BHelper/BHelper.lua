@@ -11,19 +11,25 @@ BHelper._event_frame:RegisterEvent('PLAYER_REGEN_ENABLED')
 BHelper._event_frame:RegisterEvent('UI_ERROR_MESSAGE')
 BHelper._event_frame:RegisterEvent('PLAYER_CONTROL_LOST')
 BHelper._event_frame:RegisterEvent('PLAYER_CONTROL_GAINED')
-BHelper._event_frame:RegisterEvent('UNIT_TARGET')
 
 function BHelper:PLAYER_LOGIN()
-    self.vars.player_name = self:get_player_name()
-    self.DB:init()
+    self:init_DB()
     self:create_state_frame()
-    self:reload()
+    self.core:reload()
 
     CreateFrame('Frame'):SetScript('OnUpdate', function(_, elapsed)
         self.timers:update(elapsed)
-        local module = self:get_module()
+        local module = self.core.module:get()
         if ((module) and (self._runing) and (not self._cooldown)) then module:_update() end
     end)
+end
+
+function BHelper:init_DB()
+    if ((not BHelperDB) or (type(BHelperDB) ~= 'table')) then BHelperDB = {} end
+    if ((not BHelperDB[BHelper.player:get_spec()]) or
+        (type(BHelperDB[BHelper.player:get_spec()]) ~= 'table')) then
+        BHelperDB[BHelper.player:get_spec()] = {}
+    end
 end
 
 function BHelper:create_state_frame()
@@ -39,27 +45,18 @@ end
 
 function BHelper:ACTIVE_TALENT_GROUP_CHANGED()
     self.timers:create(1, function()
-        self:reload()
+        self.core:reload()
     end)
 end
 
 function BHelper:PLAYER_REGEN_DISABLED()
     self.vars._combat_state = true
-    self:start()
+    self.core:start()
 end
 
 function BHelper:PLAYER_REGEN_ENABLED()
     self.vars._combat_state = false
-    self:stop()
-end
-
-function BHelper:UNIT_TARGET(unit)
-    if (unit == 'player') then
-        self.vars.cooldown_target = true
-        self.timers:create(0.2, function()
-            self.vars.cooldown_target = false
-        end, 'cooldown_target')
-    end
+    self.core:stop()
 end
 
 function BHelper:UI_ERROR_MESSAGE(message)
@@ -86,28 +83,28 @@ function BHelper:commands(msg)
     for arg in string.gmatch(msg, '([^%s]+)') do table.insert(args, arg) end
 
     if ((args[1] == 'toggle') or (#args == 0)) then
-        self:toggle()
+        self.core:toggle()
     elseif (args[1] == 'start') then
-        self:start()
+        self.core:start()
     elseif (args[1] == 'stop') then
-        self:stop()
+        self.core:stop()
     elseif (args[1] == 'tv') then
-        self:toggle_var(args[2])
+        self.core:toggle_var(args[2])
     elseif (args[1] == 'sv') then
-        self:set_var(args[2], args[3])
+        self.core:set_var(args[2], args[3])
     elseif (args[1] == 'sm') then
-        self:set_module(args[2])
-    elseif (args[1] == 'sa') then
-        self:set_action(args[2])
+        self.core.module:set(args[2])
     elseif (args[1] == 'sp') then
-        self.DB:set_profile_name(args[2])
+        self.core.profile:set(args[2])
+    elseif (args[1] == 'sa') then
+        self.core.action:set(args[2])
     elseif (args[1] == 'm') then
         self.modules[self._module]:_macros()
     elseif (args[1] == 'c') then
         if (args[2] == nil) then args[2] = 0.2 end
-        self:cooldown(tonumber(args[2]))
+        self.core:cooldown(tonumber(args[2]))
     else
-        self:print('Неизвестная команда')
+        self.core:print('Неизвестная команда')
     end
 end
 

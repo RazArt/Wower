@@ -40,12 +40,8 @@ function BHelper.macros:delete(name, global)
     return false
 end
 
-function BHelper.macros:delete_all(global)
+function BHelper.macros:delete_all()
     local result = false
-    if (global) then
-        for i = 36, 1, -1 do if (DeleteMacro(i)) then result = true end end
-    else
-        for i = 54, 37, -1 do if (DeleteMacro(i)) then result = true end end
-    end
+    for i = 54, 1, -1 do if (DeleteMacro(i)) then result = true end end
     return result
 end

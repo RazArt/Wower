@@ -1,67 +1,65 @@
-BHelper.DB = {}
-
-function BHelper.DB:reload()
-    self.DB = nil
-    self.vars = nil
-    self.profile_name = nil
-end
-
-function BHelper.DB:get_DB()
-    if (self.DB == nil) then
-        local profile_name = self:get_profile_name()
-        if ((BHelperDB[profile_name] == nil) or (type(BHelperDB[profile_name]) ~= 'table')) then
-            BHelperDB[profile_name] = {}
-        end
-        self.DB = BHelperDB[profile_name]
-    end
-    return self.DB
-end
-
-function BHelper.DB:get_vars()
-    if (self.vars == nil) then
-        local DB = self:get_DB()
-        if ((DB.vars == nil) or (type(DB.vars) ~= 'table')) then DB.vars = {} end
-        if ((DB.vars[DB.module_name] == nil) or (type(DB.vars[DB.module_name]) ~= 'table')) then
-            DB.vars[DB.module_name] = {}
-        end
-        self.vars = DB.vars[DB.module_name]
-    end
-    return self.vars
-end
-
-function BHelper.DB:get_profile_name()
-    if (self.profile_name == nil) then
-        local profile_name = BHelperDB.selected_profiles[BHelper:get_player_spec()]
-        if ((profile_name) and (string.match(profile_name, '^[_%w]+$'))) then
-            self.profile_name = profile_name
-        else
-            self:set_profile_name(self._default_profile_name)
-            self.profile_name = self._default_profile_name
-        end
-    end
-    return self.profile_name
-end
-
-function BHelper.DB:set_profile_name(profile_name)
-    profile_name = string.lower(profile_name)
-    if (string.match(profile_name, '^[_%w]+$')) then
-        BHelperDB.selected_profiles[BHelper:get_player_spec()] = profile_name
-        BHelper:reload()
-        return true
-    end
-    return false
-end
-
-function BHelper.DB:init()
-    setmetatable(BHelper.DB, {
-        __call = function(self)
-            return self:get_DB()
-        end
-    })
-
-    self._default_profile_name = 'default'
-    if ((BHelperDB == nil) or (type(BHelperDB) ~= 'table')) then BHelperDB = {} end
-    if ((BHelperDB.selected_profiles == nil) or (type(BHelperDB.selected_profiles) ~= 'table')) then
-        BHelperDB.selected_profiles = {self._default_profile_name, self._default_profile_name}
-    end
-end
+-- BHelper.DB = {}
+-- function BHelper.DB:reload()
+--     self.DB = nil
+--     self.vars = nil
+--     self.profile_name = nil
+-- end
+-- function BHelper.DB:get_DB()
+--     if (self.DB == nil) then
+--         local profile_name = self:get_profile_name()
+--         if ((BHelperDB[profile_name] == nil) or (type(BHelperDB[profile_name]) ~= 'table')) then
+--             BHelperDB[profile_name] = {}
+--         end
+--         self.DB = BHelperDB[profile_name]
+--     end
+--     return self.DB
+-- end
+-- function BHelper.DB:get(var)
+--     if (BHelperDB[var] ~= nil) then return BHelperDB[var] end
+--     return nil
+-- end
+-- function BHelper.DB:set(var, value)
+--     BHelperDB[var] = value
+-- end
+-- function BHelper.core.profile:get().vars
+--     if (self.vars == nil) then
+--         local DB = self:get_DB()
+--         if ((DB.vars == nil) or (type(DB.vars) ~= 'table')) then DB.vars = {} end
+--         if ((DB.vars[DB.module_name] == nil) or (type(DB.vars[DB.module_name]) ~= 'table')) then
+--             print(DB.module_name)
+--             print(DB.vars)
+--             DB.vars[DB.module_name] = {}
+--         end
+--         self.vars = DB.vars[DB.module_name]
+--     end
+--     return self.vars
+-- end
+-- function BHelper.DB:get_profile_name()
+--     if (self.profile_name == nil) then
+--         local profile_name = BHelperDB.selected_profiles[BHelper.player:get_spec()]
+--         if ((profile_name) and (string.match(profile_name, '^[_%w]+$'))) then
+--             self.profile_name = profile_name
+--         else
+--             self:set_profile_name(self._default_profile_name)
+--             self.profile_name = self._default_profile_name
+--         end
+--     end
+--     return self.profile_name
+-- end
+-- function BHelper.DB:set_profile_name(profile_name)
+--     profile_name = string.lower(profile_name)
+--     if (string.match(profile_name, '^[_%w]+$')) then
+--         BHelperDB.selected_profiles[BHelper.player:get_spec()] = profile_name
+--         self:reload()
+--         BHelper.core:reload()
+--         return true
+--     end
+--     return false
+-- end
+-- function BHelper.DB:init()
+--     setmetatable(BHelper.DB, {
+--         __call = function(self)
+--             return self:get_DB()
+--         end
+--     })
+-- end

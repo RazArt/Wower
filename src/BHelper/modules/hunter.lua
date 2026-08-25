@@ -1,6 +1,6 @@
 function BHelper.modules.hunter.default:init()
-    BHelper.DB().type = 'battle'
-    BHelper.DB().only_combat_start = true
+    self.settings.type = 'battle'
+    self.settings.only_combat_start = true
 
     if (self.vars.mana_regeneration == nil) then self.vars.mana_regeneration = false end
     if (self.vars.mark == nil) then self.vars.mark = true end
@@ -55,135 +55,140 @@ function BHelper.modules.hunter.default:macros()
 end
 
 function BHelper.modules.hunter.default:rotation_single()
-    if ((BHelper:get_mana_on_percent('player') < 20) and (not self.vars.mana_regeneration)) then
+    if ((BHelper.player:get_mana_on_percent('player') < 20) and (not self.vars.mana_regeneration)) then
         self.vars.mana_regeneration = true
-    elseif ((BHelper:get_mana_on_percent('player') > 60) and (self.vars.mana_regeneration)) then
+    elseif ((BHelper.player:get_mana_on_percent('player') > 60) and (self.vars.mana_regeneration)) then
         self.vars.mana_regeneration = false
     end
 
     if ((self.vars.mana_regeneration == false) and
-        (BHelper:get_player_buff_time('Дух дракондора') == 0) and
-        (BHelper:get_player_buff_time('Дух дикой природы') == 0) and
-        (BHelper:can_cast('Дух дракондора'))) then
+        (BHelper.player:get_buff_time('Дух дракондора') == 0) and
+        (BHelper.player:get_buff_time('Дух дикой природы') == 0) and
+        (BHelper.player:can_cast('Дух дракондора'))) then
         BHelper.keybinds:show_spell('Дух дракондора')
         return true
     end
 
     if ((self.vars.mana_regeneration == true) and
-        (BHelper:get_player_buff_time('Дух гадюки') == 0) and
-        (BHelper:get_player_buff_time('Дух дикой природы') == 0) and
-        (BHelper:can_cast('Дух гадюки'))) then
+        (BHelper.player:get_buff_time('Дух гадюки') == 0) and
+        (BHelper.player:get_buff_time('Дух дикой природы') == 0) and
+        (BHelper.player:can_cast('Дух гадюки'))) then
         BHelper.keybinds:show_spell('Дух гадюки')
         return true
     end
 
-    if ((BHelper:get_player_buff_time('Аура меткого выстрела') == 0) and
-        (BHelper:can_cast('Аура меткого выстрела'))) then
+    if ((BHelper.player:get_buff_time('Аура меткого выстрела') == 0) and
+        (BHelper.player:can_cast('Аура меткого выстрела'))) then
         BHelper.keybinds:show_spell('Аура меткого выстрела')
         return true
     end
 
-    if (BHelper:is_enemy_cast() and BHelper:can_cast_on_enemy('Глушащий выстрел')) then
+    if (BHelper.target:check_cast() and
+        BHelper.player:can_cast_on_enemy('Глушащий выстрел')) then
         BHelper.keybinds:show_spell('Глушащий выстрел')
         return true
     end
 
-    if ((BHelper:get_ememy_debuff_time('Метка охотника') == 0) and
-        (BHelper:can_cast_on_enemy('Метка охотника')) and self.vars.mark) then
+    if ((BHelper.target:get_debuff_time('Метка охотника') == 0) and
+        (BHelper.player:can_cast_on_enemy('Метка охотника')) and self.vars.mark) then
         BHelper.keybinds:show_spell('Метка охотника')
         return true
     end
 
-    if (BHelper:can_cast('Команда "Взять!"')) then
+    if (BHelper.player:can_cast('Команда "Взять!"')) then
         BHelper.keybinds:show_help('Команда "Взять!"')
         return true
     end
 
     if ((self.vars.mana_regeneration == false) and
-        (BHelper:get_ememy_debuff_time('Укус змеи', true) == 0) and
-        (BHelper:can_cast_on_enemy('Укус змеи'))) then
+        (BHelper.target:get_debuff_time('Укус змеи', true) == 0) and
+        (BHelper.player:can_cast_on_enemy('Укус змеи'))) then
         BHelper.keybinds:show_spell('Укус змеи')
         return true
     end
 
     if ((self.vars.mana_regeneration == true) and
-        (BHelper:get_ememy_debuff_time('Укус гадюки', true) == 0) and
-        (BHelper:can_cast_on_enemy('Укус гадюки'))) then
+        (BHelper.target:get_debuff_time('Укус гадюки', true) == 0) and
+        (BHelper.player:can_cast_on_enemy('Укус гадюки'))) then
         BHelper.keybinds:show_spell('Укус гадюки')
         return true
     end
 
-    if (BHelper:can_cast_on_enemy('Убийственный выстрел')) then
+    if (BHelper.player:can_cast_on_enemy('Убийственный выстрел')) then
         BHelper.keybinds:show_spell('Убийственный выстрел')
         return true
     end
 
-    if (BHelper:can_cast_on_point('Бросок ловушки: взрывная ловушка')) then
+    if (BHelper.player:can_cast_on_point(
+        'Бросок ловушки: взрывная ловушка')) then
         BHelper.keybinds:show_spell('Бросок ловушки: взрывная ловушка')
         return true
     end
 
-    if (BHelper:can_cast_on_enemy('Выстрел химеры')) then
+    if (BHelper.player:can_cast_on_enemy('Выстрел химеры')) then
         BHelper.keybinds:show_spell('Выстрел химеры')
         return true
     end
 
-    if (BHelper:can_cast_on_enemy('Прицельный выстрел')) then
+    if (BHelper.player:can_cast_on_enemy('Прицельный выстрел')) then
         BHelper.keybinds:show_spell('Прицельный выстрел')
         return true
     end
 
-    if (BHelper:can_cast_on_enemy('Чародейский выстрел') and self.vars.acrane_shot) then
+    if (BHelper.player:can_cast_on_enemy('Чародейский выстрел') and
+        self.vars.acrane_shot) then
         BHelper.keybinds:show_spell('Чародейский выстрел')
         return true
     end
 
-    if (BHelper:can_cast_on_enemy('Верный выстрел')) then
+    if (BHelper.player:can_cast_on_enemy('Верный выстрел')) then
         BHelper.keybinds:show_spell('Верный выстрел')
         return true
     end
 end
 
 function BHelper.modules.hunter.default:rotation_multiple()
-    if ((BHelper:get_mana_on_percent('player') < 20) and (not self.vars.mana_regeneration)) then
+    if ((BHelper.player:get_mana_on_percent('player') < 20) and (not self.vars.mana_regeneration)) then
         self.vars.mana_regeneration = true
-    elseif ((BHelper:get_mana_on_percent('player') > 60) and (self.vars.mana_regeneration)) then
+    elseif ((BHelper.player:get_mana_on_percent('player') > 60) and (self.vars.mana_regeneration)) then
         self.vars.mana_regeneration = false
     end
 
     if ((self.vars.mana_regeneration == false) and
-        (BHelper:get_player_buff_time('Дух дракондора') == 0) and
-        (BHelper:get_player_buff_time('Дух дикой природы') == 0) and
-        (BHelper:can_cast('Дух дракондора'))) then
+        (BHelper.player:get_buff_time('Дух дракондора') == 0) and
+        (BHelper.player:get_buff_time('Дух дикой природы') == 0) and
+        (BHelper.player:can_cast('Дух дракондора'))) then
         BHelper.keybinds:show_spell('Дух дракондора')
         return true
     end
 
     if ((self.vars.mana_regeneration == true) and
-        (BHelper:get_player_buff_time('Дух гадюки') == 0) and
-        (BHelper:get_player_buff_time('Дух дикой природы') == 0) and
-        (BHelper:can_cast('Дух гадюки'))) then
+        (BHelper.player:get_buff_time('Дух гадюки') == 0) and
+        (BHelper.player:get_buff_time('Дух дикой природы') == 0) and
+        (BHelper.player:can_cast('Дух гадюки'))) then
         BHelper.keybinds:show_spell('Дух гадюки')
         return true
     end
 
-    if ((BHelper:get_player_buff_time('Аура меткого выстрела') == 0) and
-        (BHelper:can_cast('Аура меткого выстрела'))) then
+    if ((BHelper.player:get_buff_time('Аура меткого выстрела') == 0) and
+        (BHelper.player:can_cast('Аура меткого выстрела'))) then
         BHelper.keybinds:show_spell('Аура меткого выстрела')
         return true
     end
 
-    if (BHelper:is_enemy_cast() and BHelper:can_cast_on_enemy('Глушащий выстрел')) then
+    if (BHelper.target:check_cast() and
+        BHelper.player:can_cast_on_enemy('Глушащий выстрел')) then
         BHelper.keybinds:show_spell('Глушащий выстрел')
         return true
     end
 
-    if (BHelper:can_cast_on_point('Бросок ловушки: взрывная ловушка')) then
+    if (BHelper.player:can_cast_on_point(
+        'Бросок ловушки: взрывная ловушка')) then
         BHelper.keybinds:show_spell('Бросок ловушки: взрывная ловушка')
         return true
     end
 
-    if (BHelper:can_cast_on_point('Град стрел')) then
+    if (BHelper.player:can_cast_on_point('Град стрел')) then
         BHelper.keybinds:show_spell('Град стрел')
         return true
     end

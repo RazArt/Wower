@@ -10,7 +10,7 @@
 -- -- 38426 Этерниевая нить
 -- -- 33470 Ледяная ткань
 function BHelper.modules.crafting.common:init()
-    BHelper.DB().type = 'craft'
+    self.settings.type = 'craft'
 
     BHelper.keybinds:bind_macro('Субстанция')
     BHelper.keybinds:bind_macro('Распыление')
@@ -22,7 +22,7 @@ function BHelper.modules.crafting.common:init()
     BHelper.keybinds:bind_macro('Нитки')
     BHelper.keybinds:bind_macro('Start')
 
-    BHelper:set_action('step_1')
+    BHelper.core.action:set('step_1')
 end
 
 -- function BHelper.modules.crafting.common:macros()
@@ -44,43 +44,43 @@ end
 -- end
 
 function BHelper.modules.crafting.common:update()
-    if ((GetItemCount(34056) > 2) and (self:can_cast())) then
+    if ((GetItemCount(34056) > 2) and (self.player:can_cast())) then
         BHelper.keybinds:show_macro('Субстанция')
-        BHelper:cooldown(0.2)
+        BHelper.core:cooldown(0.2)
     end
 end
 
 function BHelper.modules.crafting.common:step_1()
     if (GetItemCount(41512) > 0) then
-        if (self:can_cast()) then BHelper.keybinds:show_macro('Распыление') end
+        if (self.player:can_cast()) then BHelper.keybinds:show_macro('Распыление') end
     else
-        BHelper:set_action('step_2')
+        BHelper.core.action:set('step_2')
     end
 end
 
 function BHelper.modules.crafting.common:step_2()
     if ((GetItemCount(41510) > 2) and (GetItemCount(38426) > 0) and
         (BHelper:get_bag_free_slots() > 1)) then
-        if (self:can_cast()) then BHelper.keybinds:show_macro('Брасы') end
+        if (self.player:can_cast()) then BHelper.keybinds:show_macro('Брасы') end
     else
         if (GetItemCount(41512) > 0) then
-            BHelper:set_action('step_1')
+            BHelper.core.action:set('step_1')
         else
-            BHelper:set_action('step_3')
+            BHelper.core.action:set('step_3')
         end
     end
 end
 
 function BHelper.modules.crafting.common:step_3()
-    if (BHelper:get_bag_free_slots() <= 2) then BHelper:stop() end
+    if (BHelper:get_bag_free_slots() <= 2) then BHelper.core:stop() end
 
     if (GetItemCount(33470) > 4) then
         if (self:can_cast()) then BHelper.keybinds:show_macro('Рулоны') end
     else
         if (GetItemCount(41510) > 2 and (GetItemCount(38426) > 0)) then
-            BHelper:set_action('step_2')
+            BHelper.core.action:set('step_2')
         else
-            -- BHelper:set_action('auction', self)
+            -- BHelper.core.action:set('auction', self)
         end
     end
 end

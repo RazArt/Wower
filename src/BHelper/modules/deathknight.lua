@@ -1,6 +1,6 @@
 function BHelper.modules.deathknight.default:init()
-    BHelper.DB().type = 'battle'
-    BHelper.DB().only_combat_start = true
+    self.settings.type = 'battle'
+    self.settings.only_combat_start = true
 
     if (self.vars.silence == nil) then self.vars.silence = true end
 
@@ -53,164 +53,167 @@ function BHelper.modules.deathknight.default:macros()
 end
 
 function BHelper.modules.deathknight.default:update()
-    if ((BHelper:get_health_on_percent() < 30) and BHelper:can_cast('Кровь вампира')) then
+    if ((BHelper.player:get_health_on_percent() < 30) and
+        BHelper.player:can_cast('Кровь вампира')) then
         BHelper.keybinds:show_spell('Кровь вампира')
         return true
     end
 
-    if ((BHelper:get_health_on_percent() < 40) and
-        (BHelper:can_cast('Воскрешение мертвых') or
-            BHelper:can_cast('Смертельный союз'))) then
+    if ((BHelper.player:get_health_on_percent() < 40) and
+        (BHelper.player:can_cast('Воскрешение мертвых') or
+            BHelper.player:can_cast('Смертельный союз'))) then
         BHelper.keybinds:show_macro('Смертельный союз')
         return true
     end
 
-    if ((BHelper:get_health_on_percent() < 60) and BHelper:can_cast('Захват рун')) then
+    if ((BHelper.player:get_health_on_percent() < 60) and
+        BHelper.player:can_cast('Захват рун')) then
         BHelper.keybinds:show_spell('Захват рун')
         return true
     end
 
-    if ((BHelper:get_health_on_percent() < 80) and
-        ((BHelper:get_ememy_debuff_time('Озноб', true) > 0) or
-            (BHelper:get_ememy_debuff_time('Кровавая чума', true) > 0)) and
-        (BHelper:can_cast_on_enemy('Удар смерти'))) then
+    if ((BHelper.player:get_health_on_percent() < 80) and
+        ((BHelper.target:get_debuff_time('Озноб', true) > 0) or
+            (BHelper.target:get_debuff_time('Кровавая чума', true) > 0)) and
+        (BHelper.player:can_cast_on_enemy('Удар смерти'))) then
         BHelper.keybinds:show_spell('Удар смерти')
         return true
     end
 
-    if ((BHelper:get_player_buff_time('Зимний горн') == 0) and
-        (BHelper:get_player_buff_time('Тотем силы земли') == 0) and
-        (BHelper:can_cast('Зимний горн'))) then
+    if ((BHelper.player:get_buff_time('Зимний горн') == 0) and
+        (BHelper.player:get_buff_time('Тотем силы земли') == 0) and
+        (BHelper.player:can_cast('Зимний горн'))) then
         BHelper.keybinds:show_spell('Зимний горн')
         return true
     end
 end
 
 function BHelper.modules.deathknight.default:rotation_single()
-    if (BHelper:can_cast('Рунический удар')) then
+    if (BHelper.player:can_cast('Рунический удар')) then
         BHelper.keybinds:show_attack('Рунический удар')
     end
 
-    if (BHelper:is_enemy_cast() and BHelper:can_cast_on_enemy('Заморозка разума') and
-        (self.vars.silence)) then
+    if (BHelper.target:check_cast() and
+        BHelper.player:can_cast_on_enemy('Заморозка разума') and (self.vars.silence)) then
         BHelper.keybinds:show_spell('Заморозка разума')
         return true
     end
 
-    -- if (BHelper:is_enemy_cast() and BHelper:can_cast_on_enemy('Удушение')) then
+    -- if (BHelper.target:check_cast() and BHelper.player:can_cast_on_enemy('Удушение')) then
     --     BHelper.keybinds:show_spell('Удушение')
     --     return true
     -- end
 
-    if (BHelper:can_cast_on_enemy('Ледяное прикосновение')) then
+    if (BHelper.player:can_cast_on_enemy('Ледяное прикосновение')) then
         BHelper.keybinds:show_spell('Ледяное прикосновение')
         return true
     end
 
-    if (BHelper:can_cast_on_enemy('Удар чумы')) then
+    if (BHelper.player:can_cast_on_enemy('Удар чумы')) then
         BHelper.keybinds:show_spell('Удар чумы')
         return true
     end
 
-    if ((BHelper:get_ememy_debuff_time('Озноб', true) > 0) and
-        (BHelper:get_ememy_debuff_time('Кровавая чума', true) > 0) and
-        (BHelper:can_cast_on_enemy('Удар в сердце'))) then
+    if ((BHelper.target:get_debuff_time('Озноб', true) > 0) and
+        (BHelper.target:get_debuff_time('Кровавая чума', true) > 0) and
+        (BHelper.player:can_cast_on_enemy('Удар в сердце'))) then
         BHelper.keybinds:show_spell('Удар в сердце')
         return true
     end
 end
 
 function BHelper.modules.deathknight.default:rotation_multiple()
-    if (BHelper:can_cast('Рунический удар')) then
+    if (BHelper.player:can_cast('Рунический удар')) then
         BHelper.keybinds:show_attack('Рунический удар')
     end
 
-    if (BHelper:is_enemy_cast() and BHelper:can_cast_on_enemy('Заморозка разума')) then
+    if (BHelper.target:check_cast() and
+        BHelper.player:can_cast_on_enemy('Заморозка разума')) then
         BHelper.keybinds:show_spell('Заморозка разума')
         return true
     end
 
-    -- if (BHelper:is_enemy_cast() and BHelper:can_cast_on_enemy('Удушение')) then
+    -- if (BHelper.target:check_cast() and BHelper.player:can_cast_on_enemy('Удушение')) then
     --     BHelper.keybinds:show_spell('Удушение')
     --     return true
     -- end
 
-    if ((BHelper:get_ememy_debuff_time('Озноб', true) == 0) and
-        (BHelper:can_cast_on_enemy('Ледяное прикосновение'))) then
+    if ((BHelper.target:get_debuff_time('Озноб', true) == 0) and
+        (BHelper.player:can_cast_on_enemy('Ледяное прикосновение'))) then
         BHelper.keybinds:show_spell('Ледяное прикосновение')
         return true
     end
 
-    if ((BHelper:get_ememy_debuff_time('Кровавая чума', true) == 0) and
-        (BHelper:can_cast_on_enemy('Удар чумы'))) then
+    if ((BHelper.target:get_debuff_time('Кровавая чума', true) == 0) and
+        (BHelper.player:can_cast_on_enemy('Удар чумы'))) then
         BHelper.keybinds:show_spell('Удар чумы')
         return true
     end
 
-    if (((BHelper:get_ememy_debuff_time('Кровавая чума', true) <= 2) or
-        (BHelper:get_ememy_debuff_time('Озноб', true) <= 2)) and
-        (BHelper:can_cast_on_enemy('Мор'))) then
+    if (((BHelper.target:get_debuff_time('Кровавая чума', true) <= 2) or
+        (BHelper.target:get_debuff_time('Озноб', true) <= 2)) and
+        (BHelper.player:can_cast_on_enemy('Мор'))) then
         BHelper.keybinds:show_spell('Мор')
         return true
     end
 
-    if ((BHelper:get_ememy_debuff_time('Озноб', true) ~=
-        BHelper:get_ememy_debuff_time('Кровавая чума', true)) and
-        (BHelper:can_cast_on_enemy('Мор'))) then
+    if ((BHelper.target:get_debuff_time('Озноб', true) ~=
+        BHelper.target:get_debuff_time('Кровавая чума', true)) and
+        (BHelper.player:can_cast_on_enemy('Мор'))) then
         BHelper.keybinds:show_spell('Мор')
         return true
     end
 
-    if ((BHelper:get_ememy_debuff_time('Озноб', true) > 0) and
-        (BHelper:get_ememy_debuff_time('Кровавая чума', true) > 0) and
-        (BHelper:can_cast('Вскипание крови'))) then
+    if ((BHelper.target:get_debuff_time('Озноб', true) > 0) and
+        (BHelper.target:get_debuff_time('Кровавая чума', true) > 0) and
+        (BHelper.player:can_cast('Вскипание крови'))) then
         BHelper.keybinds:show_spell('Вскипание крови')
         return true
     end
 
-    if ((BHelper:get_ememy_debuff_time('Озноб', true) > 0) and
-        (BHelper:get_ememy_debuff_time('Кровавая чума', true) > 0) and
-        (BHelper:can_cast_on_enemy('Удар смерти'))) then
+    if ((BHelper.target:get_debuff_time('Озноб', true) > 0) and
+        (BHelper.target:get_debuff_time('Кровавая чума', true) > 0) and
+        (BHelper.player:can_cast_on_enemy('Удар смерти'))) then
         BHelper.keybinds:show_spell('Удар смерти')
         return true
     end
 end
 
--- if ((BHelper:get_health_on_percent() < 40) and
---     (BHelper:can_cast('Воскрешение мертвых') or
---         BHelper:can_cast('Смертельный союз'))) then BHelper.keybinds:show_spell(10) end
+-- if ((BHelper.player:get_health_on_percent() < 40) and
+--     (BHelper.player:can_cast('Воскрешение мертвых') or
+--         BHelper.player:can_cast('Смертельный союз'))) then BHelper.keybinds:show_spell(10) end
 
--- if ((BHelper:get_health_on_percent() < 60) and BHelper:can_cast('Захват рун')) then
+-- if ((BHelper.player:get_health_on_percent() < 60) and BHelper.player:can_cast('Захват рун')) then
 --     BHelper.keybinds:show_spell(9)
 -- end
 
--- if ((BHelper:get_ememy_debuff_time('Озноб', true) == 0) and
---     (BHelper:can_cast_on_enemy('Ледяное прикосновение'))) then
+-- if ((BHelper.target:get_debuff_time('Озноб', true) == 0) and
+--     (BHelper.player:can_cast_on_enemy('Ледяное прикосновение'))) then
 --     BHelper.keybinds:show_spell(5)
 --     return
 -- end
 
--- if ((BHelper:get_ememy_debuff_time('Кровавая чума', true) == 0) and
---     (BHelper:can_cast_on_enemy('Удар чумы'))) then
+-- if ((BHelper.target:get_debuff_time('Кровавая чума', true) == 0) and
+--     (BHelper.player:can_cast_on_enemy('Удар чумы'))) then
 --     BHelper.keybinds:show_spell(4)
 --     return
 -- end
 
--- if (((BHelper:get_ememy_debuff_time('Кровавая чума', true) <= 2) or
---     (BHelper:get_ememy_debuff_time('Озноб', true) <= 2)) and
---     (BHelper:can_cast_on_enemy('Мор'))) then
+-- if (((BHelper.target:get_debuff_time('Кровавая чума', true) <= 2) or
+--     (BHelper.target:get_debuff_time('Озноб', true) <= 2)) and
+--     (BHelper.player:can_cast_on_enemy('Мор'))) then
 --     BHelper.keybinds:show_spell(2)
 --     return
 -- end
 
--- if ((BHelper:get_ememy_debuff_time('Озноб', true) > 0) and
---     (BHelper:get_ememy_debuff_time('Кровавая чума', true) > 0) and
---     (BHelper:can_cast_on_enemy('Удар смерти'))) then
+-- if ((BHelper.target:get_debuff_time('Озноб', true) > 0) and
+--     (BHelper.target:get_debuff_time('Кровавая чума', true) > 0) and
+--     (BHelper.player:can_cast_on_enemy('Удар смерти'))) then
 --     BHelper.keybinds:show_spell(6)
 --     return
 -- end
 
--- if (BHelper:can_cast('Кровоотвод')) then
+-- if (BHelper.player:can_cast('Кровоотвод')) then
 --     BHelper.keybinds:show_spell(2, false, true)
 --     return
 -- end

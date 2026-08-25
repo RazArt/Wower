@@ -20,7 +20,8 @@
 -- /закл Скачок
 -- /закл Превращение
 function BHelper.modules.mage.default:init()
-    BHelper.DB().type = 'battle'
+    self.settings.type = 'battle'
+    self.settings.only_combat_start = false
 
     BHelper.keybinds:bind_spell('Антимагия')
     BHelper.keybinds:bind_spell('Раскаленный доспех')
@@ -62,63 +63,63 @@ function BHelper.modules.mage.default:macros()
 end
 
 function BHelper.modules.mage.default:update()
-    if ((BHelper:get_player_buff_time('Раскаленный доспех') == 0) and
-        (BHelper:can_cast('Раскаленный доспех'))) then
+    if ((BHelper.player:get_buff_time('Раскаленный доспех') == 0) and
+        (BHelper.player:can_cast('Раскаленный доспех'))) then
         BHelper.keybinds:show_spell('Раскаленный доспех')
         return true
     end
 
-    if ((BHelper:get_player_buff_time('Чародейская гениальность') == 0) and
-        (BHelper:can_cast('Чародейская гениальность'))) then
+    if ((BHelper.player:get_buff_time('Чародейская гениальность') == 0) and
+        (BHelper.player:can_cast('Чародейская гениальность'))) then
         BHelper.keybinds:show_spell('Чародейская гениальность')
         return true
     end
 
-    if ((BHelper:get_player_buff_time('Усиление магии') == 0) and
-        (BHelper:can_cast('Усиление магии'))) then
+    if ((BHelper.player:get_buff_time('Усиление магии') == 0) and
+        (BHelper.player:can_cast('Усиление магии'))) then
         BHelper.keybinds:show_spell('Усиление магии')
         return true
     end
 end
 
 function BHelper.modules.mage.default:rotation_single()
-    if (BHelper:is_enemy_cast() and BHelper:can_cast_on_enemy('Антимагия')) then
+    if (BHelper.target:check_cast() and BHelper.player:can_cast_on_enemy('Антимагия')) then
         BHelper.keybinds:show_spell('Антимагия')
         return true
     end
 
-    if ((BHelper:get_player_debuff_count('Чародейская вспышка') < 3) and
-        (BHelper:can_cast('Чародейская вспышка'))) then
+    if ((BHelper.player:get_debuff_count('Чародейская вспышка') < 3) and
+        (BHelper.player:can_cast('Чародейская вспышка'))) then
         BHelper.keybinds:show_spell('Чародейская вспышка')
         return true
     end
 
-    if ((BHelper:get_player_buff_time('Величие разума') > 0) and
-        (BHelper:can_cast('Чародейская вспышка'))) then
+    if ((BHelper.player:get_buff_time('Величие разума') > 0) and
+        (BHelper.player:can_cast('Чародейская вспышка'))) then
         BHelper.keybinds:show_spell('Чародейская вспышка')
         return true
     end
 
-    if ((BHelper:get_player_buff_time('Заградительные стрелы') > 0) and
-        (BHelper:can_cast('Чародейские стрелы'))) then
+    if ((BHelper.player:get_buff_time('Заградительные стрелы') > 0) and
+        (BHelper.player:can_cast('Чародейские стрелы'))) then
         BHelper.keybinds:show_spell('Чародейские стрелы')
         return true
     end
 
-    if ((BHelper:can_cast('Чародейский обстрел'))) then
+    if ((BHelper.player:can_cast('Чародейский обстрел'))) then
         BHelper.keybinds:show_spell('Чародейский обстрел')
         return true
     end
 
-    if ((BHelper:can_cast('Чародейские стрелы'))) then
+    if ((BHelper.player:can_cast('Чародейские стрелы'))) then
         BHelper.keybinds:show_spell('Чародейские стрелы')
         return true
     end
 end
 
 function BHelper.modules.mage.ttw:init()
-    BHelper.DB().type = 'battle'
-    BHelper.DB().only_combat_start = false
+    self.settings.type = 'battle'
+    self.settings.only_combat_start = true
 
     if (self.vars.silence == nil) then self.vars.silence = false end
     if (self.vars.can_cast_scorch == nil) then self.vars.can_cast_scorch = true end
@@ -167,7 +168,7 @@ function BHelper.modules.mage.ttw:macros()
                           '#showtooltip Невидимость\n/bh c\n/cast Невидимость',
                           11)
     BHelper.macros:create('Невидимость авто',
-                          '#showtooltip Невидимость\n/cast Невидимость\n/bh c 3.1')
+                          '#showtooltip Невидимость\n/cast Невидимость\n/bh c 1')
     BHelper.macros:create('Прилив сил',
                           '#showtooltip Прилив сил\n/bh c\n/cast Прилив сил', 12)
     BHelper.macros:create('Превращение',
@@ -187,40 +188,42 @@ function BHelper.modules.mage.ttw:macros()
 end
 
 function BHelper.modules.mage.ttw:update()
-    if ((BHelper:get_health_on_percent() < 20) and BHelper:can_cast('Ледяная глыба')) then
+    if ((BHelper.player:get_health_on_percent() < 20) and
+        BHelper.player:can_cast('Ледяная глыба')) then
         BHelper.keybinds:show_spell('Ледяная глыба')
         return true
     end
 
-    if ((BHelper:get_player_buff_time('Невидимость') > 0)) then return true end
+    if ((BHelper.player:get_buff_time('Невидимость') > 0)) then return true end
 
-    if ((BHelper:player_is_target()) and (BHelper:can_cast('Невидимость')) and
-        (not BHelper:target_is_player())) then
+    if ((BHelper.target:player_on_target()) and (BHelper.player:can_cast('Невидимость')) and
+        (not BHelper.target:is_player())) then
         BHelper.keybinds:show_macro('Невидимость авто')
         return true
     end
 
-    if ((BHelper:get_mana_on_percent() < 80) and (BHelper:can_use_item('Сапфир маны'))) then
+    if ((BHelper.player:get_mana_on_percent() < 80) and
+        (BHelper.player:can_use_item('Сапфир маны'))) then
         BHelper.keybinds:show_item('Сапфир маны')
         return true
     end
 
-    -- if ((BHelper:get_item_count('Сапфир маны') == 0) and
-    --     (BHelper:can_cast('Сотворение самоцвета маны'))) then
+    -- if ((BHelper.player:get_item_count('Сапфир маны') == 0) and
+    --     (BHelper.player:can_cast('Сотворение самоцвета маны'))) then
     --     BHelper.keybinds:show_spell('Сотворение самоцвета маны')
     --     return true
     -- end
 
-    -- if ((BHelper:get_player_buff_time('Чародейская гениальность') == 0) and
-    --     (BHelper:get_player_buff_time(
+    -- if ((BHelper.player:get_buff_time('Чародейская гениальность') == 0) and
+    --     (BHelper.player:get_buff_time(
     --         'Чародейская гениальность Даларана') == 0) and
-    --     (BHelper:can_cast('Чародейская гениальность'))) then
+    --     (BHelper.player:can_cast('Чародейская гениальность'))) then
     --     BHelper.keybinds:show_spell('Чародейская гениальность')
     --     return true
     -- end
 
-    -- if ((BHelper:get_player_buff_time('Раскаленный доспех') == 0) and
-    --     (BHelper:can_cast('Раскаленный доспех'))) then
+    -- if ((BHelper.player:get_buff_time('Раскаленный доспех') == 0) and
+    --     (BHelper.player:can_cast('Раскаленный доспех'))) then
     --     UseEquipmentSet('BUFF')
     --     BHelper.keybinds:show_spell('Раскаленный доспех')
     --     UseEquipmentSet('BUFF2')
@@ -229,65 +232,77 @@ function BHelper.modules.mage.ttw:update()
 end
 
 function BHelper.modules.mage.ttw:rotation_single()
-    if ((BHelper:get_player_buff_time('Невидимость') > 0)) then return true end
+    if ((BHelper.player:get_buff_time('Невидимость') > 0)) then return true end
 
-    if (BHelper:is_enemy_cast() and BHelper:can_cast_on_enemy('Антимагия') and
+    if (BHelper.target:check_cast() and BHelper.player:can_cast_on_enemy('Антимагия') and
         (self.vars.silence)) then
         BHelper.keybinds:show_spell('Антимагия')
         return true
     end
 
-    if ((BHelper:get_player_buff_time('Путь огня') > 0) and
-        (BHelper:can_cast_on_enemy('Огненная глыба'))) then
+    if ((BHelper.player:get_buff_time('Путь огня') > 0) and
+        (BHelper.player:can_cast_on_enemy('Огненная глыба'))) then
         BHelper.keybinds:show_spell('Огненная глыба')
         return true
     end
 
-    if ((BHelper:get_ememy_debuff_time('Живая бомба', true) == 0) and
-        (not BHelper:exist_heroism_buff()) and (BHelper:can_cast_on_enemy('Живая бомба'))) then
+    if ((BHelper.target:get_debuff_time('Живая бомба', true) == 0) and
+        (not BHelper.player:check_heroism_buff()) and
+        (BHelper.player:can_cast_on_enemy('Живая бомба'))) then
         BHelper.keybinds:show_spell('Живая бомба')
         return true
     end
 
-    if ((BHelper:get_ememy_debuff_time('Улучшенный ожог') == 0) and
-        (BHelper:get_ememy_debuff_time('Власть над Тенями') == 0) and
-        (BHelper:can_cast_on_enemy('Ожог')) and (not BHelper:is_player_moving()) and
+    if ((BHelper.target:get_debuff_time('Улучшенный ожог') == 0) and
+        (BHelper.target:get_debuff_time('Власть над Тенями') == 0) and
+        (BHelper.player:can_cast_on_enemy('Ожог')) and (not BHelper.player:check_moving()) and
         (self.vars.can_cast_scorch) and (self.vars.scorch)) then
         BHelper.keybinds:show_spell('Ожог')
         return true
     end
 
-    if (BHelper:is_burst_mode()) then
-        if (BHelper:can_cast('Зеркальное изображение')) then
+    if (BHelper.player:check_burst_mode()) then
+        if (BHelper.player:can_cast('Зеркальное изображение')) then
             BHelper.keybinds:show_spell('Зеркальное изображение')
             return true
         end
 
-        if ((BHelper:get_player_buff_time('Возгорание') == 0) and
-            (BHelper:can_cast('Возгорание'))) then
+        if ((BHelper.player:get_buff_time('Возгорание') == 0) and
+            (BHelper.player:can_cast('Возгорание'))) then
             BHelper.keybinds:show_spell('Возгорание')
             return true
         end
 
-        if ((not BHelper:exist_heroism_buff()) and (not BHelper.vars.cooldown_berserker) and
-            (BHelper:can_cast('Берсерк(Расовая)'))) then
+        if ((not BHelper.player:check_heroism_buff()) and (not BHelper.vars.cooldown_berserker) and
+            (BHelper.player:can_cast('Берсерк(Расовая)'))) then
             BHelper.keybinds:show_spell('Берсерк(Расовая)')
             return true
         end
     end
 
-    if ((BHelper.common:is_equipped_item('Перчатки ложных знаков')) and
-        (BHelper:can_use_item('Перчатки ложных знаков'))) then
+    if ((BHelper.player:check_equipped_item('Перчатки ложных знаков')) and
+        (BHelper.player:can_use_item('Перчатки ложных знаков'))) then
         BHelper.keybinds:show_item('Перчатки ложных знаков')
         return true
     end
 
-    if (BHelper:can_cast_on_enemy('Огненный шар') and (not BHelper:is_player_moving())) then
+    if ((BHelper.player:check_equipped_item(
+        'Освященные перчатки волшебника крови')) and
+        (BHelper.player:can_use_item(
+            'Освященные перчатки волшебника крови'))) then
+        BHelper.keybinds:show_item(
+            'Освященные перчатки волшебника крови')
+        return true
+    end
+
+    if (BHelper.player:can_cast_on_enemy('Огненный шар') and
+        (not BHelper.player:check_moving())) then
         BHelper.keybinds:show_spell('Огненный шар')
         return true
     end
 
-    if (BHelper:can_cast_on_enemy('Огненный взрыв') and (BHelper:is_player_moving())) then
+    if (BHelper.player:can_cast_on_enemy('Огненный взрыв') and
+        (BHelper.player:check_moving())) then
         BHelper.keybinds:show_spell('Огненный взрыв')
         return true
     end
@@ -303,14 +318,9 @@ function BHelper.modules.mage.ttw:UNIT_SPELLCAST_START(castGUID, spellName)
 end
 
 function BHelper.modules.mage.ttw:rotation_multiple()
-    -- if (BHelper:can_cast_on_point('Огненный столб') and
-    --     (not BHelper:is_player_moving())) then
-    --     BHelper.keybinds:show_spell('Огненный столб')
-    --     return true
-    -- end
-
-    -- if (BHelper:can_cast_on_point('Снежная буря') and (not BHelper:is_player_moving())) then
-    --     BHelper.keybinds:show_spell('Снежная буря')
-    --     return true
-    -- end
+    if (BHelper.player:can_cast_on_point('Огненный столб') and
+        (not BHelper.player:check_moving())) then
+        BHelper.keybinds:show_spell('Огненный столб')
+        return true
+    end
 end
