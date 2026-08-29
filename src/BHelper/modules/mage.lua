@@ -174,17 +174,18 @@ function BHelper.modules.mage.ttw:macros()
     BHelper.macros:create('Превращение',
                           '#showtooltip Превращение\n/bh c\n/cast Превращение',
                           18)
+    BHelper.macros:create('Ожог', '#showtooltip Ожог\n/bh tv scorch', 40)
+    BHelper.macros:create('Антимагия', '#showtooltip Антимагия\n/bh tv silence',
+                          41)
+
     BHelper.macros:create('S', '/cast Огненная глыба\n/bh sa rotation_single\n/bh', 13,
                           true, 1263)
     BHelper.macros:create('M', '/cast Огненный столб\n/bh sa rotation_multiple\n/bh',
                           14, true, 1264)
-    -- BHelper.macros:create('Огненный шар',
-    --                       '#showtooltip Огненный шар\n/use 10\n/cast Огненный шар')
-    -- BHelper.macros:create('Стрела ледяного огня',
-    --                       '#showtooltip Стрела ледяного огня\n/use 10\n/cast Стрела ледяного огня')
-    BHelper.macros:create('Ожог', '#showtooltip Ожог\n/bh tv scorch', 40)
-    BHelper.macros:create('Антимагия', '#showtooltip Антимагия\n/bh tv silence',
-                          41)
+
+    BHelper.macros:create('Stop',
+                          '/stopcasting\n/stopattack\n/petfollow\n/cleartarget\n/equipset BM', 0,
+                          true)
 end
 
 function BHelper.modules.mage.ttw:update()
@@ -237,6 +238,13 @@ function BHelper.modules.mage.ttw:rotation_single()
     if (BHelper.target:check_cast() and BHelper.player:can_cast_on_enemy('Антимагия') and
         (self.vars.silence)) then
         BHelper.keybinds:show_spell('Антимагия')
+        return true
+    end
+
+    if ((not BHelper.player:check_equipped_item('Трупное окоченение')) and
+        (BHelper.player:get_buff_time('Черная магия') > 0)) then
+        print('NADELI')
+        BHelper.player:equip_set('MAIN')
         return true
     end
 

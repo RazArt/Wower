@@ -190,10 +190,10 @@ function BHelper.core:toggle_var(var)
 end
 
 function BHelper.core:cooldown(count)
-    -- BHelper.core:print('cooldown <', count, '>')
+    BHelper.core:print('cooldown <', count, '>')
     BHelper._cooldown = true
     BHelper.timers:create(count, function()
-        -- BHelper.core:print('cooldown < off >')
+        BHelper.core:print('cooldown < off >')
         BHelper._cooldown = false
     end, 'cooldown')
 end
@@ -319,8 +319,8 @@ function BHelper.player:check_equipped_item(item)
     return true
 end
 
-function BHelper.player:equip_set(item)
-    UseEquipmentSet(item)
+function BHelper.player:equip_set(set)
+    UseEquipmentSet(set)
 end
 
 function BHelper.player:get_item_count(item)
@@ -331,6 +331,8 @@ function BHelper.player:can_cast(spellname)
     if (not (select(1, IsUsableSpell(spellname)))) then return false end
     if (BHelper.player:check_cast()) then return false end
     if (BHelper.player:check_spell_on_cooldown(spellname)) then return false end
+    if (IsMounted()) then return false end
+    if (not HasFullControl()) then return false end
     return true
 end
 
@@ -388,8 +390,7 @@ function BHelper.player:check_moving()
 end
 
 function BHelper.player:check_hight_treat()
-    local threat = (select(3, UnitDetailedThreatSituation('player', 'target')))
-    if ((threat ~= nil) and (threat >= 100)) then return true end
+    if (UnitThreatSituation('player', 'target') > 0) then return true end
     return false
 end
 
@@ -438,7 +439,7 @@ function BHelper.target:is_player()
 end
 
 function BHelper.target:player_on_target()
-    if (UnitName('playertargettarget') == BHelper.player:get_name()) then return true end
+    if (UnitIsUnit('player', 'targettarget')) then return true end
     return false
 end
 
