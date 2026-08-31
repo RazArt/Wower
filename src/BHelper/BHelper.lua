@@ -13,7 +13,6 @@ BHelper._event_frame:RegisterEvent('PLAYER_CONTROL_LOST')
 BHelper._event_frame:RegisterEvent('PLAYER_CONTROL_GAINED')
 
 function BHelper:PLAYER_LOGIN()
-    self:init_DB()
     self:create_state_frame()
     self.core:reload()
 
@@ -22,14 +21,6 @@ function BHelper:PLAYER_LOGIN()
         local module = self.core.module:get()
         if ((module) and (self._runing) and (not self._cooldown)) then module:_update() end
     end)
-end
-
-function BHelper:init_DB()
-    if ((not BHelperDB) or (type(BHelperDB) ~= 'table')) then BHelperDB = {} end
-    if ((not BHelperDB[BHelper.player:get_spec()]) or
-        (type(BHelperDB[BHelper.player:get_spec()]) ~= 'table')) then
-        BHelperDB[BHelper.player:get_spec()] = {}
-    end
 end
 
 function BHelper:create_state_frame()

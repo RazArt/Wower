@@ -17,14 +17,14 @@ def get_pixels_color(hWnd):
 
 
 def key_send(hWnd, key_code):
-    key_press(hWnd, 16)
+    # key_press(hWnd, 16)
     key_press(hWnd, 17)
     key_press(hWnd, 18)
     key_press(hWnd, key_code)
     key_release(hWnd, key_code)
     key_release(hWnd, 18)
     key_release(hWnd, 17)
-    key_release(hWnd, 16)
+    # key_release(hWnd, 16)
 
 
 def key_press(hWnd, key_code):

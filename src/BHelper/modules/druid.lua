@@ -26,19 +26,22 @@ function BHelper.modules.druid.default:init()
     BHelper.keybinds:bind_spell('Облик лютого медведя')
     BHelper.keybinds:bind_spell('Облик кошки')
     BHelper.keybinds:bind_item('Знак превосходства')
+    BHelper.keybinds:bind_macro('Reform')
 end
 
 function BHelper.modules.druid.default:macros()
-    BHelper.macros:create('Накинуться',
-                          '#showtooltip\n/bh start\n/cast Накинуться', 88)
     BHelper.macros:create('Чардж',
                           '#showtooltip\n/cast [form:1] Звериная атака - медведь\n/cast [form:3] Звериная атака - кошка',
                           15)
     BHelper.macros:create('Атака',
                           '#showtooltip\n/startattack\n/cast [form:0/2/4/5/6] !Облик кошки(Смена облика)\n/cast Волшебный огонь (зверь)',
                           16)
-    BHelper.macros:create('Сало',
-                          '#showtooltip\n/cast [form:1/2] Оглушить\n/cast [form:3] Калечение',
+    BHelper.macros:create('Reform',
+                          '/bh c\n/cast [form:0/1/2/4/5/6] !Облик кошки(Смена облика)\n/cast [form:3] !Облик лютого медведя(Смена облика)\n')
+    SetBinding('BUTTON5', 'macro Reform')
+
+    BHelper.macros:create('Калечение',
+                          '#showtooltip\n/bh c\n/cast [form:1/2] Оглушить\n/cast [form:3] Калечение',
                           17)
     BHelper.macros:create('Возрождение',
                           '#showtooltip Возрождение\n/bh c\n/cast Возрождение',
@@ -71,9 +74,7 @@ function BHelper.modules.druid.default:macros()
                           '#showtooltip Исступление\n/bh c\n/cast Исступление',
                           72)
     BHelper.macros:create('Порыв', '#showtooltip Порыв\n/bh c\n/cast Порыв', 83)
-    BHelper.macros:create('Попятиться',
-                          '#showtooltip Попятиться\n/bh c\n/cast Попятиться', 84)
-    BHelper.macros:create('Калечение', '#showtooltip Калечение\n/bh tv silence',
+    BHelper.macros:create('КалечениеTV', '#showtooltip Калечение\n/bh tv silence',
                           43)
 end
 
@@ -113,6 +114,11 @@ function BHelper.modules.druid.default:update()
 end
 
 function BHelper.modules.druid.default:rotation_single()
+    if ((BHelper.player:get_buff_time('Облик кошки') == 0) and
+        (BHelper.player:get_buff_time('Облик лютого медведя') == 0)) then
+        return BHelper.keybinds:show_macro('Reform')
+    end
+
     if (BHelper.player:get_buff_time('Облик кошки') > 0) then return self:cat_single() end
 
     if (BHelper.player:get_buff_time('Облик лютого медведя') > 0) then
@@ -121,6 +127,11 @@ function BHelper.modules.druid.default:rotation_single()
 end
 
 function BHelper.modules.druid.default:rotation_multiple()
+    if ((BHelper.player:get_buff_time('Облик кошки') == 0) and
+        (BHelper.player:get_buff_time('Облик лютого медведя') == 0)) then
+        return BHelper.keybinds:show_macro('Reform')
+    end
+
     if (BHelper.player:get_buff_time('Облик кошки') > 0) then
         return self:cat_multiple()
     end
@@ -191,8 +202,8 @@ function BHelper.modules.druid.default:cat_single()
         return BHelper.keybinds:show_spell('Разорвать')
     end
 
-    if ((BHelper.target:get_debuff_time('Разорвать', true) >= 4) and
-        (BHelper.player:get_buff_time('Дикий рев') >= 4) and
+    if ((BHelper.target:get_debuff_time('Разорвать', true) >= 6) and
+        (BHelper.player:get_buff_time('Дикий рев') >= 6) and
         ((BHelper.player:get_power() <= 45) or (BHelper.player:get_buff_time(50334) > 0)) and
         (BHelper.player:check_combo_points(5)) and
         (BHelper.player:can_cast_on_enemy('Свирепый укус'))) then

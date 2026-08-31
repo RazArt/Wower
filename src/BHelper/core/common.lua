@@ -40,6 +40,12 @@ function BHelper.core:toggle()
 end
 
 function BHelper.core:reload()
+    if ((not BHelperDB) or (type(BHelperDB) ~= 'table')) then BHelperDB = {} end
+    if ((not BHelperDB[BHelper.player:get_spec()]) or
+        (type(BHelperDB[BHelper.player:get_spec()]) ~= 'table')) then
+        BHelperDB[BHelper.player:get_spec()] = {}
+    end
+
     local module = BHelper.core.module:get()
     if (not module) then
         BHelper.core.module:set()
@@ -190,10 +196,10 @@ function BHelper.core:toggle_var(var)
 end
 
 function BHelper.core:cooldown(count)
-    BHelper.core:print('cooldown <', count, '>')
+    -- BHelper.core:print('cooldown <', count, '>')
     BHelper._cooldown = true
     BHelper.timers:create(count, function()
-        BHelper.core:print('cooldown < off >')
+        -- BHelper.core:print('cooldown < off >')
         BHelper._cooldown = false
     end, 'cooldown')
 end
@@ -203,13 +209,8 @@ function BHelper.core:print(...)
 end
 
 function BHelper.core:create_shared_macros()
-    -- BHelper.macros:create('Target',
-    --                       '/targetlasttarget [exist,help,nodead]\n/target [@focustarget,harm,nodead]\n/targetenemy [@focus,noexists]\n/targetenemy [@focus,harm]\n/bh c',
-    --                       0, true, 711)
-    -- BHelper.macros:create('Target',
-    --                       '/target [@focustarget,harm,nodead]\n/targetenemy [@focus,noexists]\n/targetenemy [@focus,harm]\n/bh c',
-    --                       0, true, 711)
-    BHelper.macros:create('Target', '/targetenemy\n/bh c', 0, true, 711)
+    BHelper.macros:create('Target', '/targetenemy\n/startattack\n/petattack [@target]\n/bh c', 0,
+                          true, 711)
     BHelper.macros:create('Stop', '/stopcasting\n/stopattack\n/petfollow\n/cleartarget', 0, true)
     BHelper.macros:create('Аук', '/s .i au', 60, true, 1935)
     BHelper.macros:create('Банк', '/s .i b', 59, true, 1933)
@@ -320,7 +321,7 @@ function BHelper.player:check_equipped_item(item)
 end
 
 function BHelper.player:equip_set(set)
-    UseEquipmentSet(set)
+    return UseEquipmentSet(set)
 end
 
 function BHelper.player:get_item_count(item)
@@ -339,13 +340,19 @@ end
 function BHelper.player:can_cast_on_enemy(spellname)
     if (not BHelper.player:can_cast(spellname)) then return false end
     if (not BHelper.player:can_target_attack()) then return false end
+    if (not BHelper.player:check_spell_range(spellname)) then return false end
+    return true
+end
+
+function BHelper.player:check_spell_range(spellname)
     if (IsSpellInRange(spellname, 'target') ~= 1) then return false end
     return true
 end
 
 function BHelper.player:can_cast_on_point(spellname)
     if (not BHelper.player:can_cast(spellname)) then return false end
-    if (UnitExists('mouseover') ~= 1) then return false end
+    if (not UnitExists('mouseover')) then return false end
+    if (IsMouseButtonDown('RightButton')) then return false end
     return true
 end
 
@@ -390,7 +397,8 @@ function BHelper.player:check_moving()
 end
 
 function BHelper.player:check_hight_treat()
-    if (UnitThreatSituation('player', 'target') > 0) then return true end
+    local treat_level = UnitThreatSituation('player', 'target')
+    if ((treat_level) and (treat_level > 0)) then return true end
     return false
 end
 

@@ -16,7 +16,7 @@ function BHelper.keybinds:_bind(class, name, mouse_click)
     for key, bind in pairs(self._binds) do
         if ((bind.class == class) and (bind.name == name)) then return key end
         if (bind.name == nil) then
-            if (SetBinding('ALT-CTRL-SHIFT-' .. key, class .. ' ' .. name)) then
+            if (SetBinding('ALT-CTRL-' .. key, class .. ' ' .. name)) then
                 bind.name = name
                 bind.class = class
                 bind.mouse_click = not mouse_click and 0 or 1
@@ -45,7 +45,7 @@ function BHelper.keybinds:unbind_all()
         bind.name = nil
         bind.class = nil
         bind.mouse_click = nil
-        if (SetBinding('ALT-CTRL-SHIFT-' .. key) == nil) then result = false end
+        if (SetBinding('ALT-CTRL-' .. key) == nil) then result = false end
     end
     return result
 end
