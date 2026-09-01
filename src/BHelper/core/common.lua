@@ -39,12 +39,16 @@ function BHelper.core:toggle()
     end
 end
 
-function BHelper.core:reload()
+function BHelper.core:init_DB()
     if ((not BHelperDB) or (type(BHelperDB) ~= 'table')) then BHelperDB = {} end
     if ((not BHelperDB[BHelper.player:get_spec()]) or
         (type(BHelperDB[BHelper.player:get_spec()]) ~= 'table')) then
         BHelperDB[BHelper.player:get_spec()] = {}
     end
+end
+
+function BHelper.core:reload()
+    BHelper.core:init_DB()
 
     local module = BHelper.core.module:get()
     if (not module) then
@@ -209,8 +213,7 @@ function BHelper.core:print(...)
 end
 
 function BHelper.core:create_shared_macros()
-    BHelper.macros:create('Target', '/targetenemy\n/startattack\n/petattack [@target]\n/bh c', 0,
-                          true, 711)
+    BHelper.macros:create('Target', '/targetenemy\n/startattack\n/bh c', 0, true, 711)
     BHelper.macros:create('Stop', '/stopcasting\n/stopattack\n/petfollow\n/cleartarget', 0, true)
     BHelper.macros:create('Аук', '/s .i au', 60, true, 1935)
     BHelper.macros:create('Банк', '/s .i b', 59, true, 1933)

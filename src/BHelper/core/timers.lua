@@ -3,6 +3,7 @@ BHelper.timers = {}
 function BHelper.timers:update(elapsed)
     for i = #self._timers, 1, -1 do
         self._timers[i][1] = self._timers[i][1] + elapsed
+
         if self._timers[i][1] >= self._timers[i][2] then
             self._timers[i][3]()
             if (not self._timers[i][4]) then
@@ -28,7 +29,7 @@ function BHelper.timers:delete(name)
     name = string.lower(name)
 
     for i = #self._timers, 1, -1 do
-        if (string.find(self._timers[i][5], '^' .. name)) then table.remove(self._timers, i) end
+        if (self._timers[i][5] == name) then table.remove(self._timers, i) end
     end
 end
 

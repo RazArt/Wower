@@ -89,6 +89,10 @@ function BHelper.keybinds:show_help(name, time_count)
     return self:_show(3, 'spell', name, time_count)
 end
 
+function BHelper.keybinds:show_help_macro(name, time_count)
+    return self:_show(3, 'macro', name, time_count)
+end
+
 function BHelper.keybinds:init()
     self._binds = {}
 

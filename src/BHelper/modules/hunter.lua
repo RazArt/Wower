@@ -5,7 +5,7 @@ function BHelper.modules.hunter.default:init()
     if (self.vars.mana_regeneration == nil) then self.vars.mana_regeneration = false end
     if (self.vars.mark == nil) then self.vars.mark = true end
     if (self.vars.acrane_shot == nil) then self.vars.acrane_shot = false end
-    if (self.vars.misdirection == nil) then self.vars.acrane_shot = true end
+    if (self.vars.misdirection == nil) then self.vars.misdirection = true end
 
     BHelper.keybinds:bind_macro('BH: Цель')
     BHelper.keybinds:bind_spell('Дух дракондора')
@@ -23,18 +23,19 @@ function BHelper.modules.hunter.default:init()
     BHelper.keybinds:bind_spell('Чародейский выстрел')
     BHelper.keybinds:bind_spell('Верный выстрел')
     BHelper.keybinds:bind_spell('Град стрел', true)
-    BHelper.keybinds:bind_spell('Ледяная ловушка')
     BHelper.keybinds:bind_spell('Команда "Взять!"')
     BHelper.keybinds:bind_spell('Быстрая стрельба')
     BHelper.keybinds:bind_spell('Зов дикой природы')
     BHelper.keybinds:bind_spell('Берсерк(Расовая)')
+    BHelper.keybinds:bind_spell('Готовность')
     BHelper.keybinds:bind_item('Знак превосходства')
     BHelper.keybinds:bind_macro('Перенаправление')
+    BHelper.keybinds:bind_macro('PetAttack')
 end
 
 function BHelper.modules.hunter.default:macros()
-    BHelper.macros:create('Атака', '/petattack [@target]', 19, false, 973)
-    BHelper.macros:create('Назад', '/petfollow', 20, false, 970)
+    BHelper.macros:create('PetAttack', '/petattack [@target]', 19, false, 973)
+    BHelper.macros:create('PetFollow', '/petfollow', 20, false, 970)
     BHelper.macros:create('Отрыв', '#showtooltip\n/bh c\n/stopcasting\n/cast Отрыв', 1)
     BHelper.macros:create('Дух дикой природы',
                           '#showtooltip Дух дикой природы\n/bh c\n/stopcasting\n/cast Дух дикой природы',
@@ -44,23 +45,28 @@ function BHelper.modules.hunter.default:macros()
                           22)
     BHelper.macros:create('Метка охотникаTV',
                           '#showtooltip Метка охотника\n/bh tv mark', 41)
+    BHelper.macros:create('ПеренаправлениеTV',
+                          '#showtooltip Перенаправление\n/bh tv misdirection', 42)
     BHelper.macros:create('Чародейский выстрелTV',
                           '#showtooltip Чародейский выстрел\n/bh tv acrane_shot',
-                          42)
+                          43)
     BHelper.macros:create('Быстрая стрельба',
-                          '#showtooltip Быстрая стрельба\n/bh c\n/stopcasting\n/cast Берсерк\n/cast Быстрая стрельба\n/cast Зов дикой природы',
+                          '#showtooltip Быстрая стрельба\n/bh c\n/stopcasting\n/cast Быстрая стрельба\n/cast Зов дикой природы',
                           9)
+    BHelper.macros:create('Берсерк(Расовая)',
+                          '#showtooltip Берсерк(Расовая)\n/bh c\n/cast Берсерк(Расовая)',
+                          10)
     BHelper.macros:create('Готовность',
                           '#showtooltip Готовность\n/bh c\n/stopcasting\n/cast Готовность',
-                          10)
+                          11)
     BHelper.macros:create('Притвориться мертвым',
                           '#showtooltip Притвориться мертвым\n/bh c\n/stopcasting\n/cast Притвориться мертвым',
-                          11)
+                          12)
     BHelper.macros:create('Сдерживание',
                           '#showtooltip Сдерживание\n/bh c\n/stopcasting\n/cast Сдерживание',
-                          12)
+                          24)
     BHelper.macros:create('Перенаправление',
-                          '#showtooltip Перенаправление\n/bh c\n/stopcasting\n/cast [@focus,help,nodead] Перенаправление\n/cast [@target,help,nodead] Перенаправление\n/cast [@mouseover,help,nodead] Перенаправление',
+                          '#showtooltip Перенаправление\n/bh c\n/stopcasting\n/cast [@focus,help,nodead] Перенаправление\n/cast [@target,help,nodead] Перенаправление\n/cast [@targettarget,help,nodead] Перенаправление',
                           15)
     BHelper.macros:create('Глушащий выстрел',
                           '#showtooltip\n/bh c\n/stopcasting\n/cast Глушащий выстрел',
@@ -100,15 +106,16 @@ function BHelper.modules.hunter.default:update()
         return BHelper.keybinds:show_spell('Аура меткого выстрела')
     end
 
-    if (BHelper.target:check_cast() and
-        BHelper.player:can_cast_on_enemy('Глушащий выстрел')) then
-        return BHelper.keybinds:show_spell('Глушащий выстрел')
-    end
+    if (BHelper.player:can_target_attack()) then BHelper.keybinds:show_help_macro('PetAttack') end
 end
 
 function BHelper.modules.hunter.default:rotation_single()
     if (BHelper.player:can_cast_on_enemy('Убийственный выстрел')) then
         return BHelper.keybinds:show_spell('Убийственный выстрел')
+    end
+
+    if (BHelper.player:can_cast_on_enemy('Глушащий выстрел')) then
+        return BHelper.keybinds:show_spell('Глушащий выстрел')
     end
 
     if ((BHelper.target:get_debuff_time('Метка охотника') == 0) and
@@ -132,30 +139,6 @@ function BHelper.modules.hunter.default:rotation_single()
         return BHelper.keybinds:show_spell('Укус гадюки')
     end
 
-    if (BHelper.player:check_burst_mode()) then
-        if ((BHelper.player:get_buff_time('Быстрая стрельба') == 0) and
-            (BHelper.player:can_cast('Быстрая стрельба'))) then
-            return BHelper.keybinds:show_spell('Быстрая стрельба')
-        end
-
-        if ((BHelper.player:get_buff_time('Зов дикой природы') == 0) and
-            (BHelper.player:can_cast('Зов дикой природы'))) then
-            return BHelper.keybinds:show_spell('Зов дикой природы')
-        end
-
-        if ((BHelper.player:get_buff_time(50334) > 0) and
-            (BHelper.player:check_equipped_item('Знак превосходства')) and
-            (BHelper.player:can_use_item('Знак превосходства'))) then
-            return BHelper.keybinds:show_item('Знак превосходства')
-        end
-
-        if ((BHelper.player:get_buff_time('Быстрая стрельба') == 0) and
-            (not BHelper.player:check_heroism_buff()) and (not BHelper.vars.cooldown_berserker) and
-            (BHelper.player:can_cast('Берсерк(Расовая)'))) then
-            return BHelper.keybinds:show_spell('Берсерк(Расовая)')
-        end
-    end
-
     if (BHelper.player:can_cast_on_point(
         'Бросок ловушки: взрывная ловушка') and
         (not BHelper.player:check_moving())) then
@@ -163,9 +146,39 @@ function BHelper.modules.hunter.default:rotation_single()
                    'Бросок ловушки: взрывная ловушка')
     end
 
-    if (BHelper.player:can_cast_on_enemy('Перенаправление') and
-        (self.vars.misdirection)) then
+    if (BHelper.player:can_cast('Перенаправление') and (self.vars.misdirection)) then
         return BHelper.keybinds:show_macro('Перенаправление')
+    end
+
+    if (BHelper.player:check_burst_mode()) then
+        if ((BHelper.player:get_buff_time('Зов дикой природы') == 0) and
+            (BHelper.player:can_cast('Зов дикой природы'))) then
+            return BHelper.keybinds:show_spell('Зов дикой природы')
+        end
+
+        if ((BHelper.player:check_equipped_item('Знак превосходства')) and
+            (BHelper.player:can_use_item('Знак превосходства'))) then
+            return BHelper.keybinds:show_item('Знак превосходства')
+        end
+
+        if ((BHelper.player:get_buff_time('Быстрая стрельба') == 0) and
+            (BHelper.player:get_buff_time(26297) == 0) and (not BHelper.player:check_heroism_buff()) and
+            (not BHelper.vars.cooldown_berserker) and
+            (BHelper.player:can_cast('Быстрая стрельба'))) then
+            return BHelper.keybinds:show_spell('Быстрая стрельба')
+        end
+
+        if ((BHelper.player:get_buff_time('Быстрая стрельба') == 0) and
+            (BHelper.player:get_buff_time(26297) == 0) and (not BHelper.player:check_heroism_buff()) and
+            (not BHelper.vars.cooldown_berserker) and
+            (BHelper.player:can_cast('Берсерк(Расовая)'))) then
+            return BHelper.keybinds:show_spell('Берсерк(Расовая)')
+        end
+
+        if ((BHelper.player:get_spell_cooldown('Быстрая стрельба') > 15) and
+            (BHelper.player:can_cast('Готовность'))) then
+            return BHelper.keybinds:show_spell('Готовность')
+        end
     end
 
     if (BHelper.player:can_cast_on_enemy('Выстрел химеры')) then
