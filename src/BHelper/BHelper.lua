@@ -17,7 +17,6 @@ function BHelper:PLAYER_LOGIN()
     self.core:reload()
 
     CreateFrame('Frame'):SetScript('OnUpdate', function(_, elapsed)
-        -- print(BHelper.vars.cooldown_berserker)
         self.timers:update(elapsed)
         local module = self.core.module:get()
         if ((module) and (self._runing) and (not self._cooldown)) then module:_update() end

@@ -54,8 +54,8 @@ function BHelper.modules.warrior.default:macros()
                           '#showtooltip\n/cast [noharm]Вмешательство;[stance:2]Рывок;Перехват',
                           15)
 
-    BHelper.macros:create('S', '/startattack\n/bh sv attack_type 1\n/bh', 13, true, 1263)
-    BHelper.macros:create('M', '/startattack\n/bh sv attack_type 2\n/bh', 14, true, 1264)
+    BHelper.macros:create('S', '/startattack\n/bh sv attack_type 1\n/bh', 13, 1263)
+    BHelper.macros:create('M', '/startattack\n/bh sv attack_type 2\n/bh', 14, 1264)
 end
 
 function BHelper.modules.warrior.default:rotation()

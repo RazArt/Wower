@@ -31,6 +31,8 @@ function BHelper.modules:module(profiles)
         if ((profile) and (profile.settings.type ~= 'heal') and (profile.settings.type ~= 'craft')) then
             BHelper.keybinds:bind_macro('Target')
             BHelper.keybinds:bind_macro('Stop')
+            BHelper.keybinds:bind_macro('PetAttack')
+            BHelper.keybinds:bind_macro('PetFollow')
         end
     end
 
@@ -49,6 +51,8 @@ function BHelper.modules:module(profiles)
         local module = BHelper.core.module:get()
         local profile = BHelper.core.profile:get()
         local action = BHelper.core.action:get()
+
+        if (SpellIsTargeting()) then return BHelper.keybinds:show_click() end
 
         if ((not stop_flag) and (profile.settings.type ~= 'heal') and
             (profile.settings.type ~= 'craft') and (not BHelper.player:can_target_attack())) then

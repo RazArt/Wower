@@ -8,7 +8,7 @@ def get_pixels_color(hWnd):
     result = []
     if (hWnd != 0):
         hWndDC = win32gui.GetWindowDC(hWnd)
-        for i in range(0, 4):
+        for i in range(0, 5):
             ret = win32gui.GetPixel(hWndDC, i, 0)
             r, g, b = ret & 0xff, (ret >> 8) & 0xff, (ret >> 16) & 0xff
             result.append((r, g, b))
@@ -17,14 +17,12 @@ def get_pixels_color(hWnd):
 
 
 def key_send(hWnd, key_code):
-    # key_press(hWnd, 16)
     key_press(hWnd, 17)
     key_press(hWnd, 18)
     key_press(hWnd, key_code)
     key_release(hWnd, key_code)
     key_release(hWnd, 18)
     key_release(hWnd, 17)
-    # key_release(hWnd, 16)
 
 
 def key_press(hWnd, key_code):
@@ -47,13 +45,13 @@ while True:
     try:
         pixel_color = get_pixels_color(hWnd_wow)
         if (pixel_color[0] == (31, 11, 12)):
-            for i in range(1, 4):
+            for i in range(1, 5):
                 if (pixel_color[i][0] == 44):
-                    key_send(hWnd_wow, pixel_color[i][1])
-
-                if (pixel_color[i][2] == 1):
-                    click_send(hWnd_wow)
+                    if (pixel_color[i][1] > 44):
+                        key_send(hWnd_wow, pixel_color[i][1])
+                    if (pixel_color[i][2] == 1):
+                        click_send(hWnd_wow)
     except:
         hWnd_wow = win32gui.FindWindow(None, 'World of Warcraft')
 
-    sleep(0.05)
+    sleep(0.01)

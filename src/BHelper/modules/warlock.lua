@@ -25,9 +25,9 @@ end
 function BHelper.modules.warlock.default:macros()
 
     BHelper.macros:create('S', '/cast Огненная глыба\n/bh sa rotation_single\n/bh', 13,
-                          true, 1263)
+                          1263)
     BHelper.macros:create('M', '/cast Огненный столб\n/bh sa rotation_multiple\n/bh',
-                          14, true, 1264)
+                          14, 1264)
 end
 
 function BHelper.modules.warlock.default:update()

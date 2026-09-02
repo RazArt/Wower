@@ -28,6 +28,7 @@ function BHelper.modules.mage.default:init()
     BHelper.keybinds:bind_item('Перчатки ложных знаков')
 
     self:register_event('UNIT_SPELLCAST_START')
+    self:register_event('PLAYER_REGEN_ENABLED')
 end
 
 function BHelper.modules.mage.default:macros()
@@ -67,13 +68,13 @@ function BHelper.modules.mage.default:macros()
                           41)
 
     BHelper.macros:create('S', '/cast Огненная глыба\n/bh sa rotation_single\n/bh', 13,
-                          true, 1263)
+                          1263)
     BHelper.macros:create('M', '/cast Огненный столб\n/bh sa rotation_multiple\n/bh',
-                          14, true, 1264)
+                          14, 1264)
 
-    BHelper.macros:create('Stop',
-                          '/stopcasting\n/stopattack\n/petfollow\n/cleartarget\n/equipset BM', 0,
-                          true)
+    BHelper.macros:create('Stop', '/stopcasting\n/stopattack\n/petfollow\n/cleartarget', 0)
+    -- BHelper.macros:create('Stop',
+    --                       '/stopcasting\n/stopattack\n/petfollow\n/cleartarget\n/equipset BM', 0)
 end
 
 function BHelper.modules.mage.default:update()
@@ -190,6 +191,10 @@ function BHelper.modules.mage.default:UNIT_SPELLCAST_START(castGUID, spellName)
             self.vars.can_cast_scorch = true
         end, 'can_cast_scorch')
     end
+end
+
+function BHelper.modules.mage.default:PLAYER_REGEN_ENABLED()
+    BHelper.player:equip_set('BM')
 end
 
 function BHelper.modules.mage.default:rotation_multiple()

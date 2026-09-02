@@ -51,14 +51,20 @@ function BHelper.keybinds:unbind_all()
 end
 
 function BHelper.keybinds:_show(num, class, name, time_count)
-    time_count = time_count or 0.05
+    time_count = time_count or 0.01
     if (ACTIVE_CHAT_EDIT_BOX) then return false end
 
-    local key = self:_get_bind_key(class, name)
-    if (not key) then return false end
     local flag = 44 / 255
-    local mouse_click = self._binds[key].mouse_click / 255
-    key = string.byte(key, 1) / 255
+    local key = 0
+    local mouse_click = 0
+
+    if (num < 4) then
+        key = self:_get_bind_key(class, name)
+        if (not key) then return false end
+        key = string.byte(key, 1) / 255
+    else
+        mouse_click = 1 / 255
+    end
 
     self._frames.frame[num].texture:SetTexture(flag, key, mouse_click)
     self._frames.frame[num]:Show()
@@ -68,6 +74,25 @@ function BHelper.keybinds:_show(num, class, name, time_count)
     end, 'keybinds_hide_' .. num)
     return true
 end
+
+-- function BHelper.keybinds:_show(num, class, name, time_count)
+--     time_count = time_count or 0.05
+--     if (ACTIVE_CHAT_EDIT_BOX) then return false end
+
+--     local key = self:_get_bind_key(class, name)
+--     if (not key) then return false end
+--     local flag = 44 / 255
+--     local mouse_click = self._binds[key].mouse_click / 255
+--     key = string.byte(key, 1) / 255
+
+--     self._frames.frame[num].texture:SetTexture(flag, key, mouse_click)
+--     self._frames.frame[num]:Show()
+
+--     BHelper.timers:create(time_count, function()
+--         self._frames.frame[num]:Hide()
+--     end, 'keybinds_hide_' .. num)
+--     return true
+-- end
 
 function BHelper.keybinds:show_macro(name, time_count)
     return self:_show(1, 'macro', name, time_count)
@@ -93,25 +118,29 @@ function BHelper.keybinds:show_help_macro(name, time_count)
     return self:_show(3, 'macro', name, time_count)
 end
 
+function BHelper.keybinds:show_click()
+    return self:_show(4)
+end
+
 function BHelper.keybinds:init()
     self._binds = {}
 
     for _, key in ipairs({
         '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', 'T', 'Y', 'U', 'I', 'O', 'P', 'H', 'J',
-        'K', 'L', 'X', 'C', 'V', 'B', 'N', 'M'
+        'K', 'L', 'Z', 'X', 'C', 'V', 'B', 'N', 'M'
     }) do self._binds[key] = {} end
     self:unbind_all()
 
     self._frames = CreateFrame('Frame')
     self._frames:SetScale(0.71)
-    self._frames:SetSize(4, 1)
+    self._frames:SetSize(5, 1)
     self._frames:SetFrameStrata('tooltip')
     self._frames:SetPoint('topleft', UIParent, 0, 0)
     self._frames.texture = self._frames:CreateTexture(nil, 'tooltip')
     self._frames.texture:SetAllPoints(self._frames)
     self._frames.texture:SetTexture(31 / 255, 11 / 255, 12 / 255)
     self._frames.frame = {}
-    for i = 1, 3 do
+    for i = 1, 4 do
         self._frames.frame[i] = CreateFrame('Frame', nil, self._frames)
         self._frames.frame[i]:SetSize(1, 1)
         self._frames.frame[i]:SetPoint('topleft', self._frames, i, 0)
