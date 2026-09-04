@@ -271,11 +271,11 @@ function BHelper.player:get_level()
 end
 
 function BHelper.player:get_health_on_percent()
-    return UnitHealth('player') / UnitHealthMax('player') * 100
+    return BHelper.player:get_health() / BHelper.player:get_health_max() * 100
 end
 
 function BHelper.player:get_mana_on_percent()
-    return UnitMana('player') / UnitManaMax('player') * 100
+    return BHelper.player:get_mana() / BHelper.player:get_mana_max() * 100
 end
 
 function BHelper.player:get_health()
@@ -288,6 +288,18 @@ end
 
 function BHelper.player:get_power()
     return UnitPower('player') or 0
+end
+
+function BHelper.player:get_health_max()
+    return UnitHealthMax('player') or 0
+end
+
+function BHelper.player:get_mana_max()
+    return UnitManaMax('player') or 0
+end
+
+function BHelper.player:get_power_max()
+    return UnitPowerMax('player') or 0
 end
 
 function BHelper.player:get_buff_time(spell, is_player_caster)
@@ -334,25 +346,25 @@ function BHelper.player:get_item_count(item)
     return GetItemCount(item)
 end
 
-function BHelper.player:can_cast(spellname)
+function BHelper.player:can_cast(spellname, check_time)
     if (not (select(1, IsUsableSpell(spellname)))) then return false end
     if (BHelper.player:spell_is_targeting()) then return false end
     if (BHelper.player:check_cast()) then return false end
-    if (BHelper.player:check_spell_on_cooldown(spellname)) then return false end
+    if (BHelper.player:check_spell_on_cooldown(spellname, check_time)) then return false end
     if (IsMounted()) then return false end
     if (not HasFullControl()) then return false end
     return true
 end
 
-function BHelper.player:can_cast_on_enemy(spellname)
-    if (not BHelper.player:can_cast(spellname)) then return false end
+function BHelper.player:can_cast_on_enemy(spellname, check_time)
+    if (not BHelper.player:can_cast(spellname, check_time)) then return false end
     if (not BHelper.player:can_target_attack()) then return false end
     if (not BHelper.player:check_spell_range(spellname)) then return false end
     return true
 end
 
-function BHelper.player:can_cast_on_point(spellname)
-    if (not BHelper.player:can_cast(spellname)) then return false end
+function BHelper.player:can_cast_on_point(spellname, check_time)
+    if (not BHelper.player:can_cast(spellname, check_time)) then return false end
     if (not UnitExists('mouseover')) then return false end
     if (IsMouseButtonDown('RightButton')) then return false end
     return true
@@ -377,9 +389,8 @@ function BHelper.player:can_target_attack()
     if (target_name == 'Темное ядро') then return false end
     if (((target_name == 'Принц Валанар') or
         (target_name == 'Принц Келесет') or
-        (target_name == 'Принц Талдарам')) and (BHelper.target:get_health() == 1)) then
-        return false
-    end
+        (target_name == 'Принц Талдарам')) and (BHelper.target:get_health() == 1) and
+        (BHelper.player:get_buff_time('Перенаправление') == 0)) then return false end
 
     return true
 end
@@ -399,17 +410,18 @@ function BHelper.player:get_spell_cooldown(spellname)
     return start + duration - GetTime() - 0.2
 end
 
-function BHelper.player:check_spell_on_cooldown(spellname)
-    local start, duration = GetSpellCooldown(spellname)
-    return (start + duration - GetTime() - 0.2 > 0) and true or false
+function BHelper.player:check_spell_on_cooldown(spellname, check_time)
+    check_time = check_time or 0.2
+    local cd = BHelper.player:get_spell_cooldown(spellname)
+    return (cd > check_time) and true or false
 end
 
 function BHelper.player:check_cast()
     local _, _, _, _, _, endTime = UnitCastingInfo('player')
-    if (endTime) then return (endTime / 1000 - GetTime() - 0.2 > 0) and true or false end
+    if (endTime) then return (endTime / 1000 - GetTime() > 0.2) and true or false end
 
     local _, _, _, _, _, endTime = UnitChannelInfo('player')
-    if (endTime) then return (endTime / 1000 - GetTime() - 0.2 > 0) and true or false end
+    if (endTime) then return (endTime / 1000 - GetTime() > 0.2) and true or false end
 
     return false
 end
@@ -496,6 +508,18 @@ end
 
 function BHelper.target:get_power()
     return UnitPower('target') or 0
+end
+
+function BHelper.target:get_health_max()
+    return UnitHealthMax('target') or 0
+end
+
+function BHelper.target:get_mana_max()
+    return UnitManaMax('target') or 0
+end
+
+function BHelper.target:get_power_max()
+    return UnitPowerMax('target') or 0
 end
 
 function BHelper.target:is_boss()
