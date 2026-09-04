@@ -1,6 +1,7 @@
 function BHelper.modules.rogue.default:init()
     self.settings.type = 'battle'
     self.settings.only_combat_start = true
+    self.settings.auto_combat_start = true
 
     if (self.vars.sunder == nil) then self.vars.sunder = false end
 
@@ -77,11 +78,11 @@ function BHelper.modules.rogue.default:rotation_single()
         return true
     end
 
-    -- if ((BHelper.player:can_cast_on_enemy('Потрошение')) and
-    --     (BHelper.player:check_combo_points(4))) then
-    --     BHelper.keybinds:show_spell('Потрошение')
-    --     return true
-    -- end
+    if ((BHelper.player:can_cast_on_enemy('Потрошение')) and
+        (BHelper.player:check_combo_points(4))) then
+        BHelper.keybinds:show_spell('Потрошение')
+        return true
+    end
 
     if (BHelper.player:can_cast_on_enemy('Коварный удар')) then
         BHelper.keybinds:show_spell('Коварный удар')

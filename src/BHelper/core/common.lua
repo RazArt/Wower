@@ -12,8 +12,6 @@ function BHelper.core:start()
         return
     end
 
-    BHelper.core:print('start')
-
     BHelper.vars.cooldown_berserker = true
     BHelper.timers:create(5, function()
         BHelper.vars.cooldown_berserker = false
@@ -24,8 +22,6 @@ function BHelper.core:start()
 end
 
 function BHelper.core:stop()
-    BHelper.core:print('stop')
-
     BHelper._runing = false
     BHelper._cooldown = false
     BHelper.vars.cooldown_berserker = false
@@ -33,7 +29,7 @@ function BHelper.core:stop()
     BHelper.state_frame:Hide()
 
     BHelper.keybinds:show_macro('Stop', 0.1)
-    if (BHelper.pet:check_control()) then BHelper.keybinds:show_help_macro('PetFollow', 0.1) end
+    if (BHelper.pet:check_control()) then BHelper.keybinds:show_pet('Follow', 0.1) end
 end
 
 function BHelper.core:toggle()
@@ -340,7 +336,7 @@ end
 
 function BHelper.player:can_cast(spellname)
     if (not (select(1, IsUsableSpell(spellname)))) then return false end
-    if (SpellIsTargeting()) then return false end
+    if (BHelper.player:spell_is_targeting()) then return false end
     if (BHelper.player:check_cast()) then return false end
     if (BHelper.player:check_spell_on_cooldown(spellname)) then return false end
     if (IsMounted()) then return false end
@@ -355,15 +351,46 @@ function BHelper.player:can_cast_on_enemy(spellname)
     return true
 end
 
-function BHelper.player:check_spell_range(spellname)
-    if (IsSpellInRange(spellname, 'target') ~= 1) then return false end
-    return true
-end
-
 function BHelper.player:can_cast_on_point(spellname)
     if (not BHelper.player:can_cast(spellname)) then return false end
     if (not UnitExists('mouseover')) then return false end
     if (IsMouseButtonDown('RightButton')) then return false end
+    return true
+end
+
+function BHelper.player:can_target_attack()
+    if (not UnitExists('target')) then return false end
+    if (UnitIsDeadOrGhost('target')) then return false end
+    if (UnitIsDeadOrGhost('player')) then return false end
+    if (not UnitCanAttack('player', 'target')) then return false end
+
+    if (BHelper.target:get_debuff_time('Спячка') > 0) then return false end
+    if (BHelper.target:get_debuff_time('Смерч') > 0) then return false end
+    if (BHelper.target:get_debuff_time('Превращение') > 0) then return false end
+    if (BHelper.target:get_debuff_time('Страх') > 0) then return false end
+    if (BHelper.target:get_debuff_time('Ослепление') > 0) then return false end
+
+    local target_name = BHelper.target:get_name()
+    if (target_name == 'Дарнаван') then return false end
+    if (target_name == 'Большой слизнюк') then return false end
+    if (target_name == 'Малый слизнюк') then return false end
+    if (target_name == 'Темное ядро') then return false end
+    if (((target_name == 'Принц Валанар') or
+        (target_name == 'Принц Келесет') or
+        (target_name == 'Принц Талдарам')) and (BHelper.target:get_health() == 1)) then
+        return false
+    end
+
+    return true
+end
+
+function BHelper.player:spell_is_targeting()
+    if (not SpellIsTargeting()) then return false end
+    return true
+end
+
+function BHelper.player:check_spell_range(spellname)
+    if (IsSpellInRange(spellname, 'target') ~= 1) then return false end
     return true
 end
 
@@ -387,18 +414,6 @@ function BHelper.player:check_cast()
     return false
 end
 
-function BHelper.player:can_target_attack()
-    if (UnitIsDeadOrGhost('target')) then return false end
-    if (UnitIsDeadOrGhost('player')) then return false end
-    if (UnitCanAttack('player', 'target') ~= 1) then return false end
-    if (BHelper.target:get_debuff_time('Спячка') > 0) then return false end
-    if (BHelper.target:get_debuff_time('Смерч') > 0) then return false end
-    if (BHelper.target:get_debuff_time('Превращение') > 0) then return false end
-    if (BHelper.target:get_debuff_time('Страх') > 0) then return false end
-    if (BHelper.target:get_debuff_time('Ослепление') > 0) then return false end
-    return true
-end
-
 function BHelper.player:check_combat_state()
     return BHelper.vars._combat_state
 end
@@ -409,7 +424,7 @@ function BHelper.player:check_moving()
 end
 
 function BHelper.player:check_hight_treat()
-    if (string.find(string.lower(BHelper.target:get_name()), 'манекен')) then return false end
+    if (not BHelper.target:should_evade()) then return false end
 
     local treat_level = UnitThreatSituation('player', 'target')
     if ((treat_level) and (treat_level > 0)) then return true end
@@ -428,11 +443,27 @@ function BHelper.player:check_burst_mode()
     return false
 end
 
+function BHelper.player:help_focus_exist()
+    if (not UnitExists('focus')) then return false end
+    if (UnitIsDeadOrGhost('focus')) then return false end
+    if (not UnitCanAssist('player', 'focus')) then return false end
+    return true
+end
+
 function BHelper.pet:can_target_attack()
     if (not BHelper.player:can_target_attack()) then return false end
     if (UnitIsUnit('pettarget', 'target')) then return false end
-    if (BHelper.target:get_name() == 'Ледяная сфера') then return false end
-    if (BHelper.target:get_name() == 'Зловещий дух') then return false end
+
+    local target_name = BHelper.target:get_name()
+    if (target_name == 'Ледяная сфера') then return false end
+    if (target_name == 'Ледяной шар') then return false end
+    if (target_name == 'Зловещий дух') then return false end
+    if (target_name == 'Волдырный зомби') then return false end
+    if ((target_name == 'Имирьярская повелительница льда') and
+        (BHelper.target:get_buff_time('Арктический холод') > 0)) then
+        return false
+    end
+
     return true
 end
 
@@ -480,10 +511,19 @@ function BHelper.target:is_player()
 end
 
 function BHelper.target:player_on_target()
-    if (string.find(string.lower(BHelper.target:get_name()), 'манекен')) then return false end
+    if (not BHelper.target:should_evade()) then return false end
 
     if (UnitIsUnit('player', 'targettarget')) then return true end
     return false
+end
+
+function BHelper.target:should_evade()
+    if (string.find(string.lower(BHelper.target:get_name()), 'манекен')) then return false end
+    if (BHelper.target:get_name() == 'Кровавая королева Лана\'тель') then
+        return false
+    end
+    if (BHelper.target:get_name() == 'Леди Смертный Шепот') then return false end
+    return true
 end
 
 function BHelper.target:get_buff_time(spell, is_player_caster)
@@ -511,6 +551,11 @@ function BHelper.target:enemy_on_combat()
     if (UnitCanAttack('player', 'target') ~= 1) then return false end
     if (UnitCanAttack('target', 'targettarget') == 1) then return true end
     if (UnitAffectingCombat('target') ~= nil) then return true end
+    return false
+end
+
+function BHelper.target:check_moving()
+    if (GetUnitSpeed('target') > 0) then return true end
     return false
 end
 

@@ -1,6 +1,7 @@
 function BHelper.modules.warrior.default:init()
     self.settings.type = 'battle'
     self.settings.only_combat_start = true
+    self.settings.auto_combat_start = true
 
     if (self.vars.attack_type == nil) then self.vars.attack_type = '1' end
     if (self.vars.battle_shout == nil) then self.vars.battle_shout = false end
@@ -76,8 +77,8 @@ function BHelper.modules.warrior.default:rotation()
     end
 
     if ((BHelper.target:get_debuff_time('Деморализующий крик') == 0) and
-        (BHelper.player:can_cast('Деморализующий крик')) and
-        (self.vars.demoralizing_shout)) then
+        (self.vars.demoralizing_shout) and
+        (BHelper.player:can_cast('Деморализующий крик'))) then
         BHelper.keybinds:show_spell('Деморализующий крик')
         return true
     end
@@ -86,20 +87,20 @@ function BHelper.modules.warrior.default:rotation()
         (BHelper.player:get_buff_time('Благословение могущества') == 0) and
         (BHelper.player:get_buff_time(
             'Великое благословение могущества') == 0) and
-        (BHelper.player:can_cast('Боевой крик')) and (self.vars.battle_shout)) then
+        (self.vars.battle_shout) and (BHelper.player:can_cast('Боевой крик'))) then
         BHelper.keybinds:show_spell('Боевой крик')
         return true
     end
 
     if ((BHelper.player:get_buff_time('Командирский крик') == 0) and
-        (BHelper.player:can_cast('Командирский крик')) and
-        (self.vars.commanding_shout)) then
+        (self.vars.commanding_shout) and
+        (BHelper.player:can_cast('Командирский крик'))) then
         BHelper.keybinds:show_spell('Командирский крик')
         return true
     end
 
-    if (BHelper.target:check_cast() and BHelper.player:can_cast_on_enemy('Зуботычина') and
-        (self.vars.silence)) then
+    if (BHelper.target:check_cast() and (self.vars.silence) and
+        BHelper.player:can_cast_on_enemy('Зуботычина')) then
         BHelper.keybinds:show_spell('Зуботычина')
         return true
     end
@@ -149,7 +150,8 @@ function BHelper.modules.warrior.default:rotation()
         return true
     end
 
-    if ((BHelper.player:can_cast('Вихрь'))) then
+    if ((BHelper.target:get_name() ~= 'Принц Келесет') and
+        (BHelper.player:can_cast('Вихрь'))) then
         BHelper.keybinds:show_spell('Вихрь')
         return true
     end

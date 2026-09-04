@@ -1,6 +1,7 @@
 function BHelper.modules.deathknight.default:init()
     self.settings.type = 'battle'
     self.settings.only_combat_start = true
+    self.settings.auto_combat_start = true
 
     if (self.vars.silence == nil) then self.vars.silence = true end
 
@@ -93,16 +94,11 @@ function BHelper.modules.deathknight.default:rotation_single()
         BHelper.keybinds:show_attack('Рунический удар')
     end
 
-    if (BHelper.target:check_cast() and
-        BHelper.player:can_cast_on_enemy('Заморозка разума') and (self.vars.silence)) then
+    if (BHelper.target:check_cast() and (self.vars.silence) and
+        BHelper.player:can_cast_on_enemy('Заморозка разума')) then
         BHelper.keybinds:show_spell('Заморозка разума')
         return true
     end
-
-    -- if (BHelper.target:check_cast() and BHelper.player:can_cast_on_enemy('Удушение')) then
-    --     BHelper.keybinds:show_spell('Удушение')
-    --     return true
-    -- end
 
     if (BHelper.player:can_cast_on_enemy('Ледяное прикосновение')) then
         BHelper.keybinds:show_spell('Ледяное прикосновение')
@@ -132,11 +128,6 @@ function BHelper.modules.deathknight.default:rotation_multiple()
         BHelper.keybinds:show_spell('Заморозка разума')
         return true
     end
-
-    -- if (BHelper.target:check_cast() and BHelper.player:can_cast_on_enemy('Удушение')) then
-    --     BHelper.keybinds:show_spell('Удушение')
-    --     return true
-    -- end
 
     if ((BHelper.target:get_debuff_time('Озноб', true) == 0) and
         (BHelper.player:can_cast_on_enemy('Ледяное прикосновение'))) then

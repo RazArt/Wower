@@ -44,7 +44,7 @@ end
 
 function BHelper:PLAYER_REGEN_DISABLED()
     self.vars._combat_state = true
-    self.core:start()
+    if (BHelper.core.profile:get().settings.auto_combat_start) then self.core:start() end
 end
 
 function BHelper:PLAYER_REGEN_ENABLED()

@@ -1,6 +1,7 @@
 function BHelper.modules.mage.default:init()
     self.settings.type = 'battle'
     self.settings.only_combat_start = true
+    self.settings.auto_combat_start = true
 
     if (self.vars.silence == nil) then self.vars.silence = false end
     if (self.vars.can_cast_scorch == nil) then self.vars.can_cast_scorch = true end
@@ -21,8 +22,9 @@ function BHelper.modules.mage.default:init()
     BHelper.keybinds:bind_spell('Невидимость')
     BHelper.keybinds:bind_spell('Ледяная глыба')
     BHelper.keybinds:bind_spell('Сотворение самоцвета маны')
-    BHelper.keybinds:bind_spell('Снежная буря', true)
-    BHelper.keybinds:bind_spell('Огненный столб', true)
+    BHelper.keybinds:bind_spell('Снежная буря')
+    BHelper.keybinds:bind_spell('Огненный столб')
+    BHelper.keybinds:bind_spell('Превращение')
     BHelper.keybinds:bind_macro('Невидимость авто')
     BHelper.keybinds:bind_item('Сапфир маны')
     BHelper.keybinds:bind_item('Перчатки ложных знаков')
@@ -95,6 +97,12 @@ function BHelper.modules.mage.default:update()
         return BHelper.keybinds:show_item('Сапфир маны')
     end
 
+    if ((BHelper.target:get_name() == 'Имирьярская охотница') and
+        (BHelper.target:check_cast()) and
+        (BHelper.player:can_cast_on_enemy('Превращение'))) then
+        return BHelper.keybinds:show_spell('Превращение')
+    end
+
     -- if ((BHelper.player:get_item_count('Сапфир маны') == 0) and
     --     (BHelper.player:can_cast('Сотворение самоцвета маны'))) then
     --     return BHelper.keybinds:show_spell('Сотворение самоцвета маны')
@@ -118,8 +126,10 @@ end
 function BHelper.modules.mage.default:rotation_single()
     if ((BHelper.player:get_buff_time('Невидимость') > 0)) then end
 
-    if (BHelper.target:check_cast() and BHelper.player:can_cast_on_enemy('Антимагия') and
-        (self.vars.silence)) then return BHelper.keybinds:show_spell('Антимагия') end
+    if (BHelper.target:check_cast() and (self.vars.silence) and
+        (BHelper.player:can_cast_on_enemy('Антимагия'))) then
+        return BHelper.keybinds:show_spell('Антимагия')
+    end
 
     if ((not BHelper.player:check_equipped_item('Трупное окоченение')) and
         (BHelper.player:get_buff_time('Черная магия') > 0)) then
@@ -133,14 +143,15 @@ function BHelper.modules.mage.default:rotation_single()
 
     if ((BHelper.target:get_debuff_time('Живая бомба', true) == 0) and
         (not BHelper.player:check_heroism_buff()) and
+        ((BHelper.target:get_name() ~= 'Принц Келесет')) and
         (BHelper.player:can_cast_on_enemy('Живая бомба'))) then
         return BHelper.keybinds:show_spell('Живая бомба')
     end
 
     if ((BHelper.target:get_debuff_time('Улучшенный ожог') == 0) and
         (BHelper.target:get_debuff_time('Власть над Тенями') == 0) and
-        (BHelper.player:can_cast_on_enemy('Ожог')) and (not BHelper.player:check_moving()) and
-        (self.vars.can_cast_scorch) and (self.vars.scorch)) then
+        (not BHelper.player:check_moving()) and (self.vars.can_cast_scorch) and (self.vars.scorch) and
+        (BHelper.player:can_cast_on_enemy('Ожог'))) then
         return BHelper.keybinds:show_spell('Ожог')
     end
 

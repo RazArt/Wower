@@ -1,6 +1,7 @@
 function BHelper.modules.druid.default:init()
     self.settings.type = 'battle'
     self.settings.only_combat_start = true
+    self.settings.auto_combat_start = true
 
     if (self.vars.silence == nil) then self.vars.silence = false end
 
@@ -25,6 +26,7 @@ function BHelper.modules.druid.default:init()
     BHelper.keybinds:bind_spell('Берсерк(Расовая)')
     BHelper.keybinds:bind_spell('Облик лютого медведя')
     BHelper.keybinds:bind_spell('Облик кошки')
+    BHelper.keybinds:bind_spell('Вихрь')
     BHelper.keybinds:bind_item('Знак превосходства')
     BHelper.keybinds:bind_macro('Reform')
 end
@@ -111,6 +113,15 @@ function BHelper.modules.druid.default:update()
             end
         end
     end
+
+    if ((BHelper.target:is_player()) and (BHelper.player:can_cast_on_enemy('Вихрь'))) then
+        return BHelper.keybinds:show_spell('Вихрь')
+    end
+
+    if ((BHelper.target:get_name() == 'Имирьярская охотница') and
+        (BHelper.target:check_cast()) and (BHelper.player:can_cast_on_enemy('Вихрь'))) then
+        return BHelper.keybinds:show_spell('Вихрь')
+    end
 end
 
 function BHelper.modules.druid.default:rotation_single()
@@ -142,8 +153,10 @@ function BHelper.modules.druid.default:rotation_multiple()
 end
 
 function BHelper.modules.druid.default:cat_single()
-    if ((BHelper.target:check_cast()) and (BHelper.player:can_cast_on_enemy('Калечение')) and
-        (self.vars.silence)) then return BHelper.keybinds:show_spell('Калечение') end
+    if ((BHelper.target:check_cast()) and (self.vars.silence) and
+        (BHelper.player:can_cast_on_enemy('Калечение'))) then
+        return BHelper.keybinds:show_spell('Калечение')
+    end
 
     if ((BHelper.player:get_buff_time('Дикий рев') == 0) and
         (BHelper.player:can_cast('Дикий рев'))) then
@@ -231,8 +244,10 @@ function BHelper.modules.druid.default:bear_single()
         BHelper.keybinds:show_attack('Трепка')
     end
 
-    if ((BHelper.target:check_cast()) and (BHelper.player:can_cast_on_enemy('Оглушить')) and
-        (self.vars.silence)) then return BHelper.keybinds:show_spell('Оглушить') end
+    if ((BHelper.target:check_cast()) and (self.vars.silence) and
+        (BHelper.player:can_cast_on_enemy('Оглушить'))) then
+        return BHelper.keybinds:show_spell('Оглушить')
+    end
 
     if ((BHelper.player:get_buff_time('Ясность мысли') == 0) and
         (BHelper.player:can_cast_on_enemy('Волшебный огонь (зверь)'))) then
