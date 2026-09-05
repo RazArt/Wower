@@ -1,7 +1,6 @@
 function BHelper.modules.mage.default:init()
     self.settings.type = 'battle'
     self.settings.only_combat_start = true
-    self.settings.auto_combat_start = true
 
     if (self.vars.silence == nil) then self.vars.silence = false end
     if (self.vars.can_cast_scorch == nil) then self.vars.can_cast_scorch = true end

@@ -1,7 +1,6 @@
 function BHelper.modules.warrior.default:init()
     self.settings.type = 'battle'
     self.settings.only_combat_start = true
-    self.settings.auto_combat_start = true
 
     if (self.vars.attack_type == nil) then self.vars.attack_type = '1' end
     if (self.vars.battle_shout == nil) then self.vars.battle_shout = false end

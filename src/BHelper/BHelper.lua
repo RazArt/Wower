@@ -16,6 +16,10 @@ function BHelper:PLAYER_LOGIN()
     self:create_state_frame()
     self.core:reload()
 
+    -- for index, bind in pairs(BHelper.keybinds._binds) do
+    --     print(bind.name, bind.class, bind.bind_string)
+    -- end
+
     CreateFrame('Frame'):SetScript('OnUpdate', function(_, elapsed)
         self.timers:update(elapsed)
         local module = self.core.module:get()
@@ -44,7 +48,8 @@ end
 
 function BHelper:PLAYER_REGEN_DISABLED()
     self.vars._combat_state = true
-    if (BHelper.core.profile:get().settings.auto_combat_start) then self.core:start() end
+    self.core:start()
+    -- if (BHelper.core.profile:get().settings.auto_combat_start) then self.core:start() end
 end
 
 function BHelper:PLAYER_REGEN_ENABLED()

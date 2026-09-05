@@ -1,27 +1,34 @@
 BHelper.keybinds = {}
 
-function BHelper.keybinds:_get_bind_key(class, name)
+function BHelper.keybinds:_get_bind_index(class, name)
     class = string.lower(class)
     name = string.lower(name)
-    for key, bind in pairs(self._binds) do
-        if ((bind.class == class) and (bind.name == name)) then return key end
+    for num, bind in pairs(self._binds) do
+        if ((bind.class == class) and (bind.name == name)) then return num end
     end
-    return false
+    return 0
 end
 
-function BHelper.keybinds:_bind(class, name, mouse_click)
+function BHelper.keybinds:_get_bind_string(key, modifier)
+    if (modifier == 1) then return 'ALT-' .. key end
+    if (modifier == 2) then return 'CTRL-' .. key end
+    if (modifier == 3) then return 'ALT-CTRL-' .. key end
+    return ''
+end
+
+function BHelper.keybinds:_bind(class, name)
     class = string.lower(class)
     name = string.lower(name)
-    mouse_click = mouse_click or false
-    for key, bind in pairs(self._binds) do
-        if ((bind.class == class) and (bind.name == name)) then return key end
+
+    for index, bind in pairs(self._binds) do
+        if ((bind.class == class) and (bind.name == name)) then return true end
         if (bind.name == nil) then
-            if (SetBinding('ALT-CTRL-' .. key, class .. ' ' .. name)) then
+            if (SetBinding(bind.bind_string, class .. ' ' .. name)) then
                 bind.name = name
                 bind.class = class
-                bind.mouse_click = not mouse_click and 0 or 1
-                return key
+                return true
             end
+            return false
         end
     end
     return false
@@ -41,11 +48,10 @@ end
 
 function BHelper.keybinds:unbind_all()
     local result = true
-    for key, bind in pairs(self._binds) do
+    for _, bind in pairs(self._binds) do
         bind.name = nil
         bind.class = nil
-        bind.mouse_click = nil
-        if (SetBinding('ALT-CTRL-' .. key) == nil) then result = false end
+        if (SetBinding(bind.bind_string) == nil) then result = false end
     end
     return result
 end
@@ -54,20 +60,22 @@ function BHelper.keybinds:_show(num, class, name, time_count)
     time_count = time_count or 0.01
     if (ACTIVE_CHAT_EDIT_BOX) then return false end
 
-    local flag = 44 / 255
-    local key = 0
-    local mouse_click = 0
+    local flag = 0
+    local info = 0
+    local modifier = 0
 
     if (num > 1) then
-        key = self:_get_bind_key(class, name)
-        if (not key) then return false end
-        key = string.byte(key, 1) / 255
-
+        flag = 44 / 255
+        local index = self:_get_bind_index(class, name)
+        if (index == 0) then return false end
+        info = self._binds[index].key
+        modifier = self._binds[index].modifier
     else
-        mouse_click = 1 / 255
+        flag = 56 / 255
+        info = 1 / 255
     end
 
-    self._frames.frame[num].texture:SetTexture(flag, key, mouse_click)
+    self._frames.frame[num].texture:SetTexture(flag, info, modifier)
     self._frames.frame[num]:Show()
 
     BHelper.timers:create(time_count, function()
@@ -106,11 +114,21 @@ end
 
 function BHelper.keybinds:init()
     self._binds = {}
-
-    for _, key in ipairs({
-        '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', 'T', 'Y', 'U', 'I', 'O', 'P', 'H', 'G',
-        'J', 'K', 'L', 'Z', 'X', 'C', 'V', 'B', 'N', 'M'
-    }) do self._binds[key] = {} end
+    for index, bind in ipairs({
+        {'T', 1}, {'Y', 1}, {'U', 1}, {'I', 1}, {'O', 1}, {'P', 1}, {'H', 1}, {'G', 1}, {'J', 1},
+        {'K', 1}, {'L', 1}, {'Z', 1}, {'X', 1}, {'C', 1}, {'V', 1}, {'B', 1}, {'N', 1}, {'M', 1},
+        {'T', 2}, {'Y', 2}, {'U', 2}, {'I', 2}, {'O', 2}, {'P', 2}, {'H', 2}, {'G', 2}, {'J', 2},
+        {'K', 2}, {'L', 2}, {'Z', 2}, {'X', 2}, {'C', 2}, {'V', 2}, {'B', 2}, {'N', 2}, {'M', 2},
+        {'1', 3}, {'2', 3}, {'3', 3}, {'4', 3}, {'5', 3}, {'6', 3}, {'7', 3}, {'8', 3}, {'9', 3},
+        {'0', 3}, {'T', 3}, {'Y', 3}, {'U', 3}, {'I', 3}, {'O', 3}, {'P', 3}, {'H', 3}, {'G', 3},
+        {'J', 3}, {'K', 3}, {'L', 3}, {'Z', 3}, {'X', 3}, {'C', 3}, {'V', 3}, {'B', 3}, {'N', 3},
+        {'M', 3}
+    }) do
+        self._binds[index] = {}
+        self._binds[index].key = string.byte(bind[1], 1) / 255
+        self._binds[index].modifier = bind[2] / 255
+        self._binds[index].bind_string = self:_get_bind_string(bind[1], bind[2])
+    end
     self:unbind_all()
 
     self._frames = CreateFrame('Frame')

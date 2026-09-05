@@ -1,7 +1,6 @@
 function BHelper.modules.druid.default:init()
     self.settings.type = 'battle'
     self.settings.only_combat_start = true
-    self.settings.auto_combat_start = true
 
     if (self.vars.silence == nil) then self.vars.silence = false end
 
@@ -82,6 +81,15 @@ end
 
 function BHelper.modules.druid.default:update()
     if (BHelper.player:get_buff_time('Облик кошки') > 0) then
+        if ((BHelper.target:is_player()) and (BHelper.player:can_cast_on_enemy('Вихрь'))) then
+            return BHelper.keybinds:show_spell('Вихрь')
+        end
+
+        if ((BHelper.target:get_name() == 'Имирьярская охотница') and
+            (BHelper.target:check_cast()) and (BHelper.player:can_cast_on_enemy('Вихрь'))) then
+            return BHelper.keybinds:show_spell('Вихрь')
+        end
+
         if ((BHelper.target:player_on_target() or BHelper.player:check_hight_treat()) and
             (not BHelper.target:is_player()) and (BHelper.player:can_cast('Попятиться'))) then
             return BHelper.keybinds:show_spell('Попятиться')
@@ -112,15 +120,6 @@ function BHelper.modules.druid.default:update()
                 return BHelper.keybinds:show_spell('Берсерк(Расовая)')
             end
         end
-    end
-
-    if ((BHelper.target:is_player()) and (BHelper.player:can_cast_on_enemy('Вихрь'))) then
-        return BHelper.keybinds:show_spell('Вихрь')
-    end
-
-    if ((BHelper.target:get_name() == 'Имирьярская охотница') and
-        (BHelper.target:check_cast()) and (BHelper.player:can_cast_on_enemy('Вихрь'))) then
-        return BHelper.keybinds:show_spell('Вихрь')
     end
 end
 

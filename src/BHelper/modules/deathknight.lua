@@ -1,7 +1,6 @@
 function BHelper.modules.deathknight.default:init()
     self.settings.type = 'battle'
     self.settings.only_combat_start = true
-    self.settings.auto_combat_start = true
 
     if (self.vars.silence == nil) then self.vars.silence = true end
 

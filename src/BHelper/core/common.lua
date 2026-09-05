@@ -325,6 +325,8 @@ end
 function BHelper.player:can_use_item(item)
     if (BHelper.player:get_item_count(item) == 0) then return false end
     if (BHelper.player:check_item_on_cooldown(item)) then return false end
+    if (IsMounted()) then return false end
+    if (not HasFullControl()) then return false end
     return true
 end
 
@@ -405,6 +407,11 @@ function BHelper.player:check_spell_range(spellname)
     return true
 end
 
+function BHelper.player:get_spell_casttime(spellname)
+    local castTime = (select(7, GetSpellInfo(spellname)))
+    return (castTime > 0) and (castTime / 1000) or 0
+end
+
 function BHelper.player:get_spell_cooldown(spellname)
     local start, duration = GetSpellCooldown(spellname)
     return start + duration - GetTime() - 0.2
@@ -460,6 +467,13 @@ function BHelper.player:help_focus_exist()
     if (UnitIsDeadOrGhost('focus')) then return false end
     if (not UnitCanAssist('player', 'focus')) then return false end
     return true
+end
+
+function BHelper.player:check_focus_treat()
+    local treat_level = UnitThreatSituation('focus', 'target')
+    print(treat_level)
+    if ((treat_level) and (treat_level < 3)) then return true end
+    return false
 end
 
 function BHelper.pet:can_target_attack()
