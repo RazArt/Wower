@@ -7,10 +7,8 @@ BHelper.pet = {}
 BHelper.target = {}
 
 function BHelper.core:start()
-    if ((BHelper.core.profile:get().settings.only_combat_start) and
-        (not BHelper.player:check_combat_state()) and (not BHelper.target:enemy_on_combat())) then
-        return
-    end
+    if ((BHelper.core.profile:get().settings.only_combat_start) and (not BHelper.player:check_combat_state()) and
+        (not BHelper.target:enemy_on_combat())) then return end
 
     BHelper.vars.cooldown_berserker = true
     BHelper.timers:create(5, function()
@@ -42,8 +40,7 @@ end
 
 function BHelper.core:init_DB()
     if ((not BHelperDB) or (type(BHelperDB) ~= 'table')) then BHelperDB = {} end
-    if ((not BHelperDB[BHelper.player:get_spec()]) or
-        (type(BHelperDB[BHelper.player:get_spec()]) ~= 'table')) then
+    if ((not BHelperDB[BHelper.player:get_spec()]) or (type(BHelperDB[BHelper.player:get_spec()]) ~= 'table')) then
         BHelperDB[BHelper.player:get_spec()] = {}
     end
 end
@@ -74,9 +71,7 @@ function BHelper.core:reload()
     local profile_name = BHelper.core.profile:get_name()
 
     if (not BHelperDB[player_spec]['modules']) then BHelperDB[player_spec]['modules'] = {} end
-    if (not BHelperDB[player_spec]['modules'][module_name]) then
-        BHelperDB[player_spec]['modules'][module_name] = {}
-    end
+    if (not BHelperDB[player_spec]['modules'][module_name]) then BHelperDB[player_spec]['modules'][module_name] = {} end
     if (not BHelperDB[player_spec]['modules'][module_name][profile_name]) then
         BHelperDB[player_spec]['modules'][module_name][profile_name] = {}
     end
@@ -389,8 +384,7 @@ function BHelper.player:can_target_attack()
     if (target_name == 'Большой слизнюк') then return false end
     if (target_name == 'Малый слизнюк') then return false end
     if (target_name == 'Темное ядро') then return false end
-    if (((target_name == 'Принц Валанар') or
-        (target_name == 'Принц Келесет') or
+    if (((target_name == 'Принц Валанар') or (target_name == 'Принц Келесет') or
         (target_name == 'Принц Талдарам')) and (BHelper.target:get_health() == 1) and
         (BHelper.player:get_buff_time('Перенаправление') == 0)) then return false end
 
@@ -418,7 +412,12 @@ function BHelper.player:get_spell_cooldown(spellname)
 end
 
 function BHelper.player:check_spell_on_cooldown(spellname, check_time)
-    check_time = check_time or 0.2
+    if ((check_time) and (check_time > 0.2)) then
+        check_time = check_time - 0.2
+    else
+        check_time = 0.2
+    end
+
     local cd = BHelper.player:get_spell_cooldown(spellname)
     return (cd > check_time) and true or false
 end
@@ -471,7 +470,6 @@ end
 
 function BHelper.player:check_focus_treat()
     local treat_level = UnitThreatSituation('focus', 'target')
-    print(treat_level)
     if ((treat_level) and (treat_level < 3)) then return true end
     return false
 end
@@ -486,9 +484,7 @@ function BHelper.pet:can_target_attack()
     if (target_name == 'Зловещий дух') then return false end
     if (target_name == 'Волдырный зомби') then return false end
     if ((target_name == 'Имирьярская повелительница льда') and
-        (BHelper.target:get_buff_time('Арктический холод') > 0)) then
-        return false
-    end
+        (BHelper.target:get_buff_time('Арктический холод') > 0)) then return false end
 
     return true
 end
@@ -537,9 +533,7 @@ function BHelper.target:get_power_max()
 end
 
 function BHelper.target:is_boss()
-    if ((UnitClassification('target') == 'worldboss') or UnitLevel('target') == -1) then
-        return true
-    end
+    if ((UnitClassification('target') == 'worldboss') or UnitLevel('target') == -1) then return true end
     return false
 end
 
@@ -557,9 +551,7 @@ end
 
 function BHelper.target:should_evade()
     if (string.find(string.lower(BHelper.target:get_name()), 'манекен')) then return false end
-    if (BHelper.target:get_name() == 'Кровавая королева Лана\'тель') then
-        return false
-    end
+    if (BHelper.target:get_name() == 'Кровавая королева Лана\'тель') then return false end
     if (BHelper.target:get_name() == 'Леди Смертный Шепот') then return false end
     return true
 end
@@ -607,12 +599,10 @@ function BHelper:_get_aura_info(unit, class, spell, is_player_caster)
     if (is_player_caster) then filter = filter .. '|PLAYER' end
 
     for i = 1, 200 do
-        local name, _, _, count, _, _, expiration_time, _, _, _, spell_id =
-            UnitAura(unit, i, filter)
+        local name, _, _, count, _, _, expiration_time, _, _, _, spell_id = UnitAura(unit, i, filter)
         if (name == nil) then break end
         name = string.lower(name)
-        if (((type(spell) == 'string') and (spell == name)) or
-            ((type(spell) == 'number') and (spell == spell_id))) then
+        if (((type(spell) == 'string') and (spell == name)) or ((type(spell) == 'number') and (spell == spell_id))) then
             if (expiration_time == 0) then
                 expiration_time = 99999
             elseif (expiration_time == nil) then
@@ -628,8 +618,6 @@ end
 
 function BHelper:get_bag_free_slots()
     local free_slots_count = 0
-    for bag_num = 0, 4 do
-        free_slots_count = free_slots_count + (select(1, GetContainerNumFreeSlots(bag_num)))
-    end
+    for bag_num = 0, 4 do free_slots_count = free_slots_count + (select(1, GetContainerNumFreeSlots(bag_num))) end
     return free_slots_count
 end
