@@ -191,7 +191,8 @@ function BHelper.modules.hunter.default:rotation_multiple()
     if ((not self.vars.mana_regeneration) and (not self.vars.manual_mana_regeneration)) then
         if (BHelper.player:can_cast_on_enemy('Залп')) then return BHelper.keybinds:show_spell('Залп') end
 
-        if (BHelper.player:can_cast_on_point('Бросок ловушки: взрывная ловушка') and
+        if ((BHelper.player:get_buff_time('Перенаправление') == 0) and
+            (BHelper.player:can_cast_on_point('Бросок ловушки: взрывная ловушка')) and
             (not BHelper.player:check_moving())) then
             return BHelper.keybinds:show_spell('Бросок ловушки: взрывная ловушка')
         end
@@ -205,6 +206,22 @@ function BHelper.modules.hunter.default:rotation_multiple()
 end
 
 function BHelper.modules.hunter.default:mana_regeneration()
+    if ((BHelper.target:get_mana_max() > 1) and (BHelper.target:get_debuff_time('Укус гадюки', true) == 0) and
+        (BHelper.player:can_cast_on_enemy('Укус гадюки'))) then
+        return BHelper.keybinds:show_spell('Укус гадюки')
+    end
+
+    if ((BHelper.target:get_debuff_time('Укус гадюки', true) > 0) and
+        BHelper.player:can_cast_on_enemy('Выстрел химеры')) then
+        return BHelper.keybinds:show_spell('Выстрел химеры')
+    end
+
+    if ((not BHelper.player:check_moving()) and BHelper.player:can_cast_on_enemy('Верный выстрел')) then
+        return BHelper.keybinds:show_spell('Верный выстрел')
+    end
+end
+
+function BHelper.modules.hunter.default:stop()
     if ((BHelper.target:get_mana_max() > 1) and (BHelper.target:get_debuff_time('Укус гадюки', true) == 0) and
         (BHelper.player:can_cast_on_enemy('Укус гадюки'))) then
         return BHelper.keybinds:show_spell('Укус гадюки')

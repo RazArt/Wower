@@ -109,8 +109,7 @@ function BHelper.modules.druid.default:update()
                 return BHelper.keybinds:show_item('Знак превосходства')
             end
 
-            if ((not BHelper.player:check_heroism_buff()) and (not BHelper.vars.cooldown_berserker) and
-                (BHelper.player:can_cast('Берсерк(Расовая)'))) then
+            if ((not BHelper.vars.cooldown_berserker) and (BHelper.player:can_cast('Берсерк(Расовая)'))) then
                 return BHelper.keybinds:show_spell('Берсерк(Расовая)')
             end
         end

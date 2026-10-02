@@ -32,21 +32,15 @@ end
 
 function BHelper.modules.warrior.default:macros()
     BHelper.macros:create('Деморализующий крик',
-                          '#showtooltip Деморализующий крик\n/bh tv demoralizing_shout',
-                          41)
-    BHelper.macros:create('Боевой крик',
-                          '#showtooltip Боевой крик\n/bh tv battle_shout', 42)
+                          '#showtooltip Деморализующий крик\n/bh tv demoralizing_shout', 41)
+    BHelper.macros:create('Боевой крик', '#showtooltip Боевой крик\n/bh tv battle_shout', 42)
     BHelper.macros:create('Командирский крик',
-                          '#showtooltip Командирский крик\n/bh tv commanding_shout',
-                          43)
-    BHelper.macros:create('Зуботычина',
-                          '#showtooltip Зуботычина\n/bh tv silence', 44)
-    BHelper.macros:create('Берсерк(Расовая)',
-                          '#showtooltip\n/bh c\n/cast Берсерк(Расовая)', 93)
-    BHelper.macros:create('Жажда смерти',
-                          '#showtooltip\n/bh c\n/cast Жажда смерти', 94)
-    BHelper.macros:create('Безрассудство',
-                          '#showtooltip\n/bh c\n/cast Безрассудство', 95)
+                          '#showtooltip Командирский крик\n/bh tv commanding_shout', 43)
+    BHelper.macros:create('Зуботычина', '#showtooltip Зуботычина\n/bh tv silence', 44)
+    BHelper.macros:create('Берсерк(Расовая)', '#showtooltip\n/bh c\n/cast Берсерк(Расовая)',
+                          93)
+    BHelper.macros:create('Жажда смерти', '#showtooltip\n/bh c\n/cast Жажда смерти', 94)
+    BHelper.macros:create('Безрассудство', '#showtooltip\n/bh c\n/cast Безрассудство', 95)
     BHelper.macros:create('Возмездие',
                           '#showtooltip Возмездие\n/bh c\n/cast [stance:2/3] Боевая стойка\n/cast [stance:1] Возмездие',
                           96)
@@ -76,42 +70,36 @@ function BHelper.modules.warrior.default:rotation()
     end
 
     if ((BHelper.target:get_debuff_time('Деморализующий крик') == 0) and
-        (self.vars.demoralizing_shout) and
-        (BHelper.player:can_cast('Деморализующий крик'))) then
+        (self.vars.demoralizing_shout) and (BHelper.player:can_cast('Деморализующий крик'))) then
         BHelper.keybinds:show_spell('Деморализующий крик')
         return true
     end
 
     if ((BHelper.player:get_buff_time('Боевой крик') == 0) and
         (BHelper.player:get_buff_time('Благословение могущества') == 0) and
-        (BHelper.player:get_buff_time(
-            'Великое благословение могущества') == 0) and
+        (BHelper.player:get_buff_time('Великое благословение могущества') == 0) and
         (self.vars.battle_shout) and (BHelper.player:can_cast('Боевой крик'))) then
         BHelper.keybinds:show_spell('Боевой крик')
         return true
     end
 
-    if ((BHelper.player:get_buff_time('Командирский крик') == 0) and
-        (self.vars.commanding_shout) and
+    if ((BHelper.player:get_buff_time('Командирский крик') == 0) and (self.vars.commanding_shout) and
         (BHelper.player:can_cast('Командирский крик'))) then
         BHelper.keybinds:show_spell('Командирский крик')
         return true
     end
 
-    if (BHelper.target:check_cast() and (self.vars.silence) and
-        BHelper.player:can_cast_on_enemy('Зуботычина')) then
+    if (BHelper.target:check_cast() and (self.vars.silence) and BHelper.player:can_cast_on_enemy('Зуботычина')) then
         BHelper.keybinds:show_spell('Зуботычина')
         return true
     end
 
-    if ((BHelper.player:get_power() <= 30) and
-        (BHelper.player:can_cast('Ярость берсерка'))) then
+    if ((BHelper.player:get_power() <= 30) and (BHelper.player:can_cast('Ярость берсерка'))) then
         BHelper.keybinds:show_spell('Ярость берсерка')
         return true
     end
 
-    if ((BHelper.player:get_power() <= 30) and
-        (BHelper.player:can_cast('Кровавая ярость'))) then
+    if ((BHelper.player:get_power() <= 30) and (BHelper.player:can_cast('Кровавая ярость'))) then
         BHelper.keybinds:show_spell('Кровавая ярость')
         return true
     end
@@ -125,8 +113,7 @@ function BHelper.modules.warrior.default:rotation()
             return BHelper.keybinds:show_spell('Жажда смерти')
         end
 
-        if ((not BHelper.player:check_heroism_buff()) and (not BHelper.vars.cooldown_berserker) and
-            (BHelper.player:can_cast('Берсерк(Расовая)'))) then
+        if ((not BHelper.vars.cooldown_berserker) and (BHelper.player:can_cast('Берсерк(Расовая)'))) then
             return BHelper.keybinds:show_spell('Берсерк(Расовая)')
         end
     end
@@ -149,8 +136,7 @@ function BHelper.modules.warrior.default:rotation()
         return true
     end
 
-    if ((BHelper.target:get_name() ~= 'Принц Келесет') and
-        (BHelper.player:can_cast('Вихрь'))) then
+    if ((BHelper.target:get_name() ~= 'Принц Келесет') and (BHelper.player:can_cast('Вихрь'))) then
         BHelper.keybinds:show_spell('Вихрь')
         return true
     end
@@ -204,21 +190,15 @@ end
 
 function BHelper.modules.warrior.proto:macros()
     BHelper.macros:create('Деморализующий крик',
-                          '#showtooltip Деморализующий крик\n/bh tv demoralizing_shout',
-                          41)
-    BHelper.macros:create('Боевой крик',
-                          '#showtooltip Боевой крик\n/bh tv battle_shout', 42)
+                          '#showtooltip Деморализующий крик\n/bh tv demoralizing_shout', 41)
+    BHelper.macros:create('Боевой крик', '#showtooltip Боевой крик\n/bh tv battle_shout', 42)
     BHelper.macros:create('Командирский крик',
-                          '#showtooltip Командирский крик\n/bh tv commanding_shout',
-                          43)
-    BHelper.macros:create('Зуботычина',
-                          '#showtooltip Зуботычина\n/bh tv silence', 44)
-    BHelper.macros:create('Берсерк(Расовая)',
-                          '#showtooltip\n/bh c\n/cast Берсерк(Расовая)', 93)
-    BHelper.macros:create('Жажда смерти',
-                          '#showtooltip\n/bh c\n/cast Жажда смерти', 94)
-    BHelper.macros:create('Безрассудство',
-                          '#showtooltip\n/bh c\n/cast Безрассудство', 95)
+                          '#showtooltip Командирский крик\n/bh tv commanding_shout', 43)
+    BHelper.macros:create('Зуботычина', '#showtooltip Зуботычина\n/bh tv silence', 44)
+    BHelper.macros:create('Берсерк(Расовая)', '#showtooltip\n/bh c\n/cast Берсерк(Расовая)',
+                          93)
+    BHelper.macros:create('Жажда смерти', '#showtooltip\n/bh c\n/cast Жажда смерти', 94)
+    BHelper.macros:create('Безрассудство', '#showtooltip\n/bh c\n/cast Безрассудство', 95)
     BHelper.macros:create('Возмездие',
                           '#showtooltip Возмездие\n/bh c\n/cast [stance:2/3] Боевая стойка\n/cast [stance:1] Возмездие',
                           96)

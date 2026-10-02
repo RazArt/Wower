@@ -160,7 +160,7 @@ function BHelper.core.action:set(name)
     name = name or 'default'
     name = string.lower(name)
     if ((BHelper.core.action:exist(name)) and (BHelper.core.action:get_name() ~= name)) then
-        BHelper.core:print('set_action -> ', name)
+        -- BHelper.core:print('set_action -> ', name)
         BHelperDB[BHelper.player:get_spec()].action_name = name
         return true
     end
@@ -259,6 +259,8 @@ end
 
 function BHelper.player:get_spec() -- Add cache
     return GetSpecialization('player') or 1
+    -- return GetActiveSpecGroup() or 1
+    -- return 1
 end
 
 function BHelper.player:get_level()
@@ -408,6 +410,8 @@ end
 
 function BHelper.player:get_spell_cooldown(spellname)
     local start, duration = GetSpellCooldown(spellname)
+    if (start == nil) then start = 0 end
+    if (duration == nil) then duration = 0 end
     return start + duration - GetTime() - 0.2
 end
 

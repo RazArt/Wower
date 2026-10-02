@@ -23,9 +23,7 @@ function BHelper.modules.paladin.default:init()
 end
 
 function BHelper.modules.paladin.default:macros()
-    BHelper.macros:create('JoW',
-                          '#showtooltip Правосудие мудрости\n/bh tv JoL\n/bh tv JoW',
-                          40)
+    BHelper.macros:create('JoW', '#showtooltip Правосудие мудрости\n/bh tv JoL\n/bh tv JoW', 40)
 end
 
 function BHelper.modules.paladin.default:update()
@@ -36,8 +34,7 @@ function BHelper.modules.paladin.default:update()
 
     if ((BHelper.player:get_buff_time('Боевой крик') == 0) and
         (BHelper.player:get_buff_time('Благословение могущества') == 0) and
-        (BHelper.player:get_buff_time(
-            'Великое благословение могущества') == 0) and
+        (BHelper.player:get_buff_time('Великое благословение могущества') == 0) and
         (BHelper.player:can_cast('Благословение могущества'))) then
         return BHelper.keybinds:show_spell('Благословение могущества')
     end
@@ -54,8 +51,7 @@ function BHelper.modules.paladin.default:update()
 end
 
 function BHelper.modules.paladin.default:rotation_single()
-    if (BHelper.player:can_cast_on_enemy('Правосудие мудрости') and
-        (self.vars.JoW)) then
+    if (BHelper.player:can_cast_on_enemy('Правосудие мудрости') and (self.vars.JoW)) then
         return BHelper.keybinds:show_spell('Правосудие мудрости')
     end
 
@@ -85,9 +81,9 @@ function BHelper.modules.paladin.default:rotation_single()
         return BHelper.keybinds:show_spell('Экзорцизм')
     end
 
-    if (BHelper.player:can_cast('Гнев небес')) then
-        return BHelper.keybinds:show_spell('Гнев небес')
-    end
+    -- if (BHelper.player:can_cast('Гнев небес')) then
+    --     return BHelper.keybinds:show_spell('Гнев небес')
+    -- end
 end
 
 function BHelper.modules.paladin.default:rotation_multiple()
