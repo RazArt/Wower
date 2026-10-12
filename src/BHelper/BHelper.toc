@@ -10,7 +10,7 @@ core\keybinds.lua
 core\macros.lua
 core\modules.lua
 core\common.lua
-core\DB.lua
+core\threat.lua
 
 modules\druid.lua
 modules\hunter.lua

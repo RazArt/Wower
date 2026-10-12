@@ -54,20 +54,15 @@ function BHelper.modules:module(profiles)
 
         if (BHelper.player:spell_is_targeting()) then BHelper.keybinds:show_click() end
 
-        if ((not stop_flag) and (profile.settings.type ~= 'heal') and
-            (profile.settings.type ~= 'craft')) then
+        if ((not stop_flag) and (profile.settings.type ~= 'heal') and (profile.settings.type ~= 'craft')) then
             if (not BHelper.player:can_target_attack()) then
                 stop_flag = BHelper.keybinds:show_macro('Target')
             elseif ((BHelper.pet:check_control()) and (BHelper.pet:can_target_attack())) then
                 BHelper.keybinds:show_pet('Attack')
             end
         end
-        if ((not stop_flag) and (module) and (module.update)) then
-            stop_flag = module:update()
-        end
-        if ((not stop_flag) and (profile) and (profile.update)) then
-            stop_flag = profile:update()
-        end
+        if ((not stop_flag) and (module) and (module.update)) then stop_flag = module:update() end
+        if ((not stop_flag) and (profile) and (profile.update)) then stop_flag = profile:update() end
         if ((not stop_flag) and action) then action(profile) end
     end
     return obj

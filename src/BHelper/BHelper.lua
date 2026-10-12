@@ -16,6 +16,11 @@ function BHelper:PLAYER_LOGIN()
     self:create_state_frame()
     self.core:reload()
 
+    self.timers:create(0.5, function()
+        print(BHelper.threat:check_low_threat())
+        BHelper.threat:update()
+    end, 'treate_update', true)
+
     CreateFrame('Frame'):SetScript('OnUpdate', function(_, elapsed)
         self.timers:update(elapsed)
         local module = self.core.module:get()
@@ -109,8 +114,8 @@ end
 function BHelper:init()
     self._debug = true
     self._runing = false
-    self._module = ''
-    self._action = ''
+    -- self._module = ''
+    -- self._action = ''
 
     self.vars = {}
     self.vars._player = {}

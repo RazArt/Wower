@@ -28,9 +28,7 @@ function BHelper.timers:delete(name)
     name = name or ''
     name = string.lower(name)
 
-    for i = #self._timers, 1, -1 do
-        if (self._timers[i][5] == name) then table.remove(self._timers, i) end
-    end
+    for i = #self._timers, 1, -1 do if (self._timers[i][5] == name) then table.remove(self._timers, i) end end
 end
 
 function BHelper.timers:init()

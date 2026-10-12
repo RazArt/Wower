@@ -9,14 +9,18 @@ BHelper.target = {}
 function BHelper.core:start()
     if ((BHelper.core.profile:get().settings.only_combat_start) and (not BHelper.player:check_combat_state()) and
         (not BHelper.target:enemy_on_combat())) then return end
+    if (IsMounted()) then return false end
 
     BHelper.vars.cooldown_berserker = true
-    BHelper.timers:create(5, function()
+    BHelper.timers:create(2, function()
         BHelper.vars.cooldown_berserker = false
     end, 'cooldown_berserker')
 
     BHelper._runing = true
     BHelper.state_frame:Show()
+
+    local profile = BHelper.core.profile:get()
+    if (profile.start) then profile:start() end
 end
 
 function BHelper.core:stop()
@@ -28,6 +32,9 @@ function BHelper.core:stop()
 
     BHelper.keybinds:show_macro('Stop', 0.1)
     if (BHelper.pet:check_control()) then BHelper.keybinds:show_pet('Follow', 0.1) end
+
+    local profile = BHelper.core.profile:get()
+    if (profile.stop) then profile:stop() end
 end
 
 function BHelper.core:toggle()
@@ -179,6 +186,9 @@ end
 
 function BHelper.core:set_var(var, value)
     local vars = BHelper.core.profile:get().vars
+
+    if (value == "true") then value = true end
+    if (value == "false") then value = false end
     if (vars[var] ~= nil) then vars[var] = value end
 end
 
@@ -196,10 +206,8 @@ function BHelper.core:toggle_var(var)
 end
 
 function BHelper.core:cooldown(count)
-    -- BHelper.core:print('cooldown <', count, '>')
     BHelper._cooldown = true
     BHelper.timers:create(count, function()
-        -- BHelper.core:print('cooldown < off >')
         BHelper._cooldown = false
     end, 'cooldown')
 end
@@ -259,8 +267,6 @@ end
 
 function BHelper.player:get_spec() -- Add cache
     return GetSpecialization('player') or 1
-    -- return GetActiveSpecGroup() or 1
-    -- return 1
 end
 
 function BHelper.player:get_level()
@@ -350,7 +356,7 @@ function BHelper.player:can_cast(spellname, check_time)
     if (BHelper.player:spell_is_targeting()) then return false end
     if (BHelper.player:check_cast()) then return false end
     if (BHelper.player:check_spell_on_cooldown(spellname, check_time)) then return false end
-    if (IsMounted()) then return false end
+
     if (not HasFullControl()) then return false end
     return true
 end
@@ -385,10 +391,10 @@ function BHelper.player:can_target_attack()
     if (target_name == 'Дарнаван') then return false end
     if (target_name == 'Большой слизнюк') then return false end
     if (target_name == 'Малый слизнюк') then return false end
-    if (target_name == 'Темное ядро') then return false end
-    if (((target_name == 'Принц Валанар') or (target_name == 'Принц Келесет') or
-        (target_name == 'Принц Талдарам')) and (BHelper.target:get_health() == 1) and
-        (BHelper.player:get_buff_time('Перенаправление') == 0)) then return false end
+    -- if (target_name == 'Темное ядро') then return false end
+    -- if (((target_name == 'Принц Валанар') or (target_name == 'Принц Келесет') or
+    --     (target_name == 'Принц Талдарам')) and (BHelper.target:get_health() == 1) and
+    --     (BHelper.player:get_buff_time('Перенаправление') == 0)) then return false end
 
     return true
 end
@@ -445,11 +451,17 @@ function BHelper.player:check_moving()
     return false
 end
 
-function BHelper.player:check_hight_treat()
+function BHelper.player:check_hight_threat()
     if (not BHelper.target:should_evade()) then return false end
 
     local treat_level = UnitThreatSituation('player', 'target')
     if ((treat_level) and (treat_level > 0)) then return true end
+    return false
+end
+
+function BHelper.player:check_low_threat()
+    local treat_level = UnitThreatSituation('player', 'target')
+    if ((treat_level) and (treat_level < 3)) then return true end
     return false
 end
 
@@ -470,6 +482,11 @@ function BHelper.player:help_focus_exist()
     if (UnitIsDeadOrGhost('focus')) then return false end
     if (not UnitCanAssist('player', 'focus')) then return false end
     return true
+end
+
+function BHelper.player:check_location_is_icc()
+    if (GetCurrentMapAreaID() == 605) then return true end
+    return false
 end
 
 function BHelper.player:check_focus_treat()
@@ -579,6 +596,14 @@ end
 function BHelper.target:check_cast()
     if (UnitCastingInfo('target')) then return true end
     if (UnitChannelInfo('target')) then return true end
+    return false
+end
+
+function BHelper.target:check_casting_spellname(spellname)
+    local spellname_1 = UnitCastingInfo('target')
+    local spellname_2 = UnitChannelInfo('target')
+    if ((spellname == spellname_1) or (spellname == spellname_2)) then return true end
+    return false
 end
 
 function BHelper.target:enemy_on_combat()
