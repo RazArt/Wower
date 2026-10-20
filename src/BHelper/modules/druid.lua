@@ -30,6 +30,7 @@ function BHelper.modules.druid.default:init()
     BHelper.keybinds:bind_spell('Инстинкты выживания')
     BHelper.keybinds:bind_spell('Неистовое восстановление')
     BHelper.keybinds:bind_spell('Дубовая кожа')
+    BHelper.keybinds:bind_spell('Устрашающий рев')
     BHelper.keybinds:bind_item('Знак превосходства')
     BHelper.keybinds:bind_macro('Reform')
     BHelper.keybinds:bind_macro('Reform', 'BUTTON5')
@@ -146,6 +147,8 @@ function BHelper.modules.druid.default:rotation_multiple()
 end
 
 function BHelper.modules.druid.default:cat_single()
+    -- if (BHelper.player:check_hight_threat(97)) then return true end 
+
     if ((BHelper.target:check_cast()) and (self.vars.silence) and
         (BHelper.player:can_cast_on_enemy('Калечение'))) then
         return BHelper.keybinds:show_spell('Калечение')
@@ -159,20 +162,18 @@ function BHelper.modules.druid.default:cat_single()
         return BHelper.keybinds:show_spell('Дикий рев')
     end
 
-    if ((BHelper.player:get_buff_time('Дикий рев') <= 3) and (BHelper.player:can_cast('Дикий рев')) and
+    if ((BHelper.player:get_buff_time('Дикий рев') <= 2) and (BHelper.player:can_cast('Дикий рев')) and
         (BHelper.player:check_combo_points(4))) then return BHelper.keybinds:show_spell('Дикий рев') end
 
-    if ((BHelper.player:get_buff_time('Дикий рев') <= 4) and
-        (((BHelper.target:get_debuff_time('Разорвать') + 1) > BHelper.player:get_buff_time('Дикий рев')) and
-            ((BHelper.target:get_debuff_time('Разорвать') - 1) <
-                BHelper.player:get_buff_time('Дикий рев'))) and (BHelper.player:can_cast('Дикий рев'))) then
+    if ((BHelper.player:get_buff_time('Дикий рев') <= 6) and
+        (math.abs(
+            BHelper.target:get_debuff_time('Разорвать') - BHelper.player:get_buff_time('Дикий рев')) <=
+            1) and (BHelper.player:check_combo_points(3)) and (BHelper.player:can_cast('Дикий рев'))) then
         return BHelper.keybinds:show_spell('Дикий рев')
     end
 
     if ((BHelper.player:get_buff_time('Ясность мысли') == 0) and
         (BHelper.target:get_debuff_time('Глубокая рана') > 0) and
-        ((BHelper.player:get_buff_time(50334) == 0) or (BHelper.player:get_power() <= 25)) and
-        (BHelper.target:get_debuff_time('Разорвать', true) >= 2) and
         (BHelper.player:can_cast_on_enemy('Волшебный огонь (зверь)'))) then
         return BHelper.keybinds:show_spell('Волшебный огонь (зверь)')
     end
@@ -198,8 +199,8 @@ function BHelper.modules.druid.default:cat_single()
         return BHelper.keybinds:show_spell('Разорвать')
     end
 
-    if ((BHelper.target:get_debuff_time('Разорвать', true) >= 6) and
-        (BHelper.player:get_buff_time('Дикий рев') >= 6) and
+    if ((BHelper.player:get_buff_time('Дикий рев') >= 6) and
+        ((BHelper.target:get_debuff_time('Разорвать', true) >= 6) or (BHelper.player:get_buff_time(50334) > 0)) and
         ((BHelper.player:get_power() <= 55) or (BHelper.player:get_buff_time(50334) > 0)) and
         (BHelper.player:check_combo_points(5)) and (BHelper.player:can_cast_on_enemy('Свирепый укус'))) then
         return BHelper.keybinds:show_spell('Свирепый укус')
@@ -210,41 +211,12 @@ function BHelper.modules.druid.default:cat_single()
         return BHelper.keybinds:show_spell('Глубокая рана')
     end
 
-    if (BHelper.vars.behind_of_target) then
-        if (BHelper.player:can_cast_on_enemy('Полоснуть')) then
-            return BHelper.keybinds:show_spell('Полоснуть')
-        end
-    else
-        if (BHelper.player:can_cast_on_enemy('Увечье (кошка)')) then
-            return BHelper.keybinds:show_spell('Увечье (кошка)')
-        end
-    end
-end
-
-function BHelper.modules.druid.default:bear_single()
-    if (BHelper.player:can_cast('Трепка')) then BHelper.keybinds:show_attack('Трепка') end
-
-    if ((BHelper.target:check_cast()) and (self.vars.silence) and (BHelper.player:can_cast_on_enemy('Оглушить'))) then
-        return BHelper.keybinds:show_spell('Оглушить')
+    if ((BHelper.vars.behind_of_target) and (BHelper.player:can_cast_on_enemy('Полоснуть'))) then
+        return BHelper.keybinds:show_spell('Полоснуть')
     end
 
-    if ((BHelper.player:get_buff_time('Ясность мысли') == 0) and
-        (BHelper.player:can_cast_on_enemy('Волшебный огонь (зверь)'))) then
-        return BHelper.keybinds:show_spell('Волшебный огонь (зверь)')
-    end
-
-    if (BHelper.player:can_cast_on_enemy('Увечье (медведь)')) then
-        return BHelper.keybinds:show_spell('Увечье (медведь)')
-    end
-
-    if (((BHelper.target:get_debuff_time('Растерзать', true) <= 2) or
-        (BHelper.target:get_debuff_count('Растерзать', true) < 5)) and
-        (BHelper.player:can_cast_on_enemy('Растерзать'))) then
-        return BHelper.keybinds:show_spell('Растерзать')
-    end
-
-    if (BHelper.player:can_cast('Размах (медведь)')) then
-        return BHelper.keybinds:show_spell('Размах (медведь)')
+    if ((not BHelper.vars.behind_of_target) and (BHelper.player:can_cast_on_enemy('Увечье (кошка)'))) then
+        return BHelper.keybinds:show_spell('Увечье (кошка)')
     end
 end
 
@@ -273,15 +245,55 @@ function BHelper.modules.druid.default:cat_multiple()
     end
 end
 
-function BHelper.modules.druid.default:bear_multiple()
+function BHelper.modules.druid.default:bear_single()
     if (BHelper.player:can_cast('Трепка')) then BHelper.keybinds:show_attack('Трепка') end
 
-    if ((BHelper.player:get_buff_time('Ясность мысли') == 0) and
-        (BHelper.player:can_cast_on_enemy('Волшебный огонь (зверь)'))) then
-        return BHelper.keybinds:show_spell('Волшебный огонь (зверь)')
+    if ((BHelper.target:check_cast()) and (self.vars.silence) and (BHelper.player:can_cast_on_enemy('Оглушить'))) then
+        return BHelper.keybinds:show_spell('Оглушить')
+    end
+
+    if (BHelper.player:can_cast_on_enemy('Увечье (медведь)')) then
+        return BHelper.keybinds:show_spell('Увечье (медведь)')
+    end
+
+    if ((BHelper.target:get_debuff_time('Устрашающий рев') == 0) and
+        (BHelper.player:can_cast('Устрашающий рев'))) then
+        return BHelper.keybinds:show_spell('Устрашающий рев')
+    end
+
+    if (((BHelper.target:get_debuff_time('Растерзать', true) <= 2) or
+        (BHelper.target:get_debuff_count('Растерзать', true) < 5)) and
+        (BHelper.player:can_cast_on_enemy('Растерзать'))) then
+        return BHelper.keybinds:show_spell('Растерзать')
     end
 
     if (BHelper.player:can_cast('Размах (медведь)')) then
         return BHelper.keybinds:show_spell('Размах (медведь)')
     end
 end
+
+function BHelper.modules.druid.default:bear_multiple()
+    if (BHelper.player:can_cast('Трепка')) then BHelper.keybinds:show_attack('Трепка') end
+
+    if ((BHelper.target:check_cast()) and (self.vars.silence) and (BHelper.player:can_cast_on_enemy('Оглушить'))) then
+        return BHelper.keybinds:show_spell('Оглушить')
+    end
+
+    if (BHelper.player:can_cast_on_enemy('Увечье (медведь)')) then
+        return BHelper.keybinds:show_spell('Увечье (медведь)')
+    end
+
+    if ((BHelper.target:get_debuff_time('Устрашающий рев') == 0) and
+        (BHelper.player:can_cast('Устрашающий рев'))) then
+        return BHelper.keybinds:show_spell('Устрашающий рев')
+    end
+
+    if (BHelper.player:can_cast('Размах (медведь)')) then
+        return BHelper.keybinds:show_spell('Размах (медведь)')
+    end
+end
+
+function BHelper.modules.druid.default:stop()
+    BHelper.core.action:set('rotation_single')
+end
+

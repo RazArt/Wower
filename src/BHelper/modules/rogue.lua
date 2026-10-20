@@ -21,14 +21,12 @@ function BHelper.modules.rogue.default:macros()
     BHelper.macros:create('Маленькие хитрости',
                           '#showtooltip Маленькие хитрости\n/bh c\n/cancelaura Маленькие хитрости\n/cast [@focus,help,nodead] Маленькие хитрости\n/cast [@target,help,nodead] Маленькие хитрости\n/cast [@mouseover,help,nodead] Маленькие хитрости',
                           15)
-    BHelper.macros:create('Берсерк(Расовая)',
-                          '#showtooltip\n/bh c\n/cast Берсерк(Расовая)', 9)
-    BHelper.macros:create('Шквал клинков',
-                          '#showtooltip\n/bh c\n/cast Шквал клинков', 10)
+    BHelper.macros:create('Берсерк(Расовая)', '#showtooltip\n/bh c\n/cast Берсерк(Расовая)',
+                          9)
+    BHelper.macros:create('Шквал клинков', '#showtooltip\n/bh c\n/cast Шквал клинков', 10)
     BHelper.macros:create('Выброс адреналина',
                           '#showtooltip\n/bh c\n/cast Выброс адреналина', 11)
-    BHelper.macros:create('Череда убийств',
-                          '#showtooltip\n/bh c\n/cast Череда убийств', 12)
+    BHelper.macros:create('Череда убийств', '#showtooltip\n/bh c\n/cast Череда убийств', 12)
 end
 
 function BHelper.modules.rogue.default:rotation_single()
@@ -52,34 +50,18 @@ function BHelper.modules.rogue.default:rotation_single()
         end
     end
 
-    if ((BHelper.player:get_buff_time('Мясорубка') == 0) and
-        (BHelper.player:can_cast('Мясорубка'))) then
+    if ((BHelper.player:get_buff_time('Мясорубка') == 0) and (BHelper.player:can_cast('Мясорубка'))) then
         BHelper.keybinds:show_spell('Мясорубка')
         return true
     end
 
-    if ((BHelper.player:get_buff_time('Мясорубка') <= 3) and
-        (BHelper.player:can_cast('Мясорубка')) and (BHelper.player:check_combo_points(5))) then
-        BHelper.keybinds:show_spell('Мясорубка')
-        return true
-    end
-
-    if ((BHelper.target:get_debuff_time('Рваная рана', true) <= 2) and
-        (BHelper.player:can_cast_on_enemy('Рваная рана')) and
+    if ((BHelper.player:get_buff_time('Мясорубка') <= 3) and (BHelper.player:can_cast('Мясорубка')) and
         (BHelper.player:check_combo_points(5))) then
-        BHelper.keybinds:show_spell('Рваная рана')
+        BHelper.keybinds:show_spell('Мясорубка')
         return true
     end
 
-    if ((BHelper.target:get_debuff_time('Рваная рана', true) > 4) and
-        (BHelper.player:can_cast_on_enemy('Потрошение')) and
-        (BHelper.player:check_combo_points(3))) then
-        BHelper.keybinds:show_spell('Потрошение')
-        return true
-    end
-
-    if ((BHelper.player:can_cast_on_enemy('Потрошение')) and
-        (BHelper.player:check_combo_points(4))) then
+    if ((BHelper.player:can_cast_on_enemy('Потрошение')) and (BHelper.player:check_combo_points(4))) then
         BHelper.keybinds:show_spell('Потрошение')
         return true
     end

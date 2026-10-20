@@ -195,7 +195,8 @@ end
 
 function BHelper.modules.hunter.default:rotation_multiple()
     if ((not self.vars.mana_regeneration) and (not self.vars.manual_mana_regeneration)) then
-        if (BHelper.player:can_cast_on_enemy('Залп')) then return BHelper.keybinds:show_spell('Залп') end
+        if ((BHelper.player:get_buff_time('Перенаправление') == 0) and
+            (BHelper.player:can_cast_on_enemy('Залп'))) then return BHelper.keybinds:show_spell('Залп') end
 
         if ((BHelper.player:get_buff_time('Перенаправление') == 0) and
             (BHelper.player:can_cast_on_point('Бросок ловушки: взрывная ловушка')) and

@@ -167,7 +167,6 @@ function BHelper.core.action:set(name)
     name = name or 'default'
     name = string.lower(name)
     if ((BHelper.core.action:exist(name)) and (BHelper.core.action:get_name() ~= name)) then
-        -- BHelper.core:print('set_action -> ', name)
         BHelperDB[BHelper.player:get_spec()].action_name = name
         return true
     end
@@ -216,9 +215,34 @@ function BHelper.core:print(...)
     if (BHelper._debug) then print('\124cffff00ffBHelper\124r', '->', ...) end
 end
 
+-- function BHelper.core:create_shared_macros()
+--     if ((BHelper.player:get_class() == 'hunter') or (BHelper.player:get_class() == 'warlock') or
+--         (BHelper.player:get_class() == 'deathknight')) then
+--         BHelper.macros:create('PetAttack', '/petattack [@target]', 19, 417)
+--         BHelper.macros:create('PetFollow', '/petfollow', 20, 414)
+--     end
+
+--     BHelper.macros:create('Target', '/targetenemy\n/startattack\n/bh c', 0)
+--     BHelper.macros:create('Stop', '/stopcasting\n/stopattack\n/cleartarget', 0)
+--     BHelper.macros:create('Макросы', '/macro', 60, 524)
+--     BHelper.macros:create('Roll', '/roll', 52, 1056)
+--     BHelper.macros:create('Reload', '/reload', 49, 1058)
+--     BHelper.macros:create('Focus', '/focus', 53, 395)
+--     BHelper.macros:create('Баджи',
+--                           '/script local function buy (n,q) for i=1,100 do if n==GetMerchantItemInfo(i) then BuyMerchantItem(i,q) end end end buy (\'Эмблема героизма\',80)',
+--                           0, 689)
+
+--     BHelper.macros:create('S', '/startattack\n/bh sa rotation_single\n/bh', 13, 605)
+--     BHelper.macros:create('M', '/startattack\n/bh sa rotation_multiple\n/bh', 14, 606)
+-- end
+
 function BHelper.core:create_shared_macros()
-    BHelper.macros:create('PetAttack', '/petattack [@target]', 19, 973)
-    BHelper.macros:create('PetFollow', '/petfollow', 20, 970)
+    if ((BHelper.player:get_class() == 'hunter') or (BHelper.player:get_class() == 'warlock') or
+        (BHelper.player:get_class() == 'deathknight')) then
+        BHelper.macros:create('PetAttack', '/petattack [@target]', 19, 973)
+        BHelper.macros:create('PetFollow', '/petfollow', 20, 970)
+    end
+
     BHelper.macros:create('Target', '/targetenemy\n/startattack\n/bh c', 0, 711)
     BHelper.macros:create('Stop', '/stopcasting\n/stopattack\n/cleartarget', 0)
     BHelper.macros:create('Аук', '/s .i au', 60, 1935)
@@ -239,6 +263,18 @@ function BHelper.core:create_shared_macros()
     BHelper.macros:create('M', '/startattack\n/bh sa rotation_multiple\n/bh', 14, 1264)
 end
 
+function BHelper.player:get_GUID()
+    if (BHelper.vars._player.GUID) then return BHelper.vars._player.GUID end
+    BHelper.vars._player.GUID = UnitGUID('player')
+    return BHelper.vars._player.GUID
+end
+
+function BHelper.player:get_pet_GUID()
+    if (BHelper.vars._player.pet_GUID) then return BHelper.vars._player.pet_GUID end
+    BHelper.vars._player.pet_GUID = UnitGUID('pet')
+    return BHelper.vars._player.pet_GUID
+end
+
 function BHelper.player:get_name()
     if (BHelper.vars._player.name) then return BHelper.vars._player.name end
     BHelper.vars._player.name = (select(1, UnitName('player')))
@@ -247,26 +283,13 @@ end
 
 function BHelper.player:get_class()
     if (BHelper.vars._player.class) then return BHelper.vars._player.class end
-
-    local classes = {
-        warrior = '1',
-        paladin = '2',
-        hunter = '3',
-        rogue = '4',
-        priest = '5',
-        deathknight = '6',
-        shaman = '7',
-        mage = '8',
-        warlock = '9',
-        druid = '11'
-    }
-
     BHelper.vars._player.class = (select(2, UnitClass('player'))):lower()
     return BHelper.vars._player.class
 end
 
 function BHelper.player:get_spec() -- Add cache
     return GetSpecialization('player') or 1
+    -- return 1
 end
 
 function BHelper.player:get_level()
@@ -356,7 +379,6 @@ function BHelper.player:can_cast(spellname, check_time)
     if (BHelper.player:spell_is_targeting()) then return false end
     if (BHelper.player:check_cast()) then return false end
     if (BHelper.player:check_spell_on_cooldown(spellname, check_time)) then return false end
-
     if (not HasFullControl()) then return false end
     return true
 end
@@ -364,7 +386,18 @@ end
 function BHelper.player:can_cast_on_enemy(spellname, check_time)
     if (not BHelper.player:can_cast(spellname, check_time)) then return false end
     if (not BHelper.player:can_target_attack()) then return false end
-    if (not BHelper.player:check_spell_range(spellname)) then return false end
+    if (not BHelper.player:check_spell_range(spellname, unit_id)) then return false end
+    return true
+end
+
+function BHelper.player:can_cast_on_friend(spellname, unit_id, check_time)
+    unit_id = unit_id or 'target'
+    if (not BHelper.player:can_cast(spellname, check_time)) then return false end
+    if (not UnitExists(unit_id)) then return false end
+    if (UnitIsDeadOrGhost(unit_id)) then return false end
+    if (UnitIsDeadOrGhost('player')) then return false end
+    if (not UnitCanAssist('player', unit_id)) then return false end
+    if (not BHelper.player:check_spell_range(spellname, unit_id)) then return false end
     return true
 end
 
@@ -389,8 +422,9 @@ function BHelper.player:can_target_attack()
 
     local target_name = BHelper.target:get_name()
     if (target_name == 'Дарнаван') then return false end
-    if (target_name == 'Большой слизнюк') then return false end
     if (target_name == 'Малый слизнюк') then return false end
+
+    -- if (target_name == 'Большой слизнюк') then return false end
     -- if (target_name == 'Темное ядро') then return false end
     -- if (((target_name == 'Принц Валанар') or (target_name == 'Принц Келесет') or
     --     (target_name == 'Принц Талдарам')) and (BHelper.target:get_health() == 1) and
@@ -404,8 +438,9 @@ function BHelper.player:spell_is_targeting()
     return true
 end
 
-function BHelper.player:check_spell_range(spellname)
-    if (IsSpellInRange(spellname, 'target') ~= 1) then return false end
+function BHelper.player:check_spell_range(spellname, unit_id)
+    unit_id = unit_id or 'target'
+    if (IsSpellInRange(spellname, unit_id) ~= 1) then return false end
     return true
 end
 
@@ -446,21 +481,40 @@ function BHelper.player:check_combat_state()
     return BHelper.vars._combat_state
 end
 
+function BHelper.player:check_party_or_raid()
+    if ((GetNumPartyMembers() > 0) or (GetNumRaidMembers() > 0)) then return true end
+    return false
+end
+
 function BHelper.player:check_moving()
     if (GetUnitSpeed('player') > 0) then return true end
     return false
 end
 
-function BHelper.player:check_hight_threat()
+function BHelper.player:check_hight_threat(limit)
+    limit = limit or 85
+
+    if (not BHelper.player:check_party_or_raid()) then return false end
     if (not BHelper.target:should_evade()) then return false end
 
-    local treat_level = UnitThreatSituation('player', 'target')
-    if ((treat_level) and (treat_level > 0)) then return true end
+    if (BHelper.threat.first_unit_GUID == BHelper.player:get_GUID()) then return true end
+    if ((BHelper.threat.second_unit_GUID == BHelper.player:get_GUID()) and (BHelper.threat.second_unit_treat >= limit)) then
+        return true
+    end
     return false
 end
 
-function BHelper.player:check_low_threat()
-    local treat_level = UnitThreatSituation('player', 'target')
+function BHelper.player:check_low_threat(limit)
+    limit = limit or 80
+
+    if (not BHelper.player:check_party_or_raid()) then return false end
+    if (BHelper.threat.first_unit_GUID ~= BHelper.player:get_GUID()) then return true end
+    if (BHelper.threat.second_unit_treat >= limit) then return true end
+    return false
+end
+
+function BHelper.player:check_focus_treat()
+    local treat_level = UnitThreatSituation('focus', 'target')
     if ((treat_level) and (treat_level < 3)) then return true end
     return false
 end
@@ -477,21 +531,8 @@ function BHelper.player:check_burst_mode()
     return false
 end
 
-function BHelper.player:help_focus_exist()
-    if (not UnitExists('focus')) then return false end
-    if (UnitIsDeadOrGhost('focus')) then return false end
-    if (not UnitCanAssist('player', 'focus')) then return false end
-    return true
-end
-
 function BHelper.player:check_location_is_icc()
     if (GetCurrentMapAreaID() == 605) then return true end
-    return false
-end
-
-function BHelper.player:check_focus_treat()
-    local treat_level = UnitThreatSituation('focus', 'target')
-    if ((treat_level) and (treat_level < 3)) then return true end
     return false
 end
 

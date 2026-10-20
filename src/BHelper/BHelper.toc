@@ -1,7 +1,7 @@
 ## Interface: 30300
 ## Title: BHelper
 ## Notes: BHelper
-## SavedVariablesPerCharacter: BHelperDB
+## SavedVariablesPerCharacter: BHelperDB, BHelperDBIcons
 
 BHelper.lua
 
