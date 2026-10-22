@@ -15,7 +15,7 @@ BHelper._event_frame:RegisterEvent('PLAYER_CONTROL_GAINED')
 function BHelper:PLAYER_LOGIN()
     self:create_state_frame()
     self.core:reload()
-
+    print(234235235777)
     -- if ((not BHelperDBIcons) or (type(BHelperDBIcons) ~= 'table')) then BHelperDBIcons = {} end
     -- for i = 1, GetNumMacroIcons() do BHelperDBIcons[i] = GetMacroIconInfo(i) end
 end

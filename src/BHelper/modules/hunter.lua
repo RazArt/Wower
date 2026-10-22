@@ -138,12 +138,17 @@ function BHelper.modules.hunter.default:rotation_single()
             end
         end
 
-        -- if ((BHelper.auras:player('Перенаправление') == 0) and
-        --     (BHelper.auras:target('Укус змеи', true) == 0) and
-        --     (BHelper.auras:target('Укус гадюки', true) == 0) and
-        --     (BHelper.player:can_cast_on_enemy('Укус змеи'))) then
-        --     return BHelper.keybinds:show_spell('Укус змеи')
-        -- end
+        if (BHelper.auras:player('Перенаправление') == 0) then
+            if (BHelper.player:can_cast_on_point('Бросок ловушки: взрывная ловушка')) then
+                return BHelper.keybinds:show_spell('Бросок ловушки: взрывная ловушка')
+            end
+
+            if ((BHelper.auras:target('Укус змеи', true) == 0) and
+                (BHelper.auras:target('Укус гадюки', true) == 0) and
+                (BHelper.player:can_cast_on_enemy('Укус змеи'))) then
+                return BHelper.keybinds:show_spell('Укус змеи')
+            end
+        end
 
         if ((not BHelper.player:can_cast_on_enemy('Убийственный выстрел', 1)) and
             BHelper.player:can_cast_on_enemy('Выстрел химеры')) then
@@ -154,16 +159,6 @@ function BHelper.modules.hunter.default:rotation_single()
             (not BHelper.player:can_cast_on_enemy('Выстрел химеры', 1)) and
             BHelper.player:can_cast_on_enemy('Прицельный выстрел')) then
             return BHelper.keybinds:show_spell('Прицельный выстрел')
-        end
-
-        if ((BHelper.auras:player('Перенаправление') == 0) and
-            (BHelper.auras:target('Эффект взрывной ловушки', true) == 0) and
-            (not BHelper.player:can_cast_on_enemy('Убийственный выстрел', 1)) and
-            (not BHelper.player:can_cast_on_enemy('Выстрел химеры', 1)) and
-            (not BHelper.player:can_cast_on_enemy('Прицельный выстрел', 1)) and
-            (not BHelper.player:check_moving()) and
-            BHelper.player:can_cast_on_point('Бросок ловушки: взрывная ловушка')) then
-            return BHelper.keybinds:show_spell('Бросок ловушки: взрывная ловушка')
         end
 
         local ss_cast_time = BHelper.player:get_spell_casttime('Верный выстрел') - 0.5

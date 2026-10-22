@@ -13,9 +13,16 @@ function BHelper.auras:_get(unit_id, aura, cast_by_player)
     aura = (type(aura) == 'string') and string.lower(aura) or aura
 
     if (not self._auras[unit_id][aura]) then return 0, 0 end
-    if ((cast_by_player) and (not self._auras[unit_id][aura].cast_by_player)) then return 0, 0 end
 
-    return self._auras[unit_id][aura].time, self._auras[unit_id][aura].count
+    if ((cast_by_player) and (self._auras[unit_id][aura][true])) then
+        return self._auras[unit_id][aura][true].time, self._auras[unit_id][aura][true].count
+    elseif ((not cast_by_player) and (self._auras[unit_id][aura][true])) then
+        return self._auras[unit_id][aura][true].time, self._auras[unit_id][aura][true].count
+    elseif ((not cast_by_player) and (self._auras[unit_id][aura][false])) then
+        return self._auras[unit_id][aura][false].time, self._auras[unit_id][aura][false].count
+    end
+
+    return 0, 0
 end
 
 function BHelper.auras:update()
@@ -29,10 +36,14 @@ function BHelper.auras:update()
                 aura = string.lower(aura)
                 expiration_time = (expiration_time > 0) and (expiration_time - GetTime()) or expiration_time
                 expiration_time = (expiration_time == 0) and 9999 or expiration_time
-                self._auras[unit_id][aura] = {}
-                self._auras[unit_id][aura].time = expiration_time
-                self._auras[unit_id][aura].count = count
-                self._auras[unit_id][aura].cast_by_player = (unit_caster == 'player') and true or false
+                local cast_by_player = (unit_caster == 'player') and true or false
+
+                if (not self._auras[unit_id][aura]) then self._auras[unit_id][aura] = {} end
+                self._auras[unit_id][aura][cast_by_player] = {}
+                self._auras[unit_id][aura][cast_by_player].aura = aura
+                self._auras[unit_id][aura][cast_by_player].id = id
+                self._auras[unit_id][aura][cast_by_player].time = expiration_time
+                self._auras[unit_id][aura][cast_by_player].count = count
                 self._auras[unit_id][id] = self._auras[unit_id][aura]
             end
         end
