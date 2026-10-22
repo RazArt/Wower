@@ -69,12 +69,12 @@ function BHelper.modules.mage.default:macros()
     --                       '/stopcasting\n/stopattack\n/petfollow\n/cleartarget\n/equipset BM', 0)
 end
 
-function BHelper.modules.mage.default:update()
+function BHelper.modules.mage.default:execute()
     if ((BHelper.player:get_health_on_percent() < 20) and BHelper.player:can_cast('Ледяная глыба')) then
         return BHelper.keybinds:show_spell('Ледяная глыба')
     end
 
-    if ((BHelper.player:get_buff_time('Невидимость') > 0)) then return true end
+    if ((BHelper.player:get_aura_time('Невидимость') > 0)) then return true end
 
     if ((BHelper.target:player_on_target()) and (BHelper.player:can_cast('Невидимость')) and
         (not BHelper.target:is_player())) then return BHelper.keybinds:show_macro('Невидимость авто') end
@@ -93,14 +93,14 @@ function BHelper.modules.mage.default:update()
     --     return BHelper.keybinds:show_spell('Сотворение самоцвета маны')
     -- end
 
-    -- if ((BHelper.player:get_buff_time('Чародейская гениальность') == 0) and
-    --     (BHelper.player:get_buff_time(
+    -- if ((BHelper.player:get_aura_time('Чародейская гениальность') == 0) and
+    --     (BHelper.player:get_aura_time(
     --         'Чародейская гениальность Даларана') == 0) and
     --     (BHelper.player:can_cast('Чародейская гениальность'))) then
     --     return BHelper.keybinds:show_spell('Чародейская гениальность')
     -- end
 
-    -- if ((BHelper.player:get_buff_time('Раскаленный доспех') == 0) and
+    -- if ((BHelper.player:get_aura_time('Раскаленный доспех') == 0) and
     --     (BHelper.player:can_cast('Раскаленный доспех'))) then
     --     UseEquipmentSet('BUFF')
     --     return BHelper.keybinds:show_spell('Раскаленный доспех')
@@ -109,37 +109,38 @@ function BHelper.modules.mage.default:update()
 end
 
 function BHelper.modules.mage.default:rotation_single()
-    if ((BHelper.player:get_buff_time('Невидимость') > 0)) then return true end
+    if ((BHelper.player:get_aura_time('Невидимость') > 0)) then return true end
 
     if (BHelper.target:check_cast() and (self.vars.silence) and (BHelper.player:can_cast_on_enemy('Антимагия'))) then
         return BHelper.keybinds:show_spell('Антимагия')
     end
 
     if ((not BHelper.player:check_equipped_item('Трупное окоченение')) and
-        (BHelper.player:get_buff_time('Черная магия') > 0)) then return BHelper.player:equip_set('MAIN') end
+        (BHelper.player:get_aura_time('Черная магия') > 0)) then return BHelper.player:equip_set('MAIN') end
 
-    if ((BHelper.player:get_buff_time('Путь огня') > 0) and
+    if ((BHelper.player:get_aura_time('Путь огня') > 0) and
         (BHelper.player:can_cast_on_enemy('Огненная глыба'))) then
         return BHelper.keybinds:show_spell('Огненная глыба')
     end
 
-    if ((BHelper.target:get_debuff_time('Живая бомба', true) == 0) and
-        (not BHelper.player:check_heroism_buff()) and ((BHelper.target:get_name() ~= 'Принц Келесет')) and
+    if ((BHelper.target:get_aura_time('Живая бомба', true) == 0) and (not BHelper.player:check_heroism_buff()) and
+        ((BHelper.target:get_name() ~= 'Принц Келесет')) and
         (BHelper.player:can_cast_on_enemy('Живая бомба'))) then
         return BHelper.keybinds:show_spell('Живая бомба')
     end
 
-    if ((BHelper.target:get_debuff_time('Улучшенный ожог') == 0) and
-        (BHelper.target:get_debuff_time('Власть над Тенями') == 0) and
-        (not BHelper.player:check_moving()) and (self.vars.can_cast_scorch) and (self.vars.scorch) and
-        (BHelper.player:can_cast_on_enemy('Ожог'))) then return BHelper.keybinds:show_spell('Ожог') end
+    if ((BHelper.target:get_aura_time('Улучшенный ожог') == 0) and
+        (BHelper.target:get_aura_time('Власть над Тенями') == 0) and (not BHelper.player:check_moving()) and
+        (self.vars.can_cast_scorch) and (self.vars.scorch) and (BHelper.player:can_cast_on_enemy('Ожог'))) then
+        return BHelper.keybinds:show_spell('Ожог')
+    end
 
     if (BHelper.player:check_burst_mode()) then
         if (BHelper.player:can_cast('Зеркальное изображение')) then
             return BHelper.keybinds:show_spell('Зеркальное изображение')
         end
 
-        if ((BHelper.player:get_buff_time('Возгорание') == 0) and
+        if ((BHelper.player:get_aura_time('Возгорание') == 0) and
             (BHelper.player:can_cast('Возгорание'))) then
             return BHelper.keybinds:show_spell('Возгорание')
         end

@@ -9,6 +9,12 @@ function BHelper.modules:module(profiles)
     for _, profile in pairs(profiles) do
         obj[profile] = {}
         local profile = obj[profile]
+
+        profile.settings = {}
+        profile.vars = {}
+        profile.player_auras = {}
+        profile.target_auras = {}
+
         profile._event_frame = CreateFrame('Frame')
         profile._event_frame:SetScript('OnEvent', function(_, event, ...)
             profile[event](profile, ...)
@@ -46,7 +52,7 @@ function BHelper.modules:module(profiles)
         if ((profile) and (profile.macros)) then profile:macros() end
     end
 
-    function obj:_update()
+    function obj:_execute()
         local stop_flag = false
         local module = BHelper.core.module:get()
         local profile = BHelper.core.profile:get()
@@ -61,9 +67,10 @@ function BHelper.modules:module(profiles)
                 BHelper.keybinds:show_pet('Attack')
             end
         end
-        if ((not stop_flag) and (module) and (module.update)) then stop_flag = module:update() end
-        if ((not stop_flag) and (profile) and (profile.update)) then stop_flag = profile:update() end
-        if ((not stop_flag) and action) then action(profile) end
+        if ((not stop_flag) and (module) and (module.execute)) then stop_flag = module:execute() end
+        if ((not stop_flag) and (profile) and (profile.execute)) then stop_flag = profile:execute() end
+        if ((not stop_flag) and (action)) then action(profile) end
+
     end
     return obj
 end
@@ -83,5 +90,10 @@ function BHelper.modules:init()
     self.shaman = self:module({'default'})
     self.warlock = self:module({'default'})
     self.warrior = self:module({'default', 'proto', 'proto_farm'})
+
+    BHelper.timers:create(BHelper.update_time, function()
+        local module = BHelper.core.module:get()
+        if ((module) and (BHelper._runing) and (not BHelper._cooldown)) then module:_execute() end
+    end, 'main_execute', true)
 end
 BHelper.modules:init()

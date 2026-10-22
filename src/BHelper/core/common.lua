@@ -55,12 +55,18 @@ end
 function BHelper.core:reload()
     BHelper.core:init_DB()
 
+    BHelper.core.module._table = nil
+    BHelper.core.profile._table = nil
+    BHelper.core.action._table = nil
+
+    BHelper.core.module:load()
     local module = BHelper.core.module:get()
     if (not module) then
         BHelper.core.module:set()
         return false
     end
 
+    BHelper.core.profile:load()
     local profile = BHelper.core.profile:get()
     if (not profile) then
         BHelper.core.profile:set()
@@ -82,35 +88,38 @@ function BHelper.core:reload()
     if (not BHelperDB[player_spec]['modules'][module_name][profile_name]) then
         BHelperDB[player_spec]['modules'][module_name][profile_name] = {}
     end
-    if (not BHelperDB[player_spec]['modules'][module_name][profile_name].vars) then
-        BHelperDB[player_spec]['modules'][module_name][profile_name].vars = {}
-    end
     if (not BHelperDB[player_spec]['modules'][module_name][profile_name].settings) then
         BHelperDB[player_spec]['modules'][module_name][profile_name].settings = {}
     end
+    if (not BHelperDB[player_spec]['modules'][module_name][profile_name].vars) then
+        BHelperDB[player_spec]['modules'][module_name][profile_name].vars = {}
+    end
 
-    profile.vars = BHelperDB[player_spec]['modules'][module_name][profile_name].vars
     profile.settings = BHelperDB[player_spec]['modules'][module_name][profile_name].settings
+    profile.vars = BHelperDB[player_spec]['modules'][module_name][profile_name].vars
 
     module:_init()
     module:_macros()
 end
 
-function BHelper.core.module:get()
+function BHelper.core.module:load()
     local name = BHelper.core.module:get_name()
-    if (BHelper.core.module:exist(name)) then return BHelper.modules[name] end
+    if (BHelper.core.module:exist(name)) then BHelper.core.module._table = BHelper.modules[name] end
     return nil
+end
+
+function BHelper.core.module:get()
+    return BHelper.core.module._table
 end
 
 function BHelper.core.module:set(name)
     name = name or BHelper.player:get_class()
     name = string.lower(name)
-    if ((BHelper.core.module:exist(name)) and (BHelper.core.module:get_name() ~= name)) then
+    if (BHelper.core.module:exist(name)) then
         BHelper.core:print('set_module -> ', name)
         local player_spec = BHelper.player:get_spec()
         BHelperDB[player_spec].module_name = name
         BHelperDB[player_spec].profile_name = nil
-        BHelperDB[player_spec].action_name = nil
         BHelper.core:reload()
         return true
     end
@@ -127,20 +136,23 @@ function BHelper.core.module:exist(name)
     return false
 end
 
-function BHelper.core.profile:get()
+function BHelper.core.profile:load()
     local name = BHelper.core.profile:get_name()
-    if (BHelper.core.profile:exist(name)) then return BHelper.core.module:get()[name] end
+    if (BHelper.core.profile:exist(name)) then BHelper.core.profile._table = BHelper.core.module:get()[name] end
     return nil
+end
+
+function BHelper.core.profile:get()
+    return BHelper.core.profile._table
 end
 
 function BHelper.core.profile:set(name)
     name = name or 'default'
     name = string.lower(name)
-    if ((BHelper.core.profile:exist(name)) and (BHelper.core.profile:get_name() ~= name)) then
+    if (BHelper.core.profile:exist(name)) then
         BHelper.core:print('set_profile -> ', name)
         local player_spec = BHelper.player:get_spec()
         BHelperDB[player_spec].profile_name = name
-        BHelperDB[player_spec].action_name = nil
         BHelper.core:reload()
         return true
     end
@@ -158,28 +170,18 @@ function BHelper.core.profile:exist(name)
 end
 
 function BHelper.core.action:get()
-    local name = BHelper.core.action:get_name()
-    if (BHelper.core.action:exist(name)) then return BHelper.core.profile:get()[name] end
-    return nil
+    return BHelper.core.action._table
 end
 
 function BHelper.core.action:set(name)
     name = name or 'default'
     name = string.lower(name)
-    if ((BHelper.core.action:exist(name)) and (BHelper.core.action:get_name() ~= name)) then
-        BHelperDB[BHelper.player:get_spec()].action_name = name
+
+    local profile = BHelper.core.profile:get()
+    if ((profile) and (rawget(profile, string.lower(name)))) then
+        BHelper.core.action._table = BHelper.core.profile:get()[name]
         return true
     end
-    return false
-end
-
-function BHelper.core.action:get_name()
-    return BHelperDB[BHelper.player:get_spec()].action_name
-end
-
-function BHelper.core.action:exist(name)
-    name = name or ''
-    if (rawget(BHelper.core.profile:get(), string.lower(name))) then return true end
     return false
 end
 
@@ -270,9 +272,7 @@ function BHelper.player:get_GUID()
 end
 
 function BHelper.player:get_pet_GUID()
-    if (BHelper.vars._player.pet_GUID) then return BHelper.vars._player.pet_GUID end
     BHelper.vars._player.pet_GUID = UnitGUID('pet')
-    return BHelper.vars._player.pet_GUID
 end
 
 function BHelper.player:get_name()
@@ -328,20 +328,12 @@ function BHelper.player:get_power_max()
     return UnitPowerMax('player') or 0
 end
 
-function BHelper.player:get_buff_time(spell, is_player_caster)
-    return (select(1, BHelper:_get_aura_info('player', 'buff', spell, is_player_caster)))
+function BHelper.player:get_aura_time(spell, players_aura)
+    return (select(1, BHelper:_get_aura_info('player', spell, players_aura)))
 end
 
-function BHelper.player:get_debuff_time(spell, is_player_caster)
-    return (select(1, BHelper:_get_aura_info('player', 'debuff', spell, is_player_caster)))
-end
-
-function BHelper.player:get_buff_count(spell, is_player_caster)
-    return (select(2, BHelper:_get_aura_info('player', 'buff', spell, is_player_caster)))
-end
-
-function BHelper.player:get_debuff_count(spell, is_player_caster)
-    return (select(2, BHelper:_get_aura_info('player', 'debuff', spell, is_player_caster)))
+function BHelper.player:get_aura_count(spell, players_aura)
+    return (select(2, BHelper:_get_aura_info('player', spell, players_aura)))
 end
 
 function BHelper.player:check_combo_points(count)
@@ -414,11 +406,11 @@ function BHelper.player:can_target_attack()
     if (UnitIsDeadOrGhost('player')) then return false end
     if (not UnitCanAttack('player', 'target')) then return false end
 
-    if (BHelper.target:get_debuff_time('Спячка') > 0) then return false end
-    if (BHelper.target:get_debuff_time('Смерч') > 0) then return false end
-    if (BHelper.target:get_debuff_time('Превращение') > 0) then return false end
-    if (BHelper.target:get_debuff_time('Страх') > 0) then return false end
-    if (BHelper.target:get_debuff_time('Ослепление') > 0) then return false end
+    if (BHelper.target:get_aura_time('Спячка') > 0) then return false end
+    if (BHelper.target:get_aura_time('Смерч') > 0) then return false end
+    if (BHelper.target:get_aura_time('Превращение') > 0) then return false end
+    if (BHelper.target:get_aura_time('Страх') > 0) then return false end
+    if (BHelper.target:get_aura_time('Ослепление') > 0) then return false end
 
     local target_name = BHelper.target:get_name()
     if (target_name == 'Дарнаван') then return false end
@@ -428,7 +420,7 @@ function BHelper.player:can_target_attack()
     -- if (target_name == 'Темное ядро') then return false end
     -- if (((target_name == 'Принц Валанар') or (target_name == 'Принц Келесет') or
     --     (target_name == 'Принц Талдарам')) and (BHelper.target:get_health() == 1) and
-    --     (BHelper.player:get_buff_time('Перенаправление') == 0)) then return false end
+    --     (BHelper.player:get_aura_time('Перенаправление') == 0)) then return false end
 
     return true
 end
@@ -520,8 +512,8 @@ function BHelper.player:check_focus_treat()
 end
 
 function BHelper.player:check_heroism_buff()
-    if (BHelper.player:get_buff_time('Героизм') > 0) then return true end
-    if (BHelper.player:get_buff_time('Жажда крови') > 0) then return true end
+    if (BHelper.player:get_aura_time('Героизм') > 0) then return true end
+    if (BHelper.player:get_aura_time('Жажда крови') > 0) then return true end
     return false
 end
 
@@ -546,7 +538,7 @@ function BHelper.pet:can_target_attack()
     if (target_name == 'Зловещий дух') then return false end
     if (target_name == 'Волдырный зомби') then return false end
     if ((target_name == 'Имирьярская повелительница льда') and
-        (BHelper.target:get_buff_time('Арктический холод') > 0)) then return false end
+        (BHelper.target:get_aura_time('Арктический холод') > 0)) then return false end
 
     return true
 end
@@ -618,20 +610,18 @@ function BHelper.target:should_evade()
     return true
 end
 
-function BHelper.target:get_buff_time(spell, is_player_caster)
-    return (select(1, BHelper:_get_aura_info('target', 'buff', spell, is_player_caster)))
+function BHelper.target:get_aura_info(spell, players_aura)
+    local aura_info = {}
+    aura_info.time, aura_info.count = BHelper:_get_aura_info('target', spell, players_aura)
+    return aura_info
 end
 
-function BHelper.target:get_debuff_time(spell, is_player_caster)
-    return (select(1, BHelper:_get_aura_info('target', 'debuff', spell, is_player_caster)))
+function BHelper.target:get_aura_time(spell, players_aura)
+    return (select(1, BHelper:_get_aura_info('target', spell, players_aura)))
 end
 
-function BHelper.target:get_buff_count(spell, is_player_caster)
-    return (select(2, BHelper:_get_aura_info('target', 'buff', spell, is_player_caster)))
-end
-
-function BHelper.target:get_debuff_count(spell, is_player_caster)
-    return (select(2, BHelper:_get_aura_info('target', 'debuff', spell, is_player_caster)))
+function BHelper.target:get_aura_count(spell, players_aura)
+    return (select(2, BHelper:_get_aura_info('target', spell, players_aura)))
 end
 
 function BHelper.target:check_cast()
@@ -659,32 +649,30 @@ function BHelper.target:check_moving()
     return false
 end
 
-function BHelper:_get_aura_info(unit, class, spell, is_player_caster)
-    unit = string.lower(unit)
-    class = string.lower(class)
-    if (type(spell) == 'string') then spell = string.lower(spell) end
-    is_player_caster = is_player_caster or false
+-- function BHelper:_get_aura_info(unit, spell, players_aura)
+--     unit = (unit) and string.lower(unit) or ''
+--     spell = (type(spell) == 'string') and string.lower(spell) or spell
+--     players_aura = (players_aura) and '|PLAYER' or ''
 
-    local filter = class == 'buff' and 'HELPFUL' or 'HARMFUL'
-    if (is_player_caster) then filter = filter .. '|PLAYER' end
-
-    for i = 1, 200 do
-        local name, _, _, count, _, _, expiration_time, _, _, _, spell_id = UnitAura(unit, i, filter)
-        if (name == nil) then break end
-        name = string.lower(name)
-        if (((type(spell) == 'string') and (spell == name)) or ((type(spell) == 'number') and (spell == spell_id))) then
-            if (expiration_time == 0) then
-                expiration_time = 99999
-            elseif (expiration_time == nil) then
-                expiration_time = 0
-            else
-                expiration_time = expiration_time - GetTime()
-            end
-            return expiration_time, count
-        end
-    end
-    return 0, 0
-end
+--     for _, val in pairs({'HARMFUL' .. players_aura, 'HELPFUL' .. players_aura}) do
+--         for i = 1, 100 do
+--             local name, _, _, count, _, _, expiration_time, _, _, _, spell_id = UnitAura(unit, i, val)
+--             if (name == nil) then break end
+--             if (((type(spell) == 'string') and (spell == string.lower(name))) or
+--                 ((type(spell) == 'number') and (spell == spell_id))) then
+--                 if (expiration_time == 0) then
+--                     expiration_time = 99999
+--                 elseif (expiration_time == nil) then
+--                     expiration_time = 0
+--                 else
+--                     expiration_time = expiration_time - GetTime()
+--                 end
+--                 return expiration_time, count
+--             end
+--         end
+--     end
+--     return 0, 0
+-- end
 
 function BHelper:get_bag_free_slots()
     local free_slots_count = 0

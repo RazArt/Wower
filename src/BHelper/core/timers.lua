@@ -33,5 +33,9 @@ end
 
 function BHelper.timers:init()
     self._timers = {}
+
+    CreateFrame('Frame'):SetScript('OnUpdate', function(_, elapsed)
+        self:update(elapsed)
+    end)
 end
 BHelper.timers:init()

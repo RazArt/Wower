@@ -26,15 +26,15 @@ function BHelper.modules.paladin.default:macros()
     BHelper.macros:create('JoW', '#showtooltip Правосудие мудрости\n/bh tv JoL\n/bh tv JoW', 40)
 end
 
-function BHelper.modules.paladin.default:update()
-    if ((BHelper.player:get_buff_time('Печать повиновения') == 0) and
+function BHelper.modules.paladin.default:execute()
+    if ((BHelper.player:get_aura_time('Печать повиновения') == 0) and
         (BHelper.player:can_cast('Печать повиновения'))) then
         return BHelper.keybinds:show_spell('Печать повиновения')
     end
 
-    if ((BHelper.player:get_buff_time('Боевой крик') == 0) and
-        (BHelper.player:get_buff_time('Благословение могущества') == 0) and
-        (BHelper.player:get_buff_time('Великое благословение могущества') == 0) and
+    if ((BHelper.player:get_aura_time('Боевой крик') == 0) and
+        (BHelper.player:get_aura_time('Благословение могущества') == 0) and
+        (BHelper.player:get_aura_time('Великое благословение могущества') == 0) and
         (BHelper.player:can_cast('Благословение могущества'))) then
         return BHelper.keybinds:show_spell('Благословение могущества')
     end
@@ -76,7 +76,7 @@ function BHelper.modules.paladin.default:rotation_single()
     --     return BHelper.keybinds:show_spell('Освящение')
     -- end
 
-    if ((BHelper.player:get_buff_time('Искусство войны') > 0) and
+    if ((BHelper.player:get_aura_time('Искусство войны') > 0) and
         (BHelper.player:can_cast_on_enemy('Экзорцизм'))) then
         return BHelper.keybinds:show_spell('Экзорцизм')
     end

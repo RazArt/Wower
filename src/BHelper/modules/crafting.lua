@@ -43,7 +43,7 @@ end
 --     BHelper.macros:create('Start', '/bh', 13, false, 1263)
 -- end
 
-function BHelper.modules.crafting.common:update()
+function BHelper.modules.crafting.common:execute()
     if ((GetItemCount(34056) > 2) and (self.player:can_cast())) then
         BHelper.keybinds:show_macro('Субстанция')
         BHelper.core:cooldown(0.2)
@@ -59,8 +59,7 @@ function BHelper.modules.crafting.common:step_1()
 end
 
 function BHelper.modules.crafting.common:step_2()
-    if ((GetItemCount(41510) > 2) and (GetItemCount(38426) > 0) and
-        (BHelper:get_bag_free_slots() > 1)) then
+    if ((GetItemCount(41510) > 2) and (GetItemCount(38426) > 0) and (BHelper:get_bag_free_slots() > 1)) then
         if (self.player:can_cast()) then BHelper.keybinds:show_macro('Брасы') end
     else
         if (GetItemCount(41512) > 0) then
@@ -95,10 +94,6 @@ function BHelper.modules.crafting.common:craft_item(name)
     for i = GetNumTradeSkills(), 1, -1 do
         if ((select(2, GetTradeSkillInfo(i)) == "header")) then ExpandTradeSkillSubClass(i) end
     end
-    for i = 1, GetNumTradeSkills() do
-        if ((select(1, GetTradeSkillInfo(i))) == name) then index = i end
-    end
-    if (index > 0) then
-        if ((select(3, GetTradeSkillInfo(index))) > 0) then DoTradeSkill(index) end
-    end
+    for i = 1, GetNumTradeSkills() do if ((select(1, GetTradeSkillInfo(i))) == name) then index = i end end
+    if (index > 0) then if ((select(3, GetTradeSkillInfo(index))) > 0) then DoTradeSkill(index) end end
 end

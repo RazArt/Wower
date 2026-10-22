@@ -18,13 +18,6 @@ function BHelper:PLAYER_LOGIN()
 
     -- if ((not BHelperDBIcons) or (type(BHelperDBIcons) ~= 'table')) then BHelperDBIcons = {} end
     -- for i = 1, GetNumMacroIcons() do BHelperDBIcons[i] = GetMacroIconInfo(i) end
-
-    CreateFrame('Frame'):SetScript('OnUpdate', function(_, elapsed)
-        -- print(BHelper.modules.deathknight.fdk:check_blood_rune_cooldown())
-        self.timers:update(elapsed)
-        local module = self.core.module:get()
-        if ((module) and (self._runing) and (not self._cooldown)) then module:_update() end
-    end)
 end
 
 function BHelper:create_state_frame()
@@ -113,6 +106,7 @@ end
 function BHelper:init()
     self._debug = true
     self._runing = false
+    self.update_time = 0.1
     -- self._module = ''
     -- self._action = ''
 

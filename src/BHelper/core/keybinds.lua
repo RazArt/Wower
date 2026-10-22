@@ -70,7 +70,7 @@ function BHelper.keybinds:unbind_all()
 end
 
 function BHelper.keybinds:_show(num, class, name, time_count)
-    time_count = time_count or 0.01
+    time_count = time_count or BHelper.update_time
     if (ACTIVE_CHAT_EDIT_BOX) then return false end
 
     local flag = 0
@@ -127,19 +127,23 @@ end
 
 function BHelper.keybinds:init()
     self._binds = {}
-    for index, bind in ipairs({
+
+    local binds = {
         {'T', 1}, {'Y', 1}, {'U', 1}, {'I', 1}, {'O', 1}, {'P', 1}, {'H', 1}, {'G', 1}, {'J', 1}, {'K', 1}, {'L', 1},
         {'Z', 1}, {'X', 1}, {'C', 1}, {'V', 1}, {'B', 1}, {'N', 1}, {'M', 1}, {'T', 2}, {'Y', 2}, {'U', 2}, {'I', 2},
         {'O', 2}, {'P', 2}, {'H', 2}, {'G', 2}, {'J', 2}, {'K', 2}, {'L', 2}, {'Z', 2}, {'X', 2}, {'C', 2}, {'V', 2},
         {'B', 2}, {'N', 2}, {'M', 2}, {'1', 3}, {'2', 3}, {'3', 3}, {'4', 3}, {'5', 3}, {'6', 3}, {'7', 3}, {'8', 3},
         {'9', 3}, {'0', 3}, {'T', 3}, {'Y', 3}, {'U', 3}, {'I', 3}, {'O', 3}, {'P', 3}, {'H', 3}, {'G', 3}, {'J', 3},
         {'K', 3}, {'L', 3}, {'Z', 3}, {'X', 3}, {'C', 3}, {'V', 3}, {'B', 3}, {'N', 3}, {'M', 3}
-    }) do
-        self._binds[index] = {}
-        self._binds[index].key = string.byte(bind[1], 1) / 255
-        self._binds[index].modifier = bind[2] / 255
-        self._binds[index].bind_string = self:_get_bind_string(bind[1], bind[2])
+    }
+
+    for i = 1, #binds do
+        self._binds[i] = {}
+        self._binds[i].key = string.byte(binds[i][1], 1) / 255
+        self._binds[i].modifier = binds[i][2] / 255
+        self._binds[i].bind_string = self:_get_bind_string(binds[i][1], binds[i][2])
     end
+
     self:unbind_all()
 
     self._frames = CreateFrame('Frame')

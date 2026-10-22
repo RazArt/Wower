@@ -58,7 +58,7 @@ function BHelper.modules.deathknight.default:macros()
                           '#showtooltip\n/bh c\n/cast Смерть и разложение', 2)
 end
 
-function BHelper.modules.deathknight.default:update()
+function BHelper.modules.deathknight.default:execute()
     if (BHelper.player:can_cast('Рунический удар')) then
         BHelper.keybinds:show_attack('Рунический удар')
     end
@@ -83,9 +83,8 @@ function BHelper.modules.deathknight.default:update()
     if (not self.vars.army_of_the_dead_timeout) then
         if (BHelper.player:can_cast('Войско мертвых')) then
             return BHelper.keybinds:show_spell('Войско мертвых')
-        else
-            return true
         end
+        return true
     end
 
     if ((BHelper.target:check_cast()) and (self.vars.silence) and
@@ -93,13 +92,13 @@ function BHelper.modules.deathknight.default:update()
         return BHelper.keybinds:show_spell('Заморозка разума')
     end
 
-    if ((BHelper.player:get_buff_time('Власть льда') == 0) and
+    if ((BHelper.player:get_aura_time('Власть льда') == 0) and
         (BHelper.player:can_cast('Власть льда'))) then
         return BHelper.keybinds:show_spell('Власть льда')
     end
 
-    if ((BHelper.player:get_buff_time('Зимний горн') == 0) and
-        (BHelper.player:get_buff_time('Сила земли') == 0) and
+    if ((BHelper.player:get_aura_time('Зимний горн') == 0) and
+        (BHelper.player:get_aura_time('Сила земли') == 0) and
         (BHelper.player:can_cast('Зимний горн'))) then
         return BHelper.keybinds:show_spell('Зимний горн')
     end
@@ -111,13 +110,13 @@ end
 
 function BHelper.modules.deathknight.default:rotation_single()
     if ((BHelper.target:get_name() == 'Волдырный зомби') and
-        (BHelper.target:get_debuff_time('Ледяные оковы') == 0) and
+        (BHelper.target:get_aura_time('Ледяные оковы') == 0) and
         (BHelper.player:can_cast_on_enemy('Ледяные оковы'))) then
         return BHelper.keybinds:show_spell('Ледяные оковы')
     end
 
     if (((BHelper.player:check_low_threat()) or (self.vars.opener) or
-        (BHelper.target:get_debuff_time('Озноб', true) < 3)) and
+        (BHelper.target:get_aura_time('Озноб', true) < 3)) and
         (BHelper.player:can_cast_on_enemy('Ледяное прикосновение'))) then
         return BHelper.keybinds:show_spell('Ледяное прикосновение')
     end
@@ -128,12 +127,12 @@ function BHelper.modules.deathknight.default:rotation_single()
         return BHelper.keybinds:show_spell('Усиление рунического оружия')
     end
 
-    if ((BHelper.target:get_debuff_time('Кровавая чума', true) < 3) and
+    if ((BHelper.target:get_aura_time('Кровавая чума', true) < 3) and
         (BHelper.player:can_cast_on_enemy('Удар чумы'))) then
         return BHelper.keybinds:show_spell('Удар чумы')
     end
 
-    if (((BHelper.player:get_buff_time('Клинковая ограда') == 0) or (self:check_blood_rune_cooldown())) and
+    if (((BHelper.player:get_aura_time('Клинковая ограда') == 0) or (self:check_blood_rune_cooldown())) and
         (BHelper.player:can_cast_on_enemy('Кровавый удар'))) then
         return BHelper.keybinds:show_spell('Кровавый удар')
     end
@@ -148,22 +147,22 @@ function BHelper.modules.deathknight.default:rotation_single()
 end
 
 function BHelper.modules.deathknight.default:rotation_multiple()
-    if (((BHelper.player:check_low_threat()) or (BHelper.target:get_debuff_time('Озноб', true) < 3)) and
+    if (((BHelper.player:check_low_threat()) or (BHelper.target:get_aura_time('Озноб', true) < 3)) and
         (BHelper.player:can_cast_on_enemy('Ледяное прикосновение'))) then
         return BHelper.keybinds:show_spell('Ледяное прикосновение')
     end
 
-    if ((BHelper.target:get_debuff_time('Кровавая чума', true) < 3) and
+    if ((BHelper.target:get_aura_time('Кровавая чума', true) < 3) and
         (BHelper.player:can_cast_on_enemy('Удар чумы'))) then
         return BHelper.keybinds:show_spell('Удар чумы')
     end
 
-    if (((BHelper.target:get_debuff_time('Озноб', true) > 0) or
-        (BHelper.target:get_debuff_time('Кровавая чума', true) > 0)) and (not self.vars.pestilence_timeout) and
+    if (((BHelper.target:get_aura_time('Озноб', true) > 0) or
+        (BHelper.target:get_aura_time('Кровавая чума', true) > 0)) and (not self.vars.pestilence_timeout) and
         (BHelper.player:can_cast_on_enemy('Мор'))) then return BHelper.keybinds:show_spell('Мор') end
 
-    if ((BHelper.target:get_debuff_time('Озноб', true) > 0) and
-        (BHelper.target:get_debuff_time('Кровавая чума', true) > 0) and
+    if ((BHelper.target:get_aura_time('Озноб', true) > 0) and
+        (BHelper.target:get_aura_time('Кровавая чума', true) > 0) and
         (BHelper.player:can_cast('Вскипание крови'))) then
         return BHelper.keybinds:show_spell('Вскипание крови')
     end
@@ -223,7 +222,6 @@ function BHelper.modules.deathknight.fdk:init()
     BHelper.keybinds:bind_spell('Заморозка разума')
     BHelper.keybinds:bind_spell('Удушение')
     BHelper.keybinds:bind_spell('Несокрушимая броня')
-
     BHelper.keybinds:bind_spell('Ледяные оковы')
     BHelper.keybinds:bind_spell('Рунический удар')
     BHelper.keybinds:bind_spell('Ледяное прикосновение')
@@ -234,7 +232,6 @@ function BHelper.modules.deathknight.fdk:init()
     BHelper.keybinds:bind_spell('Воющий ветер')
     BHelper.keybinds:bind_spell('Мор')
     BHelper.keybinds:bind_spell('Вскипание крови')
-
     BHelper.keybinds:bind_spell('Воскрешение мертвых')
     BHelper.keybinds:bind_spell('Войско мертвых')
     BHelper.keybinds:bind_spell('Усиление рунического оружия')
@@ -242,6 +239,7 @@ function BHelper.modules.deathknight.fdk:init()
     BHelper.keybinds:bind_macro('КровоотводClear')
 
     BHelper.keybinds:bind_item('Знак превосходства')
+    BHelper.keybinds:bind_item('Отмщение Отрекшихся')
 
     self:register_event('UNIT_SPELLCAST_SUCCEEDED')
     self:register_event('PLAYER_TARGET_CHANGED')
@@ -256,7 +254,8 @@ function BHelper.modules.deathknight.fdk:macros()
     BHelper.macros:create('Кровоотвод',
                           '#showtooltip\n/bh c\n/cancelaura Кровоотвод\n/cast Кровоотвод', 7)
     BHelper.macros:create('Несокрушимая броня',
-                          '#showtooltip\n/bh c\n/cast Несокрушимая броня', 8)
+                          '#showtooltip\n/bh c\n/cast Несокрушимая броня\n/use Отмщение Отрекшихся',
+                          8)
     BHelper.macros:create('Воскрешение мертвых',
                           '#showtooltip\n/bh c\n/cast Воскрешение мертвых', 9)
     BHelper.macros:create('Усиление рунического оружия',
@@ -273,7 +272,6 @@ function BHelper.modules.deathknight.fdk:macros()
     BHelper.macros:create('Войско мертвых',
                           '#showtooltip\n/bh sv army_of_the_dead_timeout false\n/bh c\n/cast Войско мертвых',
                           21)
-
     BHelper.macros:create('Смерть и разложение',
                           '#showtooltip\n/bh c\n/cast Смерть и разложение', 2)
 
@@ -284,8 +282,17 @@ end
 function BHelper.modules.deathknight.fdk:rotation()
     local ready_rune_count = self:get_ready_rune_count()
     local blood_rune_cooldown = self:check_blood_rune_cooldown()
-    local frost_fever_time = BHelper.target:get_debuff_time('Озноб', true)
-    local blood_plague_time = BHelper.target:get_debuff_time('Кровавая чума', true)
+    local can_use_blood_rune = false
+    local disease_exists = false
+
+    if ((BHelper.auras:target('Озноб', true) > blood_rune_cooldown) and
+        (BHelper.auras:target('Кровавая чума', true) > blood_rune_cooldown)) then
+        can_use_blood_rune = true
+    end
+
+    if ((BHelper.auras:target('Озноб', true) > 0) and (BHelper.auras:target('Кровавая чума', true) > 0)) then
+        disease_exists = true
+    end
 
     if (BHelper.player:can_cast('Рунический удар')) then
         BHelper.keybinds:show_attack('Рунический удар')
@@ -297,9 +304,8 @@ function BHelper.modules.deathknight.fdk:rotation()
     if (not self.vars.army_of_the_dead_timeout) then
         if (BHelper.player:can_cast('Войско мертвых')) then
             return BHelper.keybinds:show_spell('Войско мертвых')
-        else
-            return true
         end
+        return true
     end
 
     if ((BHelper.target:check_cast()) and (self.vars.silence) and
@@ -307,13 +313,14 @@ function BHelper.modules.deathknight.fdk:rotation()
         return BHelper.keybinds:show_spell('Заморозка разума')
     end
 
-    if ((BHelper.player:get_buff_time('Власть крови') == 0) and
+    if ((BHelper.player:get_aura_time('Власть крови') == 0) and
+        (BHelper.player:get_aura_time('Власть льда') == 0) and
         (BHelper.player:can_cast('Власть крови'))) then
         return BHelper.keybinds:show_spell('Власть крови')
     end
 
-    if ((BHelper.player:get_buff_time('Зимний горн') == 0) and
-        (BHelper.player:get_buff_time('Сила земли') == 0) and
+    if ((BHelper.player:get_aura_time('Зимний горн') == 0) and
+        (BHelper.player:get_aura_time('Сила земли') == 0) and
         (BHelper.player:can_cast('Зимний горн'))) then
         return BHelper.keybinds:show_spell('Зимний горн')
     end
@@ -328,13 +335,19 @@ function BHelper.modules.deathknight.fdk:rotation()
             return BHelper.keybinds:show_item('Знак превосходства')
         end
 
-        if ((self:check_rune_cooldown()) and (BHelper.player:get_buff_time('Кровоотвод', true) > 0)) then
-            return BHelper.keybinds:show_macro('Кровоотвод')
+        if ((BHelper.player:check_equipped_item('Отмщение Отрекшихся')) and
+            (BHelper.player:can_use_item('Отмщение Отрекшихся'))) then
+            return BHelper.keybinds:show_item('Отмщение Отрекшихся')
         end
 
-        if ((self:check_rune_cooldown()) and
-            (BHelper.player:can_cast('Усиление рунического оружия'))) then
-            return BHelper.keybinds:show_spell('Усиление рунического оружия')
+        if (self:check_rune_cooldown()) then
+            if ((BHelper.player:get_aura_time('Кровоотвод', true) > 0)) then
+                return BHelper.keybinds:show_macro('Кровоотвод')
+            end
+
+            if ((BHelper.player:can_cast('Усиление рунического оружия'))) then
+                return BHelper.keybinds:show_spell('Усиление рунического оружия')
+            end
         end
 
         if ((BHelper.player:can_cast('Кровоотвод'))) then
@@ -346,43 +359,54 @@ function BHelper.modules.deathknight.fdk:rotation()
         end
     end
 
-    if ((frost_fever_time > 0) and (blood_plague_time > 0)) then
-        if ((frost_fever_time < 3) or (blood_plague_time < 3)) then
+    if (disease_exists) then
+        if ((BHelper.auras:target('Озноб', true) < 3) or
+            (BHelper.auras:target('Кровавая чума', true) < 3)) then
             if (BHelper.player:can_cast_on_enemy('Мор')) then return BHelper.keybinds:show_spell('Мор') end
             return true
         end
 
-        if ((self.vars.attack_type == '2') and (math.ceil(frost_fever_time) ~= math.ceil(blood_plague_time)) and
+        if ((self.vars.attack_type == '2') and (math.ceil(BHelper.auras:target('Озноб', true)) ~=
+            math.ceil(BHelper.auras:target('Кровавая чума', true))) and
             (BHelper.player:can_cast_on_enemy('Мор'))) then return BHelper.keybinds:show_spell('Мор') end
     end
 
-    if ((self.vars.attack_type == '2') and (BHelper.player:check_spell_range('Ледяной удар')) and
-        (BHelper.player:can_cast('Воющий ветер'))) then
-        return BHelper.keybinds:show_spell('Воющий ветер')
-    end
-
     if ((self.vars.attack_type == '1') and
-        (BHelper.player:get_buff_time('Машина для убийств', true) > 0) and
-        (BHelper.player:can_cast('Ледяной удар'))) then
+        (BHelper.player:get_aura_time('Машина для убийств', true) > 0) and
+        (BHelper.player:can_cast_on_enemy('Ледяной удар'))) then
         return BHelper.keybinds:show_spell('Ледяной удар')
     end
 
-    if ((self.vars.attack_type == '2') and (frost_fever_time > blood_rune_cooldown) and
-        (blood_plague_time > blood_rune_cooldown) and (BHelper.player:can_cast('Вскипание крови'))) then
-        return BHelper.keybinds:show_spell('Вскипание крови')
+    if (self.vars.attack_type == '2') then
+        if ((BHelper.player:get_aura_time('Морозная дымка', true) > 0) and
+            (BHelper.player:check_spell_range('Ледяной удар')) and
+            (BHelper.player:can_cast('Воющий ветер'))) then
+            return BHelper.keybinds:show_spell('Воющий ветер')
+        end
+
+        if ((disease_exists) and (BHelper.player:check_spell_range('Ледяной удар')) and
+            (BHelper.player:can_cast('Воющий ветер'))) then
+            return BHelper.keybinds:show_spell('Воющий ветер')
+        end
+
+        if ((can_use_blood_rune) and (BHelper.player:check_spell_range('Ледяной удар')) and
+            (BHelper.player:can_cast('Вскипание крови'))) then
+            return BHelper.keybinds:show_spell('Вскипание крови')
+        end
+
+        if ((disease_exists) and (BHelper.player:get_aura_time('Машина для убийств', true) > 0) and
+            (BHelper.player:can_cast_on_enemy('Ледяной удар'))) then
+            return BHelper.keybinds:show_spell('Ледяной удар')
+        end
     end
 
-    if ((self.vars.attack_type == '2') and (frost_fever_time > 0) and (blood_plague_time > 0) and
-        (BHelper.player:get_buff_time('Машина для убийств', true) > 0) and
-        (BHelper.player:can_cast('Ледяной удар'))) then
-        return BHelper.keybinds:show_spell('Ледяной удар')
-    end
-
-    if ((frost_fever_time == 0) and (BHelper.player:can_cast_on_enemy('Ледяное прикосновение'))) then
+    if ((BHelper.auras:target('Озноб', true) == 0) and
+        (BHelper.player:can_cast_on_enemy('Ледяное прикосновение'))) then
         return BHelper.keybinds:show_spell('Ледяное прикосновение')
     end
 
-    if ((blood_plague_time == 0) and (BHelper.player:can_cast_on_enemy('Удар чумы'))) then
+    if ((BHelper.auras:target('Кровавая чума', true) == 0) and
+        (BHelper.player:can_cast_on_enemy('Удар чумы'))) then
         return BHelper.keybinds:show_spell('Удар чумы')
     end
 
@@ -392,19 +416,19 @@ function BHelper.modules.deathknight.fdk:rotation()
     end
 
     if (((ready_rune_count[2] >= 1) or (ready_rune_count[3] >= 1)) and (ready_rune_count[4] >= 1) and
-        (frost_fever_time > blood_rune_cooldown) and (blood_plague_time > blood_rune_cooldown) and
-        (BHelper.player:can_cast_on_enemy('Уничтожение'))) then
+        (can_use_blood_rune) and (BHelper.player:can_cast_on_enemy('Уничтожение'))) then
         return BHelper.keybinds:show_spell('Уничтожение')
     end
 
     if ((ready_rune_count[2] == 0) and (ready_rune_count[3] == 0) and (ready_rune_count[4] == 2) and
-        (frost_fever_time > 10.5) and (blood_plague_time > 10.5) and
+        (BHelper.auras:target('Озноб', true) > 10.5) and
+        (BHelper.auras:target('Кровавая чума', true) > 10.5) and
         (BHelper.player:can_cast_on_enemy('Уничтожение'))) then
         return BHelper.keybinds:show_spell('Уничтожение')
     end
 
-    if ((self.vars.attack_type == '1') and (frost_fever_time > blood_rune_cooldown) and
-        (blood_plague_time > blood_rune_cooldown) and (BHelper.player:can_cast_on_enemy('Кровавый удар'))) then
+    if ((self.vars.attack_type == '1') and (can_use_blood_rune) and
+        (BHelper.player:can_cast_on_enemy('Кровавый удар'))) then
         return BHelper.keybinds:show_spell('Кровавый удар')
     end
 
@@ -412,13 +436,13 @@ function BHelper.modules.deathknight.fdk:rotation()
         return BHelper.keybinds:show_spell('Ледяной удар')
     end
 
-    if ((BHelper.player:get_buff_time('Морозная дымка', true) > 0) and
+    if ((BHelper.player:get_aura_time('Морозная дымка', true) > 0) and
         (BHelper.player:check_spell_range('Ледяной удар')) and
         (BHelper.player:can_cast('Воющий ветер'))) then
         return BHelper.keybinds:show_spell('Воющий ветер')
     end
 
-    if (BHelper.player:can_cast('Зимний горн')) then
+    if ((BHelper.player:get_power() <= 120) and (BHelper.player:can_cast('Зимний горн'))) then
         return BHelper.keybinds:show_spell('Зимний горн')
     end
 end

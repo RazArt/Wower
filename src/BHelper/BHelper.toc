@@ -1,11 +1,12 @@
 ## Interface: 30300
 ## Title: BHelper
 ## Notes: BHelper
-## SavedVariablesPerCharacter: BHelperDB, BHelperDBIcons
+## SavedVariablesPerCharacter: BHelperDB
 
 BHelper.lua
 
 core\timers.lua
+core\auras.lua
 core\keybinds.lua
 core\macros.lua
 core\modules.lua
