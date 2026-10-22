@@ -52,7 +52,7 @@ end
 function BHelper.modules.crafting.common:execute()
     if ((GetItemCount(34056) > 2) and (self.player:can_cast())) then
         BHelper.keybinds:show_macro('Субстанция')
-        BHelper.core:cooldown(0.2)
+        BHelper.core:add_cooldown(0.2)
     end
 end
 

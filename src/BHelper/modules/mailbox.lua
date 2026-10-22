@@ -19,11 +19,11 @@ function BHelper.modules.mailbox.common:open_click()
     if (self.vars.open == true) then return end
     self.vars.open = true
     SendChatMessage('.i m', 'SAY')
-    BHelper.core:cooldown(15)
+    BHelper.core:add_cooldown(15)
 end
 
 function BHelper.modules.mailbox.common:MAIL_INBOX_UPDATE()
-    BHelper.core:cooldown(0.5)
+    BHelper.core:add_cooldown(0.5)
 end
 
 function BHelper.modules.mailbox.common:step_2()

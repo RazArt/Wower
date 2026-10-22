@@ -71,7 +71,7 @@ function BHelper.keybinds:unbind_all()
 end
 
 function BHelper.keybinds:_show(num, class, name, time_count)
-    time_count = time_count or BHelper.update_time
+    time_count = time_count or BHelper.core:get_update_time()
     if (ACTIVE_CHAT_EDIT_BOX) then return false end
 
     local flag = 0

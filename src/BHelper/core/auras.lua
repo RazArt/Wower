@@ -51,9 +51,5 @@ end
 
 function BHelper.auras:init()
     self._auras = {}
-
-    BHelper.timers:create(BHelper.update_time, function()
-        self:update()
-    end, 'auras_update', true)
 end
 BHelper.auras:init()

@@ -31,7 +31,7 @@ end
 function BHelper.modules.auction.common:AUCTION_HOUSE_show_spell()
     SortAuctionItems("list", "bid")
     BHelper.core.action:set('step_2')
-    BHelper.core:cooldown(2)
+    BHelper.core:add_cooldown(2)
 end
 
 function BHelper.modules.auction.common:step_2()
@@ -40,7 +40,7 @@ function BHelper.modules.auction.common:step_2()
     if (select(1, CanSendAuctionQuery()) == 1) then
         QueryAuctionItems(self.vars.item_list[self.vars.item_num][1], 0, 0, 0, 0, 0, self.vars.page, false, 0, 0)
         BHelper.core.action:set('step_3')
-        BHelper.core:cooldown(1)
+        BHelper.core:add_cooldown(1)
     end
 end
 
@@ -99,7 +99,7 @@ function BHelper.modules.auction.common:buy_click()
     self.vars.click_wait = false
     PlaceAuctionBid("list", self.vars.lot_index, self.vars.buyout_price)
     self.vars.lot_index = self.vars.lot_index - 1
-    BHelper.core:cooldown(1)
+    BHelper.core:add_cooldown(1)
 end
 
 function BHelper.modules.auction.common:AUCTION_HOUSE_CLOSED()

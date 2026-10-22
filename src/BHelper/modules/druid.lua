@@ -114,8 +114,9 @@ function BHelper.modules.druid.default:execute()
     if ((player:check_location_is_icc()) and
         ((target:is_player()) or ((target:get_name() == 'Имирьярская охотница') and
             (target:check_casting_spellname('Быстрострел')))) and
-        (player:aura('Облик лютого медведя') == 0) and (target:aura('Смерч') == 0) and
-        (player:can_cast_on_enemy('Смерч'))) then return keybinds:show_spell('Смерч') end
+        (player:aura('Облик лютого медведя') == 0) and (player:can_cast_on_enemy('Смерч'))) then
+        return keybinds:show_spell('Смерч')
+    end
 
     if ((player:aura('Облик кошки') == 0) and (player:aura('Облик лютого медведя') == 0)) then
         return keybinds:show_macro('Reform')

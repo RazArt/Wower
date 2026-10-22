@@ -70,7 +70,7 @@ end
 function BHelper.player:can_use_item(item)
     if (BHelper.player:get_item_count(item) == 0) then return false end
     if (BHelper.player:check_item_on_cooldown(item)) then return false end
-    if (IsMounted()) then return false end
+    if (BHelper.player:is_mounted()) then return false end
     if (not HasFullControl()) then return false end
     return true
 end
@@ -242,7 +242,12 @@ function BHelper.player:check_burst_mode()
     return false
 end
 
+function BHelper.player:is_mounted()
+    return IsMounted()
+end
+
 function BHelper.player:check_location_is_icc()
     if (GetCurrentMapAreaID() == 605) then return true end
     return false
 end
+

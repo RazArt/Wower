@@ -13,9 +13,23 @@ BHelper._event_frame:RegisterEvent('PLAYER_CONTROL_GAINED')
 BHelper._event_frame:RegisterEvent('PLAYER_TARGET_CHANGED')
 
 function BHelper:PLAYER_LOGIN()
-    self:create_state_frame()
-    self.core:reload()
+    BHelper.core:init()
+    BHelper.core:reload()
 
+    BHelper.timers:create(BHelper.core:get_update_time(), function()
+        BHelper.auras:update()
+    end, 'auras_update', true)
+
+    BHelper.timers:create(BHelper.core:get_update_time(), function()
+        BHelper.threat:update()
+    end, 'threat_update', true)
+
+    BHelper.timers:create(BHelper.core:get_update_time(), function()
+        local module = BHelper.core.module:get()
+        if ((module) and (BHelper.core:runing()) and (not BHelper.core:cooldown())) then module:_execute() end
+    end, 'main_execute', true)
+
+    BHelper:create_state_frame()
     -- if ((not BHelperDBIcons) or (type(BHelperDBIcons) ~= 'table')) then BHelperDBIcons = {} end
     -- for i = 1, GetNumMacroIcons() do BHelperDBIcons[i] = GetMacroIconInfo(i) end
 end
@@ -50,11 +64,11 @@ function BHelper:PLAYER_REGEN_ENABLED()
 end
 
 function BHelper:PLAYER_CONTROL_LOST()
-    self._cooldown = true
+    BHelper.core._cooldown = true
 end
 
 function BHelper:PLAYER_CONTROL_GAINED()
-    self._cooldown = false
+    BHelper.core._cooldown = false
 end
 
 function BHelper:PLAYER_TARGET_CHANGED()
@@ -87,7 +101,7 @@ function BHelper:commands(msg)
         self.modules[self._module]:_macros()
     elseif (args[1] == 'c') then
         if (args[2] == nil) then args[2] = 0.2 end
-        self.core:cooldown(tonumber(args[2]))
+        self.core:add_cooldown(tonumber(args[2]))
     else
         self.core:print('Неизвестная команда')
     end
@@ -99,10 +113,6 @@ SlashCmdList["BHELPER"] = function(message)
 end
 
 function BHelper:init()
-    self._debug = true
-    self._runing = false
-    self.update_time = 0.1
-
     self.vars = {}
     self.vars._player = {}
     self.vars._combat_state = false

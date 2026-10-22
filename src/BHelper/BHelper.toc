@@ -10,11 +10,11 @@ core\auras.lua
 core\keybinds.lua
 core\macros.lua
 core\modules.lua
-core\core.lua
 core\player.lua
 core\pet.lua
 core\target.lua
 core\threat.lua
+core\core.lua
 
 modules\druid.lua
 modules\hunter.lua

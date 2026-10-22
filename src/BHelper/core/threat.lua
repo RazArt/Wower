@@ -70,9 +70,5 @@ function BHelper.threat:init()
     for i = 1, 4 do self._party_pets_IDs[i] = format('partypet%d', i) end
     for i = 1, 40 do self._raid_IDs[i] = format('raid%d', i) end
     for i = 1, 40 do self._raid_pets_IDs[i] = format('raidpet%d', i) end
-
-    BHelper.timers:create(BHelper.update_time, function()
-        self:update()
-    end, 'threat_update', true)
 end
 BHelper.threat:init()

@@ -90,10 +90,5 @@ function BHelper.modules:init()
     self.shaman = self:module({'default'})
     self.warlock = self:module({'default'})
     self.warrior = self:module({'default', 'proto', 'proto_farm'})
-
-    BHelper.timers:create(BHelper.update_time, function()
-        local module = BHelper.core.module:get()
-        if ((module) and (BHelper._runing) and (not BHelper._cooldown)) then module:_execute() end
-    end, 'main_execute', true)
 end
 BHelper.modules:init()
