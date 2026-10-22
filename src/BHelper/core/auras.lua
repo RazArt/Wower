@@ -1,16 +1,8 @@
 BHelper.auras = {}
 
-function BHelper.auras:player(aura, cast_by_player)
-    return self:_get('player', aura, cast_by_player)
-end
-
-function BHelper.auras:target(aura, cast_by_player)
-    return self:_get('target', aura, cast_by_player)
-end
-
-function BHelper.auras:_get(unit_id, aura, cast_by_player)
-    unit_id = string.lower(unit_id)
-    aura = (type(aura) == 'string') and string.lower(aura) or aura
+function BHelper.auras:get(unit_id, aura, cast_by_player)
+    unit_id = unit_id:lower()
+    aura = (type(aura) == 'string') and aura:lower() or aura
 
     if (not self._auras) then return 0, 0 end
     if (not self._auras[unit_id]) then return 0, 0 end
@@ -40,7 +32,7 @@ function BHelper.auras:update()
                 local aura, _, _, count, _, _, expiration_time, unit_caster, _, _, id = UnitAura(unit_id, i, filter)
                 if (aura == nil) then break end
 
-                aura = string.lower(aura)
+                aura = aura:lower()
                 expiration_time = (expiration_time > 0) and (expiration_time - GetTime()) or expiration_time
                 expiration_time = (expiration_time == 0) and 9999 or expiration_time
                 local cast_by_player = (unit_caster == 'player') and true or false

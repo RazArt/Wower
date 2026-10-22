@@ -8,6 +8,7 @@ function BHelper.core:start()
         (not BHelper.target:enemy_on_combat())) then return end
     if (IsMounted()) then return false end
 
+    BHelper.auras:update()
     BHelper.vars.cooldown_berserker = true
     BHelper.timers:create(2, function()
         BHelper.vars.cooldown_berserker = false
@@ -110,8 +111,7 @@ function BHelper.core.module:get()
 end
 
 function BHelper.core.module:set(name)
-    name = name or BHelper.player:get_class()
-    name = string.lower(name)
+    name = (name) and name:lower() or BHelper.player:get_class()
     if (BHelper.core.module:exist(name)) then
         BHelper.core:print('set_module -> ', name)
         local player_spec = BHelper.player:get_spec()
@@ -128,8 +128,8 @@ function BHelper.core.module:get_name()
 end
 
 function BHelper.core.module:exist(name)
-    name = name or ''
-    if (rawget(BHelper.modules, string.lower(name))) then return true end
+    name = (name) and name:lower() or ''
+    if (rawget(BHelper.modules, name)) then return true end
     return false
 end
 
@@ -144,8 +144,7 @@ function BHelper.core.profile:get()
 end
 
 function BHelper.core.profile:set(name)
-    name = name or 'default'
-    name = string.lower(name)
+    name = (name) and name:lower() or 'default'
     if (BHelper.core.profile:exist(name)) then
         BHelper.core:print('set_profile -> ', name)
         local player_spec = BHelper.player:get_spec()
@@ -161,8 +160,8 @@ function BHelper.core.profile:get_name()
 end
 
 function BHelper.core.profile:exist(name)
-    name = name or ''
-    if (rawget(BHelper.core.module:get(), string.lower(name))) then return true end
+    name = (name) and name:lower() or ''
+    if (rawget(BHelper.core.module:get(), name)) then return true end
     return false
 end
 
@@ -171,11 +170,10 @@ function BHelper.core.action:get()
 end
 
 function BHelper.core.action:set(name)
-    name = name or 'default'
-    name = string.lower(name)
+    name = (name) and name:lower() or 'default'
 
     local profile = BHelper.core.profile:get()
-    if ((profile) and (rawget(profile, string.lower(name)))) then
+    if ((profile) and (rawget(profile, name))) then
         BHelper.core.action._table = BHelper.core.profile:get()[name]
         return true
     end

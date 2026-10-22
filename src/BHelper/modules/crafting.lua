@@ -11,7 +11,7 @@
 -- -- 33470 Ледяная ткань
 function BHelper:get_bag_free_slots()
     local free_slots_count = 0
-    for bag_num = 0, 4 do free_slots_count = free_slots_count + (select(1, GetContainerNumFreeSlots(bag_num))) end
+    for bag_num = 0, 4 do free_slots_count = free_slots_count + select(1, GetContainerNumFreeSlots(bag_num)) end
     return free_slots_count
 end
 
@@ -98,8 +98,8 @@ end
 
 function BHelper.modules.crafting.common:craft_item(name)
     for i = GetNumTradeSkills(), 1, -1 do
-        if ((select(2, GetTradeSkillInfo(i)) == "header")) then ExpandTradeSkillSubClass(i) end
+        if (select(2, GetTradeSkillInfo(i)) == "header") then ExpandTradeSkillSubClass(i) end
     end
     for i = 1, GetNumTradeSkills() do if ((select(1, GetTradeSkillInfo(i))) == name) then index = i end end
-    if (index > 0) then if ((select(3, GetTradeSkillInfo(index))) > 0) then DoTradeSkill(index) end end
+    if (index > 0) then if (select(3, GetTradeSkillInfo(index)) > 0) then DoTradeSkill(index) end end
 end

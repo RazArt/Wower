@@ -8,7 +8,6 @@ BHelper._event_frame:RegisterEvent('PLAYER_LOGIN')
 BHelper._event_frame:RegisterEvent('ACTIVE_TALENT_GROUP_CHANGED')
 BHelper._event_frame:RegisterEvent('PLAYER_REGEN_DISABLED')
 BHelper._event_frame:RegisterEvent('PLAYER_REGEN_ENABLED')
-BHelper._event_frame:RegisterEvent('UI_ERROR_MESSAGE')
 BHelper._event_frame:RegisterEvent('PLAYER_CONTROL_LOST')
 BHelper._event_frame:RegisterEvent('PLAYER_CONTROL_GAINED')
 BHelper._event_frame:RegisterEvent('PLAYER_TARGET_CHANGED')
@@ -48,15 +47,6 @@ end
 function BHelper:PLAYER_REGEN_ENABLED()
     self.vars._combat_state = false
     self.core:stop()
-end
-
-function BHelper:UI_ERROR_MESSAGE(message)
-    if (message == SPELL_FAILED_NOT_BEHIND) then
-        self.vars.behind_of_target = false
-        self.timers:create(0.5, function()
-            self.vars.behind_of_target = true
-        end, 'behind_of_target')
-    end
 end
 
 function BHelper:PLAYER_CONTROL_LOST()
@@ -112,12 +102,9 @@ function BHelper:init()
     self._debug = true
     self._runing = false
     self.update_time = 0.1
-    -- self._module = ''
-    -- self._action = ''
 
     self.vars = {}
     self.vars._player = {}
     self.vars._combat_state = false
-    self.vars.behind_of_target = true
 end
 BHelper:init()

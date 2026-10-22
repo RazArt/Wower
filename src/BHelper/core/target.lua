@@ -36,6 +36,10 @@ function BHelper.target:get_power_max()
     return UnitPowerMax('target') or 0
 end
 
+function BHelper.target:aura(aura, cast_by_player)
+    return BHelper.auras:get('target', aura, cast_by_player)
+end
+
 function BHelper.target:is_boss()
     if ((UnitClassification('target') == 'worldboss') or UnitLevel('target') == -1) then return true end
     return false
@@ -54,7 +58,7 @@ function BHelper.target:player_on_target()
 end
 
 function BHelper.target:should_evade()
-    if (string.find(string.lower(BHelper.target:get_name()), 'манекен')) then return false end
+    if (string.find(BHelper.target:get_name():lower(), 'манекен')) then return false end
     if (BHelper.target:get_name() == 'Кровавая королева Лана\'тель') then return false end
     if (BHelper.target:get_name() == 'Леди Смертный Шепот') then return false end
     return true

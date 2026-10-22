@@ -29,8 +29,8 @@ end
 function BHelper.modules.mailbox.common:step_2()
     if (not self.vars.open) then BHelper.core.action:set('step_1') end
 
-    if ((select(2, GetInboxNumItems())) > 0) then
-        if ((select(1, GetInboxNumItems())) > 0) then
+    if (select(2, GetInboxNumItems()) > 0) then
+        if (select(1, GetInboxNumItems()) > 0) then
             local _, _, sender, _, money, CODAmount, _, hasItem = GetInboxHeaderInfo(1)
             if (CODAmount > 0) and (InboxItemCanDelete(1) == nil) then
                 ReturnInboxItem(1)

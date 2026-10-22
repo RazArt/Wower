@@ -36,13 +36,13 @@ function BHelper.modules.rogue.default:rotation_single()
     end
 
     if (self.vars.sunder) then
-        if ((BHelper.auras:target('Ослабление доспеха') == 0) and
+        if ((BHelper.target:aura('Ослабление доспеха') == 0) and
             (BHelper.player:can_cast_on_enemy('Ослабление доспеха'))) then
             BHelper.keybinds:show_spell('Ослабление доспеха')
             return true
         end
 
-        if ((BHelper.auras:target('Ослабление доспеха') <= 3) and
+        if ((BHelper.target:aura('Ослабление доспеха') <= 3) and
             (BHelper.player:can_cast_on_enemy('Ослабление доспеха')) and
             (BHelper.player:check_combo_points(4))) then
             BHelper.keybinds:show_spell('Ослабление доспеха')
@@ -50,12 +50,12 @@ function BHelper.modules.rogue.default:rotation_single()
         end
     end
 
-    if ((BHelper.auras:player('Мясорубка') == 0) and (BHelper.player:can_cast('Мясорубка'))) then
+    if ((BHelper.player:aura('Мясорубка') == 0) and (BHelper.player:can_cast('Мясорубка'))) then
         BHelper.keybinds:show_spell('Мясорубка')
         return true
     end
 
-    if ((BHelper.auras:player('Мясорубка') <= 3) and (BHelper.player:can_cast('Мясорубка')) and
+    if ((BHelper.player:aura('Мясорубка') <= 3) and (BHelper.player:can_cast('Мясорубка')) and
         (BHelper.player:check_combo_points(5))) then
         BHelper.keybinds:show_spell('Мясорубка')
         return true

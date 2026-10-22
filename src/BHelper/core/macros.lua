@@ -1,7 +1,7 @@
 BHelper.macros = {}
 
 function BHelper.macros:create(name, command, slot, icon)
-    name = string.lower(name)
+    name = name:lower()
     slot = slot or 0
     icon = icon or 1
 
@@ -16,16 +16,16 @@ function BHelper.macros:create(name, command, slot, icon)
 end
 
 function BHelper.macros:put_to_panel(name, slot)
-    name = string.lower(name)
+    name = name:lower()
     PickupMacro(name)
     PlaceAction(slot)
     ClearCursor()
 end
 
 function BHelper.macros:delete(name)
-    name = string.lower(name)
+    name = name:lower()
     for i = 54, 1, -1 do
-        local macro_name = (select(1, GetMacroInfo(i)))
+        local macro_name = select(1, GetMacroInfo(i))
         if ((macro_name) and (macro_name == name)) then if (DeleteMacro(i)) then return true end end
     end
     return false

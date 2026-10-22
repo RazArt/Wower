@@ -17,7 +17,7 @@ end
 
 function BHelper.timers:create(count, func, name, repeating)
     name = name or ''
-    name = string.lower(name)
+    name = name:lower()
     repeating = repeating or false
 
     if (name ~= '') then self:delete(name) end
@@ -26,7 +26,7 @@ end
 
 function BHelper.timers:delete(name)
     name = name or ''
-    name = string.lower(name)
+    name = name:lower()
 
     for i = #self._timers, 1, -1 do if (self._timers[i][5] == name) then table.remove(self._timers, i) end end
 end

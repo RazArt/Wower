@@ -8,13 +8,13 @@ end
 
 function BHelper.player:get_name()
     if (BHelper.player.name) then return BHelper.player.name end
-    BHelper.player.name = (select(1, UnitName('player')))
+    BHelper.player.name = select(1, UnitName('player'))
     return BHelper.player.name
 end
 
 function BHelper.player:get_class()
     if (BHelper.player.class) then return BHelper.player.class end
-    BHelper.player.class = (select(2, UnitClass('player'))):lower()
+    BHelper.player.class = select(2, UnitClass('player')):lower()
     return BHelper.player.class
 end
 
@@ -63,6 +63,10 @@ function BHelper.player:check_combo_points(count)
     return (GetComboPoints('player', 'target') >= count)
 end
 
+function BHelper.player:aura(aura, cast_by_player)
+    return BHelper.auras:get('player', aura, cast_by_player)
+end
+
 function BHelper.player:can_use_item(item)
     if (BHelper.player:get_item_count(item) == 0) then return false end
     if (BHelper.player:check_item_on_cooldown(item)) then return false end
@@ -90,7 +94,7 @@ function BHelper.player:get_item_count(item)
 end
 
 function BHelper.player:can_cast(spellname, check_time)
-    if (not (select(1, IsUsableSpell(spellname)))) then return false end
+    if (not select(1, IsUsableSpell(spellname))) then return false end
     if (BHelper.player:spell_is_targeting()) then return false end
     if (BHelper.player:check_cast()) then return false end
     if (BHelper.player:check_spell_on_cooldown(spellname, check_time)) then return false end
@@ -131,11 +135,11 @@ function BHelper.player:can_target_attack()
     if (UnitIsDeadOrGhost('player')) then return false end
     if (not UnitCanAttack('player', 'target')) then return false end
 
-    if (BHelper.auras:target('Спячка') > 0) then return false end
-    if (BHelper.auras:target('Смерч') > 0) then return false end
-    if (BHelper.auras:target('Превращение') > 0) then return false end
-    if (BHelper.auras:target('Страх') > 0) then return false end
-    if (BHelper.auras:target('Ослепление') > 0) then return false end
+    if (BHelper.target:aura('Спячка') > 0) then return false end
+    if (BHelper.target:aura('Смерч') > 0) then return false end
+    if (BHelper.target:aura('Превращение') > 0) then return false end
+    if (BHelper.target:aura('Страх') > 0) then return false end
+    if (BHelper.target:aura('Ослепление') > 0) then return false end
 
     -- if (BHelper.target:get_name() == 'Малый слизнюк') then return false end
     -- if (BHelper.target:get_name() == 'Дарнаван') then return false end
@@ -144,7 +148,7 @@ function BHelper.player:can_target_attack()
     -- if (((BHelper.target:get_name() == 'Принц Валанар') or
     --     (BHelper.target:get_name() == 'Принц Келесет') or
     --     (BHelper.target:get_name() == 'Принц Талдарам')) and (BHelper.target:get_health() == 1) and
-    --     (BHelper.auras:player('Перенаправление') == 0)) then return false end
+    --     (BHelper.player:aura('Перенаправление') == 0)) then return false end
 
     return true
 end
@@ -161,7 +165,7 @@ function BHelper.player:check_spell_range(spellname, unit_id)
 end
 
 function BHelper.player:get_spell_casttime(spellname)
-    local castTime = (select(7, GetSpellInfo(spellname)))
+    local castTime = select(7, GetSpellInfo(spellname))
     return (castTime > 0) and (castTime / 1000) or 0
 end
 
@@ -227,8 +231,8 @@ function BHelper.player:check_low_threat(limit)
 end
 
 function BHelper.player:check_heroism_buff()
-    if (BHelper.auras:player('Героизм') > 0) then return true end
-    if (BHelper.auras:player('Жажда крови') > 0) then return true end
+    if (BHelper.player:aura('Героизм') > 0) then return true end
+    if (BHelper.player:aura('Жажда крови') > 0) then return true end
     return false
 end
 

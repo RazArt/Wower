@@ -1,8 +1,9 @@
 BHelper.keybinds = {}
 
 function BHelper.keybinds:_get_bind_index(class, name)
-    class = string.lower(class)
-    name = string.lower(name)
+    class = class:lower()
+    name = name:lower()
+
     for num, bind in pairs(self._binds) do if ((bind.class == class) and (bind.name == name)) then return num end end
     return 0
 end
@@ -15,8 +16,8 @@ function BHelper.keybinds:_get_bind_string(key, modifier)
 end
 
 function BHelper.keybinds:_bind(class, name)
-    class = string.lower(class)
-    name = string.lower(name)
+    class = class:lower()
+    name = name:lower()
 
     for index, bind in pairs(self._binds) do
         if ((bind.class == class) and (bind.name == name)) then return true end

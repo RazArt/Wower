@@ -37,9 +37,8 @@ end
 function BHelper.modules.auction.common:step_2()
     if (not self.vars.open) then BHelper.core.action:set('step_1') end
 
-    if ((select(1, CanSendAuctionQuery())) == 1) then
-        QueryAuctionItems(self.vars.item_list[self.vars.item_num][1], 0, 0, 0, 0, 0, self.vars.page,
-                          false, 0, 0)
+    if (select(1, CanSendAuctionQuery()) == 1) then
+        QueryAuctionItems(self.vars.item_list[self.vars.item_num][1], 0, 0, 0, 0, 0, self.vars.page, false, 0, 0)
         BHelper.core.action:set('step_3')
         BHelper.core:cooldown(1)
     end
@@ -53,7 +52,7 @@ function BHelper.modules.auction.common:step_3()
     if (not self.vars.open) then BHelper.core.action:set('step_1') end
 
     if (self.vars.list_updated == true) then
-        local batch = (select(1, GetNumAuctionItems('list')))
+        local batch = select(1, GetNumAuctionItems('list'))
         self.vars.list_updated = false
         self.vars.lot_index = batch
         if (batch > 0) then
@@ -76,12 +75,10 @@ function BHelper.modules.auction.common:step_4()
     if (self.vars.click_wait == true) then BHelper.keybinds:show_spell(6, false, false, true) end
 
     if (self.vars.lot_index > 0) then
-        local name, _, count, _, _, _, _, _, buyoutPrice, _, _, owner, sold = GetAuctionItemInfo(
-                                                                                  "list", self.vars
-                                                                                      .lot_index)
-        if ((name == self.vars.item_list[self.vars.item_num][1]) and
-            (BHelper.player:get_name() ~= owner) and (GetMoney() > buyoutPrice) and
-            (buyoutPrice > 0) and (sold == 0) and
+        local name, _, count, _, _, _, _, _, buyoutPrice, _, _, owner, sold = GetAuctionItemInfo("list",
+                                                                                                 self.vars.lot_index)
+        if ((name == self.vars.item_list[self.vars.item_num][1]) and (BHelper.player:get_name() ~= owner) and
+            (GetMoney() > buyoutPrice) and (buyoutPrice > 0) and (sold == 0) and
             (buyoutPrice / count <= self.vars.item_list[self.vars.item_num][2])) then
             self.vars.buyout_price = buyoutPrice
             self.vars.change_page = false
