@@ -126,7 +126,7 @@ function BHelper.modules.mage.default:rotation_single()
         (not player:check_moving()) and (self.can_cast_scorch) and (self.vars.scorch) and
         (player:can_cast_on_enemy('Ожог'))) then return keybinds:show_spell('Ожог') end
 
-    if ((player:check_burst_mode()) and (not BHelper.vars.cooldown_berserker)) then
+    if ((player:check_burst_mode()) and (not self.burst_cooldown)) then
         if (player:can_cast('Зеркальное изображение')) then
             return keybinds:show_spell('Зеркальное изображение')
         end

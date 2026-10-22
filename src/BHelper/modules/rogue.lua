@@ -46,7 +46,7 @@ end
 function BHelper.modules.rogue.default:rotation_single()
     if (target:check_cast() and player:can_cast_on_enemy('Пинок')) then return keybinds:show_spell('Пинок') end
 
-    if (player:check_burst_mode() and (not BHelper.vars.cooldown_berserker)) then
+    if (player:check_burst_mode() and (not self.burst_cooldown)) then
         if ((player:check_equipped_item('Знак превосходства')) and
             (player:can_use_item('Знак превосходства'))) then
             return keybinds:show_item('Знак превосходства')

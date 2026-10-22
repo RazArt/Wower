@@ -307,7 +307,7 @@ function BHelper.modules.deathknight.fdk:rotation()
     if ((player:aura('Зимний горн') == 0) and (player:aura('Сила земли') == 0) and
         (player:can_cast('Зимний горн'))) then return keybinds:show_spell('Зимний горн') end
 
-    if ((player:check_burst_mode()) and (not BHelper.vars.cooldown_berserker)) then
+    if ((player:check_burst_mode()) and (not self.burst_cooldown)) then
         if (player:can_cast('Воскрешение мертвых')) then
             return keybinds:show_spell('Воскрешение мертвых')
         end

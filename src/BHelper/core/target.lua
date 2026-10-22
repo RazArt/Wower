@@ -1,7 +1,31 @@
 BHelper.target = {}
 
+local auras = {}
+local core = {}
+local keybinds = {}
+local macros = {}
+local modules = {}
+local pet = {}
+local player = {}
+local target = {}
+local threat = {}
+local timers = {}
+
+function BHelper.target:namespace_init()
+    auras = BHelper.auras
+    core = BHelper.core
+    keybinds = BHelper.keybinds
+    macros = BHelper.macros
+    modules = BHelper.modules
+    pet = BHelper.pet
+    player = BHelper.player
+    target = BHelper.target
+    threat = BHelper.threat
+    timers = BHelper.timers
+end
+
 function BHelper.target:get_name()
-    return BHelper.target._name
+    return target._name
 end
 
 function BHelper.target:get_health_on_percent()
@@ -37,7 +61,7 @@ function BHelper.target:get_power_max()
 end
 
 function BHelper.target:aura(aura, cast_by_player)
-    return BHelper.auras:get('target', aura, cast_by_player)
+    return auras:get('target', aura, cast_by_player)
 end
 
 function BHelper.target:is_boss()
@@ -51,16 +75,15 @@ function BHelper.target:is_player()
 end
 
 function BHelper.target:player_on_target()
-    if (not BHelper.target:should_evade()) then return false end
-
+    if (not target:should_evade()) then return false end
     if (UnitIsUnit('player', 'targettarget')) then return true end
     return false
 end
 
 function BHelper.target:should_evade()
-    if (string.find(BHelper.target:get_name():lower(), 'манекен')) then return false end
-    if (BHelper.target:get_name() == 'Кровавая королева Лана\'тель') then return false end
-    if (BHelper.target:get_name() == 'Леди Смертный Шепот') then return false end
+    if (string.find(target:get_name():lower(), 'манекен')) then return false end
+    if (target:get_name() == 'Кровавая королева Лана\'тель') then return false end
+    if (target:get_name() == 'Леди Смертный Шепот') then return false end
     return true
 end
 

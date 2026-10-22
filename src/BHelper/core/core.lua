@@ -3,54 +3,60 @@ BHelper.core.module = {}
 BHelper.core.profile = {}
 BHelper.core.action = {}
 
-local core = BHelper.core
-local module = BHelper.core.module
-local profile = BHelper.core.profile
-local action = BHelper.core.action
+local auras = {}
+local core = {}
+local keybinds = {}
+local macros = {}
+local modules = {}
+local pet = {}
+local player = {}
+local target = {}
+local threat = {}
+local timers = {}
+local DB = {}
 
-local modules = BHelper.modules
-local player = BHelper.player
-local pet = BHelper.pet
-local target = BHelper.target
-local auras = BHelper.auras
-local timers = BHelper.timers
-local keybinds = BHelper.keybinds
-local macros = BHelper.macros
-
-function BHelper.core:init()
-    core._runing = false
-    core._cooldown = false
-    core._debug = true
-    core.update_time = 0.1
+function BHelper.core:namespace_init()
+    auras = BHelper.auras
+    core = BHelper.core
+    keybinds = BHelper.keybinds
+    macros = BHelper.macros
+    modules = BHelper.modules
+    pet = BHelper.pet
+    player = BHelper.player
+    target = BHelper.target
+    threat = BHelper.threat
+    timers = BHelper.timers
+    DB = BHelperDB
 end
 
 function BHelper.core:start()
-    if ((profile:get().settings.only_combat_start) and (not player:check_combat_state()) and
+    if ((core.profile:get().settings.only_combat_start) and (not player:check_combat_state()) and
         (not target:enemy_on_combat())) then return end
     if (player:is_mounted()) then return false end
 
     auras:update()
-    BHelper.vars.cooldown_berserker = true
+
+    core.profile:get().burst_cooldown = true
     timers:create(2, function()
-        BHelper.vars.cooldown_berserker = false
-    end, 'cooldown_berserker')
+        core.profile:get().burst_cooldown = false
+    end, 'burst_cooldown')
 
     core._runing = true
     BHelper.state_frame:Show()
 
-    if (profile:get().start) then profile:get():start() end
+    if (core.profile:get().start) then core.profile:get():start() end
 end
 
 function BHelper.core:stop()
     core._runing = false
     core._cooldown = false
-    BHelper.vars.cooldown_berserker = false
+    core.profile:get().burst_cooldown = false
 
     BHelper.state_frame:Hide()
 
     keybinds:show_macro('Stop', 0.1)
     if (pet:check_control()) then keybinds:show_pet('Follow', 0.1) end
-    if (profile:get().stop) then profile:get():stop() end
+    if (core.profile:get().stop) then core.profile:get():stop() end
 end
 
 function BHelper.core:toggle()
@@ -62,72 +68,70 @@ function BHelper.core:toggle()
 end
 
 function BHelper.core:reload()
-    module._table = nil
-    profile._table = nil
-    action._table = nil
+    core.module._table = nil
+    core.profile._table = nil
+    core.action._table = nil
 
-    module:load()
-    if (not module:get()) then
-        module:set()
+    core.module:load()
+    if (not core.module:get()) then
+        core.module:set()
         return false
     end
 
-    profile:load()
-    if (not profile:get()) then
-        profile:set()
+    core.profile:load()
+    if (not core.profile:get()) then
+        core.profile:set()
         return false
     end
 
-    core:print('loaded ->', module:get_name(), profile:get_name())
+    core:print('loaded ->', core.module:get_name(), core.profile:get_name())
 
     core:init_DB()
     keybinds:unbind_all()
     macros:delete_all()
     core:create_shared_macros()
 
-    profile:get().settings = BHelperDB[player:get_spec()]['modules'][module:get_name()][profile:get_name()].settings
-    profile:get().vars = BHelperDB[player:get_spec()]['modules'][module:get_name()][profile:get_name()].vars
+    core.profile:get().settings = DB[player:get_spec()]['modules'][core.module:get_name()][core.profile:get_name()]
+                                      .settings
+    core.profile:get().vars = DB[player:get_spec()]['modules'][core.module:get_name()][core.profile:get_name()].vars
 
-    module:get():_init()
-    module:get():_macros()
+    core.module:get():_init()
+    core.module:get():_macros()
 end
 
 function BHelper.core:init_DB()
     local player_spec = player:get_spec()
-    local module_name = module:get_name()
-    local profile_name = profile:get_name()
+    local module_name = core.module:get_name()
+    local profile_name = core.profile:get_name()
 
-    if ((not BHelperDB) or (type(BHelperDB) ~= 'table')) then BHelperDB = {} end
+    if ((not DB[player_spec]) or (type(DB[player_spec]) ~= 'table')) then DB[player_spec] = {} end
 
-    if ((not BHelperDB[player_spec]) or (type(BHelperDB[player_spec]) ~= 'table')) then BHelperDB[player_spec] = {} end
-
-    if ((not BHelperDB[player_spec]['modules']) or (type(BHelperDB[player_spec]['modules']) ~= 'table')) then
-        BHelperDB[player_spec]['modules'] = {}
+    if ((not DB[player_spec]['modules']) or (type(DB[player_spec]['modules']) ~= 'table')) then
+        DB[player_spec]['modules'] = {}
     end
 
-    if ((not BHelperDB[player_spec]['modules'][module_name]) or
-        (type(BHelperDB[player_spec]['modules'][module_name]) ~= 'table')) then
-        BHelperDB[player_spec]['modules'][module_name] = {}
+    if ((not DB[player_spec]['modules'][module_name]) or (type(DB[player_spec]['modules'][module_name]) ~= 'table')) then
+        DB[player_spec]['modules'][module_name] = {}
     end
 
-    if ((not BHelperDB[player_spec]['modules'][module_name][profile_name]) or
-        (type(BHelperDB[player_spec]['modules'][module_name][profile_name]) ~= 'table')) then
-        BHelperDB[player_spec]['modules'][module_name][profile_name] = {}
+    if ((not DB[player_spec]['modules'][module_name][profile_name]) or
+        (type(DB[player_spec]['modules'][module_name][profile_name]) ~= 'table')) then
+        DB[player_spec]['modules'][module_name][profile_name] = {}
     end
 
-    if ((not BHelperDB[player_spec]['modules'][module_name][profile_name].settings) or
-        (type(BHelperDB[player_spec]['modules'][module_name][profile_name].settings) ~= 'table')) then
-        BHelperDB[player_spec]['modules'][module_name][profile_name].settings = {}
+    if ((not DB[player_spec]['modules'][module_name][profile_name].settings) or
+        (type(DB[player_spec]['modules'][module_name][profile_name].settings) ~= 'table')) then
+        DB[player_spec]['modules'][module_name][profile_name].settings = {}
     end
 
-    if ((not BHelperDB[player_spec]['modules'][module_name][profile_name].vars) or
-        (type(BHelperDB[player_spec]['modules'][module_name][profile_name].vars) ~= 'table')) then
-        BHelperDB[player_spec]['modules'][module_name][profile_name].vars = {}
+    if ((not DB[player_spec]['modules'][module_name][profile_name].vars) or
+        (type(DB[player_spec]['modules'][module_name][profile_name].vars) ~= 'table')) then
+        DB[player_spec]['modules'][module_name][profile_name].vars = {}
     end
 end
 
 function BHelper.core:set_var(var, value)
-    local vars = profile:get().vars
+    local vars = core.profile:get().vars
 
     if (value == "true") then value = true end
     if (value == "false") then value = false end
@@ -135,7 +139,7 @@ function BHelper.core:set_var(var, value)
 end
 
 function BHelper.core:toggle_var(var)
-    local vars = profile:get().vars
+    local vars = core.profile:get().vars
 
     if (vars[var] ~= nil) then
         if (vars[var]) then
@@ -221,21 +225,21 @@ function BHelper.core:create_shared_macros()
 end
 
 function BHelper.core.module:load()
-    local name = module:get_name():lower()
-    if (module:exist(name)) then module._table = modules[name] end
+    local name = core.module:get_name():lower()
+    if (core.module:exist(name)) then core.module._table = modules[name] end
     return nil
 end
 
 function BHelper.core.module:get()
-    return module._table
+    return core.module._table
 end
 
 function BHelper.core.module:set(name)
     name = (name) and name:lower() or player:get_class()
-    if (module:exist(name)) then
+    if (core.module:exist(name)) then
         core:print('set_module -> ', name)
-        BHelperDB[player:get_spec()].module_name = name
-        BHelperDB[player:get_spec()].profile_name = nil
+        DB[player:get_spec()].module_name = name
+        DB[player:get_spec()].profile_name = nil
         core:reload()
         return true
     end
@@ -243,7 +247,7 @@ function BHelper.core.module:set(name)
 end
 
 function BHelper.core.module:get_name()
-    return BHelperDB[player:get_spec()].module_name
+    return DB[player:get_spec()].module_name
 end
 
 function BHelper.core.module:exist(name)
@@ -253,20 +257,20 @@ function BHelper.core.module:exist(name)
 end
 
 function BHelper.core.profile:load()
-    local name = profile:get_name():lower()
-    if (profile:exist(name)) then profile._table = module:get()[name] end
+    local name = core.profile:get_name():lower()
+    if (core.profile:exist(name)) then core.profile._table = core.module:get()[name] end
     return nil
 end
 
 function BHelper.core.profile:get()
-    return profile._table
+    return core.profile._table
 end
 
 function BHelper.core.profile:set(name)
     name = (name) and name:lower() or 'default'
-    if (profile:exist(name)) then
+    if (core.profile:exist(name)) then
         core:print('set_profile -> ', name)
-        BHelperDB[player:get_spec()].profile_name = name
+        DB[player:get_spec()].profile_name = name
         core:reload()
         return true
     end
@@ -274,24 +278,34 @@ function BHelper.core.profile:set(name)
 end
 
 function BHelper.core.profile:get_name()
-    return BHelperDB[player:get_spec()].profile_name
+    return DB[player:get_spec()].profile_name
 end
 
 function BHelper.core.profile:exist(name)
     name = (name) and name:lower() or ''
-    if (rawget(module:get(), name)) then return true end
+    if (rawget(core.module:get(), name)) then return true end
     return false
 end
 
 function BHelper.core.action:get()
-    return action._table
+    return core.action._table
 end
 
 function BHelper.core.action:set(name)
     name = (name) and name:lower() or 'default'
-    if ((profile:get()) and (rawget(profile:get(), name))) then
-        action._table = profile:get()[name]
+    if ((core.profile:get()) and (rawget(core.profile:get(), name))) then
+        core.action._table = core.profile:get()[name]
         return true
     end
     return false
 end
+
+function BHelper.core:init()
+    self._runing = false
+    self._cooldown = false
+    self._debug = true
+    self.update_time = 0.1
+
+    if ((not BHelperDB) or (type(BHelperDB) ~= 'table')) then BHelperDB = {} end
+end
+BHelper.core:init()

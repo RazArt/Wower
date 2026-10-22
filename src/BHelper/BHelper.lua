@@ -13,7 +13,15 @@ BHelper._event_frame:RegisterEvent('PLAYER_CONTROL_GAINED')
 BHelper._event_frame:RegisterEvent('PLAYER_TARGET_CHANGED')
 
 function BHelper:PLAYER_LOGIN()
-    BHelper.core:init()
+    BHelper.auras:namespace_init()
+    BHelper.core:namespace_init()
+    BHelper.keybinds:namespace_init()
+    BHelper.modules:namespace_init()
+    BHelper.pet:namespace_init()
+    BHelper.player:namespace_init()
+    BHelper.target:namespace_init()
+    BHelper.threat:namespace_init()
+
     BHelper.core:reload()
 
     BHelper.timers:create(BHelper.core:get_update_time(), function()
@@ -30,6 +38,7 @@ function BHelper:PLAYER_LOGIN()
     end, 'main_execute', true)
 
     BHelper:create_state_frame()
+
     -- if ((not BHelperDBIcons) or (type(BHelperDBIcons) ~= 'table')) then BHelperDBIcons = {} end
     -- for i = 1, GetNumMacroIcons() do BHelperDBIcons[i] = GetMacroIconInfo(i) end
 end
@@ -54,13 +63,13 @@ function BHelper:ACTIVE_TALENT_GROUP_CHANGED()
 end
 
 function BHelper:PLAYER_REGEN_DISABLED()
-    self.vars._combat_state = true
-    self.core:start()
+    BHelper.player._combat_state = true
+    BHelper.core:start()
 end
 
 function BHelper:PLAYER_REGEN_ENABLED()
-    self.vars._combat_state = false
-    self.core:stop()
+    BHelper.player._combat_state = false
+    BHelper.core:stop()
 end
 
 function BHelper:PLAYER_CONTROL_LOST()
@@ -115,6 +124,6 @@ end
 function BHelper:init()
     self.vars = {}
     self.vars._player = {}
-    self.vars._combat_state = false
+
 end
 BHelper:init()

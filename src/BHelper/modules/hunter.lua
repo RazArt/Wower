@@ -39,6 +39,7 @@ function BHelper.modules.hunter.default:init()
     keybinds:bind_spell('Зов дикой природы')
     keybinds:bind_item('Зов берсерка')
     keybinds:bind_item('Знак превосходства')
+
     keybinds:bind_macro('Перенаправление')
     keybinds:bind_macro('ManaTV', 'BUTTON5')
 end
@@ -113,7 +114,7 @@ function BHelper.modules.hunter.default:rotation_single()
             return keybinds:show_spell('Убийственный выстрел')
         end
 
-        if ((player:check_burst_mode()) and (not BHelper.vars.cooldown_berserker)) then
+        if ((player:check_burst_mode()) and (not self.burst_cooldown)) then
             if ((player:check_equipped_item('Зов берсерка')) and
                 (player:can_use_item('Зов берсерка'))) then
                 return keybinds:show_item('Зов берсерка')

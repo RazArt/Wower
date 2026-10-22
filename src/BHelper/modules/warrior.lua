@@ -110,7 +110,7 @@ function BHelper.modules.warrior.default:rotation()
         return keybinds:show_spell('Кровавая ярость')
     end
 
-    if ((player:check_burst_mode()) and (not BHelper.vars.cooldown_berserker)) then
+    if ((player:check_burst_mode()) and (not self.burst_cooldown)) then
         if ((player:can_cast('Безрассудство'))) then
             return keybinds:show_spell('Безрассудство')
         end

@@ -1,5 +1,29 @@
 BHelper.modules = {}
 
+local auras = {}
+local core = {}
+local keybinds = {}
+local macros = {}
+local modules = {}
+local pet = {}
+local player = {}
+local target = {}
+local threat = {}
+local timers = {}
+
+function BHelper.modules:namespace_init()
+    auras = BHelper.auras
+    core = BHelper.core
+    keybinds = BHelper.keybinds
+    macros = BHelper.macros
+    modules = BHelper.modules
+    pet = BHelper.pet
+    player = BHelper.player
+    target = BHelper.target
+    threat = BHelper.threat
+    timers = BHelper.timers
+end
+
 function BHelper.modules:module(profiles)
     profiles = profiles or {}
     local obj = {}
@@ -12,8 +36,6 @@ function BHelper.modules:module(profiles)
 
         profile.settings = {}
         profile.vars = {}
-        profile.player_auras = {}
-        profile.target_auras = {}
 
         profile._event_frame = CreateFrame('Frame')
         profile._event_frame:SetScript('OnEvent', function(_, event, ...)
@@ -21,56 +43,51 @@ function BHelper.modules:module(profiles)
         end)
 
         function profile:register_event(event)
-            self._event_frame:RegisterEvent(event)
+            profile._event_frame:RegisterEvent(event)
         end
     end
 
     function obj:_init()
-        BHelper.core:print('_init')
+        core:print('_init')
 
-        local module = BHelper.core.module:get()
-        local profile = BHelper.core.profile:get()
+        if ((core.module:get()) and (core.module:get().init)) then core.module:get():init() end
+        if ((core.profile:get()) and (core.profile:get().init)) then core.profile:get():init() end
 
-        if ((module) and (module.init)) then module:init() end
-        if ((profile) and (profile.init)) then profile:init() end
-
-        if ((profile) and (profile.settings.type ~= 'heal') and (profile.settings.type ~= 'craft')) then
-            BHelper.keybinds:bind_macro('Target')
-            BHelper.keybinds:bind_macro('Stop')
-            BHelper.keybinds:bind_macro('PetAttack')
-            BHelper.keybinds:bind_macro('PetFollow')
+        if ((core.profile:get()) and (core.profile:get().settings.type ~= 'heal') and
+            (core.profile:get().settings.type ~= 'craft')) then
+            keybinds:bind_macro('Target')
+            keybinds:bind_macro('Stop')
+            keybinds:bind_macro('PetAttack')
+            keybinds:bind_macro('PetFollow')
         end
     end
 
     function obj:_macros()
-        BHelper.core:print('_macros')
+        core:print('_macros')
 
-        local module = BHelper.core.module:get()
-        local profile = BHelper.core.profile:get()
-
-        if ((module) and (module.macros)) then module:macros() end
-        if ((profile) and (profile.macros)) then profile:macros() end
+        if ((core.module:get()) and (core.module:get().macros)) then core.module:get():macros() end
+        if ((core.profile:get()) and (core.profile:get().macros)) then core.profile:get():macros() end
     end
 
     function obj:_execute()
         local stop_flag = false
-        local module = BHelper.core.module:get()
-        local profile = BHelper.core.profile:get()
-        local action = BHelper.core.action:get()
 
-        if (BHelper.player:spell_is_targeting()) then BHelper.keybinds:show_click() end
+        if (player:spell_is_targeting()) then keybinds:show_click() end
 
-        if ((not stop_flag) and (profile.settings.type ~= 'heal') and (profile.settings.type ~= 'craft')) then
-            if (not BHelper.player:can_target_attack()) then
-                stop_flag = BHelper.keybinds:show_macro('Target')
-            elseif ((BHelper.pet:check_control()) and (BHelper.pet:can_target_attack())) then
-                BHelper.keybinds:show_pet('Attack')
+        if ((not stop_flag) and (core.profile:get().settings.type == 'battle')) then
+            if (not player:can_target_attack()) then
+                stop_flag = keybinds:show_macro('Target')
+            elseif ((pet:check_control()) and (pet:can_target_attack())) then
+                keybinds:show_pet('Attack')
             end
         end
-        if ((not stop_flag) and (module) and (module.execute)) then stop_flag = module:execute() end
-        if ((not stop_flag) and (profile) and (profile.execute)) then stop_flag = profile:execute() end
-        if ((not stop_flag) and (action)) then action(profile) end
-
+        if ((not stop_flag) and (core.module:get()) and (core.module:get().execute)) then
+            stop_flag = core.module:get():execute()
+        end
+        if ((not stop_flag) and (core.profile:get()) and (core.profile:get().execute)) then
+            stop_flag = core.profile:get():execute()
+        end
+        if ((not stop_flag) and (core.action:get())) then core.action:get()(core.profile:get()) end
     end
     return obj
 end

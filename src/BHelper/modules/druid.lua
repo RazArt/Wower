@@ -126,7 +126,7 @@ function BHelper.modules.druid.default:execute()
         return keybinds:show_spell('Попятиться')
     end
 
-    if (player:check_burst_mode() and (not BHelper.vars.cooldown_berserker)) then
+    if (player:check_burst_mode() and (not self.burst_cooldown)) then
         if (player:aura('Облик лютого медведя') > 0) and (player:can_cast('Берсерк')) then
             return keybinds:show_spell('Берсерк')
         end
