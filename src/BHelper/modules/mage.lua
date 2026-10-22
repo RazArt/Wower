@@ -74,7 +74,7 @@ function BHelper.modules.mage.default:execute()
         return BHelper.keybinds:show_spell('Ледяная глыба')
     end
 
-    if ((BHelper.player:get_aura_time('Невидимость') > 0)) then return true end
+    if ((BHelper.auras:player('Невидимость') > 0)) then return true end
 
     if ((BHelper.target:player_on_target()) and (BHelper.player:can_cast('Невидимость')) and
         (not BHelper.target:is_player())) then return BHelper.keybinds:show_macro('Невидимость авто') end
@@ -93,14 +93,14 @@ function BHelper.modules.mage.default:execute()
     --     return BHelper.keybinds:show_spell('Сотворение самоцвета маны')
     -- end
 
-    -- if ((BHelper.player:get_aura_time('Чародейская гениальность') == 0) and
-    --     (BHelper.player:get_aura_time(
+    -- if ((BHelper.auras:player('Чародейская гениальность') == 0) and
+    --     (BHelper.auras:player(
     --         'Чародейская гениальность Даларана') == 0) and
     --     (BHelper.player:can_cast('Чародейская гениальность'))) then
     --     return BHelper.keybinds:show_spell('Чародейская гениальность')
     -- end
 
-    -- if ((BHelper.player:get_aura_time('Раскаленный доспех') == 0) and
+    -- if ((BHelper.auras:player('Раскаленный доспех') == 0) and
     --     (BHelper.player:can_cast('Раскаленный доспех'))) then
     --     UseEquipmentSet('BUFF')
     --     return BHelper.keybinds:show_spell('Раскаленный доспех')
@@ -109,28 +109,28 @@ function BHelper.modules.mage.default:execute()
 end
 
 function BHelper.modules.mage.default:rotation_single()
-    if ((BHelper.player:get_aura_time('Невидимость') > 0)) then return true end
+    if ((BHelper.auras:player('Невидимость') > 0)) then return true end
 
     if (BHelper.target:check_cast() and (self.vars.silence) and (BHelper.player:can_cast_on_enemy('Антимагия'))) then
         return BHelper.keybinds:show_spell('Антимагия')
     end
 
     if ((not BHelper.player:check_equipped_item('Трупное окоченение')) and
-        (BHelper.player:get_aura_time('Черная магия') > 0)) then return BHelper.player:equip_set('MAIN') end
+        (BHelper.auras:player('Черная магия') > 0)) then return BHelper.player:equip_set('MAIN') end
 
-    if ((BHelper.player:get_aura_time('Путь огня') > 0) and
+    if ((BHelper.auras:player('Путь огня') > 0) and
         (BHelper.player:can_cast_on_enemy('Огненная глыба'))) then
         return BHelper.keybinds:show_spell('Огненная глыба')
     end
 
-    if ((BHelper.target:get_aura_time('Живая бомба', true) == 0) and (not BHelper.player:check_heroism_buff()) and
+    if ((BHelper.auras:target('Живая бомба', true) == 0) and (not BHelper.player:check_heroism_buff()) and
         ((BHelper.target:get_name() ~= 'Принц Келесет')) and
         (BHelper.player:can_cast_on_enemy('Живая бомба'))) then
         return BHelper.keybinds:show_spell('Живая бомба')
     end
 
-    if ((BHelper.target:get_aura_time('Улучшенный ожог') == 0) and
-        (BHelper.target:get_aura_time('Власть над Тенями') == 0) and (not BHelper.player:check_moving()) and
+    if ((BHelper.auras:target('Улучшенный ожог') == 0) and
+        (BHelper.auras:target('Власть над Тенями') == 0) and (not BHelper.player:check_moving()) and
         (self.vars.can_cast_scorch) and (self.vars.scorch) and (BHelper.player:can_cast_on_enemy('Ожог'))) then
         return BHelper.keybinds:show_spell('Ожог')
     end
@@ -140,8 +140,7 @@ function BHelper.modules.mage.default:rotation_single()
             return BHelper.keybinds:show_spell('Зеркальное изображение')
         end
 
-        if ((BHelper.player:get_aura_time('Возгорание') == 0) and
-            (BHelper.player:can_cast('Возгорание'))) then
+        if ((BHelper.auras:player('Возгорание') == 0) and (BHelper.player:can_cast('Возгорание'))) then
             return BHelper.keybinds:show_spell('Возгорание')
         end
 

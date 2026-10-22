@@ -68,19 +68,19 @@ function BHelper.modules.warrior.default:rotation()
         return BHelper.keybinds:show_spell('Безудержное восстановление')
     end
 
-    if ((BHelper.target:get_aura_time('Деморализующий крик') == 0) and (self.vars.demoralizing_shout) and
+    if ((BHelper.auras:target('Деморализующий крик') == 0) and (self.vars.demoralizing_shout) and
         (BHelper.player:can_cast('Деморализующий крик'))) then
         return BHelper.keybinds:show_spell('Деморализующий крик')
     end
 
-    if ((BHelper.player:get_aura_time('Боевой крик') == 0) and
-        (BHelper.player:get_aura_time('Благословение могущества') == 0) and
-        (BHelper.player:get_aura_time('Великое благословение могущества') == 0) and
+    if ((BHelper.auras:player('Боевой крик') == 0) and
+        (BHelper.auras:player('Благословение могущества') == 0) and
+        (BHelper.auras:player('Великое благословение могущества') == 0) and
         (self.vars.battle_shout) and (BHelper.player:can_cast('Боевой крик'))) then
         return BHelper.keybinds:show_spell('Боевой крик')
     end
 
-    if ((BHelper.player:get_aura_time('Командирский крик') == 0) and (self.vars.commanding_shout) and
+    if ((BHelper.auras:player('Командирский крик') == 0) and (self.vars.commanding_shout) and
         (BHelper.player:can_cast('Командирский крик'))) then
         return BHelper.keybinds:show_spell('Командирский крик')
     end
@@ -121,7 +121,7 @@ function BHelper.modules.warrior.default:rotation()
     end
 
     if ((not BHelper.player:can_cast_on_enemy('Кровожадность', 1)) and
-        (BHelper.player:get_aura_time('Сокрушить!') > 0) and
+        (BHelper.auras:player('Сокрушить!') > 0) and
         (BHelper.player:can_cast_on_enemy('Мощный удар'))) then
         return BHelper.keybinds:show_spell('Мощный удар')
     end
@@ -134,7 +134,7 @@ function BHelper.modules.warrior.default:rotation()
         (BHelper.player:can_cast_on_enemy('Казнь'))) then return BHelper.keybinds:show_spell('Казнь') end
 
     if ((not BHelper.player:can_cast_on_enemy('Кровожадность', 1)) and
-        ((BHelper.target:get_aura_time('Раскол брони') <= 5) or
+        ((BHelper.auras:target('Раскол брони') <= 5) or
             (BHelper.target:get_aura_count('Раскол брони') < 5)) and
         (BHelper.player:can_cast_on_enemy('Раскол брони'))) then
         return BHelper.keybinds:show_spell('Раскол брони')
@@ -247,19 +247,19 @@ function BHelper.modules.warrior.proto:rotation()
     end
 
     if (not BHelper.player:check_low_threat()) then
-        if ((BHelper.target:get_aura_time('Деморализующий крик') < 2) and
+        if ((BHelper.auras:target('Деморализующий крик') < 2) and
             (BHelper.player:check_spell_range('Сокрушение')) and
             (BHelper.player:can_cast('Деморализующий крик'))) then
             return BHelper.keybinds:show_spell('Деморализующий крик')
         end
 
-        if ((BHelper.target:get_aura_time('Удар грома') < 2) and
+        if ((BHelper.auras:target('Удар грома') < 2) and
             (BHelper.player:check_spell_range('Сокрушение')) and
             (BHelper.player:can_cast('Удар грома'))) then
             return BHelper.keybinds:show_spell('Удар грома')
         end
 
-        if ((BHelper.player:get_aura_time('Командирский крик') == 0) and (self.vars.commanding_shout) and
+        if ((BHelper.auras:player('Командирский крик') == 0) and (self.vars.commanding_shout) and
             (BHelper.player:can_cast('Командирский крик'))) then
             return BHelper.keybinds:show_spell('Командирский крик')
         end
@@ -392,19 +392,19 @@ function BHelper.modules.warrior.proto_farm:rotation()
     end
 
     if (not BHelper.player:check_low_threat()) then
-        if ((BHelper.target:get_aura_time('Деморализующий крик') < 2) and
+        if ((BHelper.auras:target('Деморализующий крик') < 2) and
             (BHelper.player:check_spell_range('Сокрушение')) and
             (BHelper.player:can_cast('Деморализующий крик'))) then
             return BHelper.keybinds:show_spell('Деморализующий крик')
         end
 
-        if ((BHelper.target:get_aura_time('Удар грома') < 2) and
+        if ((BHelper.auras:target('Удар грома') < 2) and
             (BHelper.player:check_spell_range('Сокрушение')) and
             (BHelper.player:can_cast('Удар грома'))) then
             return BHelper.keybinds:show_spell('Удар грома')
         end
 
-        if ((BHelper.player:get_aura_time('Командирский крик') == 0) and (self.vars.commanding_shout) and
+        if ((BHelper.auras:player('Командирский крик') == 0) and (self.vars.commanding_shout) and
             (BHelper.player:can_cast('Командирский крик'))) then
             return BHelper.keybinds:show_spell('Командирский крик')
         end
@@ -412,7 +412,7 @@ function BHelper.modules.warrior.proto_farm:rotation()
 
     BHelper.keybinds:bind_spell('Кровопускание')
 
-    if ((BHelper.target:get_aura_time('Кровопускание') == 0) and
+    if ((BHelper.auras:target('Кровопускание') == 0) and
         (BHelper.player:can_cast_on_enemy('Кровопускание'))) then
         return BHelper.keybinds:show_spell('Кровопускание')
     end

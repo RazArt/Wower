@@ -10,7 +10,7 @@ end
 
 function BHelper.auras:_get(unit_id, aura, cast_by_player)
     unit_id = string.lower(unit_id)
-    aura = string.lower(aura)
+    aura = (type(aura) == 'string') and string.lower(aura) or aura
 
     if (not self._auras[unit_id][aura]) then return 0, 0 end
     if ((cast_by_player) and (not self._auras[unit_id][aura].cast_by_player)) then return 0, 0 end

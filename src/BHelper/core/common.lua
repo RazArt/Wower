@@ -328,14 +328,6 @@ function BHelper.player:get_power_max()
     return UnitPowerMax('player') or 0
 end
 
-function BHelper.player:get_aura_time(spell, players_aura)
-    return (select(1, BHelper:_get_aura_info('player', spell, players_aura)))
-end
-
-function BHelper.player:get_aura_count(spell, players_aura)
-    return (select(2, BHelper:_get_aura_info('player', spell, players_aura)))
-end
-
 function BHelper.player:check_combo_points(count)
     return (GetComboPoints('player', 'target') >= count)
 end
@@ -406,11 +398,11 @@ function BHelper.player:can_target_attack()
     if (UnitIsDeadOrGhost('player')) then return false end
     if (not UnitCanAttack('player', 'target')) then return false end
 
-    if (BHelper.target:get_aura_time('Спячка') > 0) then return false end
-    if (BHelper.target:get_aura_time('Смерч') > 0) then return false end
-    if (BHelper.target:get_aura_time('Превращение') > 0) then return false end
-    if (BHelper.target:get_aura_time('Страх') > 0) then return false end
-    if (BHelper.target:get_aura_time('Ослепление') > 0) then return false end
+    if (BHelper.auras:target('Спячка') > 0) then return false end
+    if (BHelper.auras:target('Смерч') > 0) then return false end
+    if (BHelper.auras:target('Превращение') > 0) then return false end
+    if (BHelper.auras:target('Страх') > 0) then return false end
+    if (BHelper.auras:target('Ослепление') > 0) then return false end
 
     local target_name = BHelper.target:get_name()
     if (target_name == 'Дарнаван') then return false end
@@ -420,7 +412,7 @@ function BHelper.player:can_target_attack()
     -- if (target_name == 'Темное ядро') then return false end
     -- if (((target_name == 'Принц Валанар') or (target_name == 'Принц Келесет') or
     --     (target_name == 'Принц Талдарам')) and (BHelper.target:get_health() == 1) and
-    --     (BHelper.player:get_aura_time('Перенаправление') == 0)) then return false end
+    --     (BHelper.auras:player('Перенаправление') == 0)) then return false end
 
     return true
 end
@@ -449,11 +441,8 @@ function BHelper.player:get_spell_cooldown(spellname)
 end
 
 function BHelper.player:check_spell_on_cooldown(spellname, check_time)
-    if ((check_time) and (check_time > 0.2)) then
-        check_time = check_time - 0.2
-    else
-        check_time = 0.2
-    end
+    check_time = check_time or 0.2
+    check_time = (check_time > 0.2) and (check_time - 0.2) or 0.2
 
     local cd = BHelper.player:get_spell_cooldown(spellname)
     return (cd > check_time) and true or false
@@ -505,15 +494,9 @@ function BHelper.player:check_low_threat(limit)
     return false
 end
 
-function BHelper.player:check_focus_treat()
-    local treat_level = UnitThreatSituation('focus', 'target')
-    if ((treat_level) and (treat_level < 3)) then return true end
-    return false
-end
-
 function BHelper.player:check_heroism_buff()
-    if (BHelper.player:get_aura_time('Героизм') > 0) then return true end
-    if (BHelper.player:get_aura_time('Жажда крови') > 0) then return true end
+    if (BHelper.auras:player('Героизм') > 0) then return true end
+    if (BHelper.auras:player('Жажда крови') > 0) then return true end
     return false
 end
 
@@ -538,7 +521,7 @@ function BHelper.pet:can_target_attack()
     if (target_name == 'Зловещий дух') then return false end
     if (target_name == 'Волдырный зомби') then return false end
     if ((target_name == 'Имирьярская повелительница льда') and
-        (BHelper.target:get_aura_time('Арктический холод') > 0)) then return false end
+        (BHelper.auras:target('Арктический холод') > 0)) then return false end
 
     return true
 end
@@ -610,20 +593,6 @@ function BHelper.target:should_evade()
     return true
 end
 
-function BHelper.target:get_aura_info(spell, players_aura)
-    local aura_info = {}
-    aura_info.time, aura_info.count = BHelper:_get_aura_info('target', spell, players_aura)
-    return aura_info
-end
-
-function BHelper.target:get_aura_time(spell, players_aura)
-    return (select(1, BHelper:_get_aura_info('target', spell, players_aura)))
-end
-
-function BHelper.target:get_aura_count(spell, players_aura)
-    return (select(2, BHelper:_get_aura_info('target', spell, players_aura)))
-end
-
 function BHelper.target:check_cast()
     if (UnitCastingInfo('target')) then return true end
     if (UnitChannelInfo('target')) then return true end
@@ -648,31 +617,6 @@ function BHelper.target:check_moving()
     if (GetUnitSpeed('target') > 0) then return true end
     return false
 end
-
--- function BHelper:_get_aura_info(unit, spell, players_aura)
---     unit = (unit) and string.lower(unit) or ''
---     spell = (type(spell) == 'string') and string.lower(spell) or spell
---     players_aura = (players_aura) and '|PLAYER' or ''
-
---     for _, val in pairs({'HARMFUL' .. players_aura, 'HELPFUL' .. players_aura}) do
---         for i = 1, 100 do
---             local name, _, _, count, _, _, expiration_time, _, _, _, spell_id = UnitAura(unit, i, val)
---             if (name == nil) then break end
---             if (((type(spell) == 'string') and (spell == string.lower(name))) or
---                 ((type(spell) == 'number') and (spell == spell_id))) then
---                 if (expiration_time == 0) then
---                     expiration_time = 99999
---                 elseif (expiration_time == nil) then
---                     expiration_time = 0
---                 else
---                     expiration_time = expiration_time - GetTime()
---                 end
---                 return expiration_time, count
---             end
---         end
---     end
---     return 0, 0
--- end
 
 function BHelper:get_bag_free_slots()
     local free_slots_count = 0
