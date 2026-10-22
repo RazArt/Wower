@@ -11,11 +11,12 @@ BHelper._event_frame:RegisterEvent('PLAYER_REGEN_ENABLED')
 BHelper._event_frame:RegisterEvent('UI_ERROR_MESSAGE')
 BHelper._event_frame:RegisterEvent('PLAYER_CONTROL_LOST')
 BHelper._event_frame:RegisterEvent('PLAYER_CONTROL_GAINED')
+BHelper._event_frame:RegisterEvent('PLAYER_TARGET_CHANGED')
 
 function BHelper:PLAYER_LOGIN()
     self:create_state_frame()
     self.core:reload()
-    print(234235235777)
+
     -- if ((not BHelperDBIcons) or (type(BHelperDBIcons) ~= 'table')) then BHelperDBIcons = {} end
     -- for i = 1, GetNumMacroIcons() do BHelperDBIcons[i] = GetMacroIconInfo(i) end
 end
@@ -64,6 +65,10 @@ end
 
 function BHelper:PLAYER_CONTROL_GAINED()
     self._cooldown = false
+end
+
+function BHelper:PLAYER_TARGET_CHANGED()
+    BHelper.target._name = (select(1, UnitName('target'))) or ''
 end
 
 function BHelper:commands(msg)

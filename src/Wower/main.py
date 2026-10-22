@@ -1,6 +1,7 @@
 import win32gui
 import win32api
 import win32con
+import keyboard
 from time import sleep
 
 
@@ -51,12 +52,14 @@ while True:
     try:
         pixel_color = get_pixels_color(hWnd_wow)
         if (pixel_color[0] == (31, 11, 12)):
-            for i in range(1, 6):
-                if (pixel_color[i][0] == 44):
-                    key_send(hWnd_wow, pixel_color[i][1], pixel_color[i][2])
+            if ((not keyboard.is_pressed(42)) and (not keyboard.is_pressed(56))
+                    and (not keyboard.is_pressed(29))):
+                for i in range(1, 6):
+                    if (pixel_color[i][0] == 44):
+                        key_send(hWnd_wow, pixel_color[i][1], pixel_color[i][2])
 
-                if (pixel_color[i][0] == 56):
-                    click_send(hWnd_wow)
+                    if (pixel_color[i][0] == 56):
+                        click_send(hWnd_wow)
     except:
         hWnd_wow = win32gui.FindWindow(None, 'World of Warcraft')
 

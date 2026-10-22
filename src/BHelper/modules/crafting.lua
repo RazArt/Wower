@@ -9,6 +9,12 @@
 -- -- 34057 Кристалл пропасти
 -- -- 38426 Этерниевая нить
 -- -- 33470 Ледяная ткань
+function BHelper:get_bag_free_slots()
+    local free_slots_count = 0
+    for bag_num = 0, 4 do free_slots_count = free_slots_count + (select(1, GetContainerNumFreeSlots(bag_num))) end
+    return free_slots_count
+end
+
 function BHelper.modules.crafting.common:init()
     self.settings.type = 'craft'
 

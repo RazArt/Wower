@@ -247,7 +247,6 @@ end
 function BHelper.modules.deathknight.fdk:macros()
     BHelper.macros:create('Заморозка разумаTV',
                           '#showtooltip Заморозка разума\n/bh tv silence', 41)
-
     BHelper.macros:create('Кровоотвод',
                           '#showtooltip\n/bh c\n/cancelaura Кровоотвод\n/cast Кровоотвод', 7)
     BHelper.macros:create('Несокрушимая броня',

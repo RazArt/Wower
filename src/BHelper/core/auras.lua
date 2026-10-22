@@ -12,6 +12,8 @@ function BHelper.auras:_get(unit_id, aura, cast_by_player)
     unit_id = string.lower(unit_id)
     aura = (type(aura) == 'string') and string.lower(aura) or aura
 
+    if (not self._auras) then return 0, 0 end
+    if (not self._auras[unit_id]) then return 0, 0 end
     if (not self._auras[unit_id][aura]) then return 0, 0 end
 
     if ((cast_by_player) and (self._auras[unit_id][aura][true])) then
@@ -26,6 +28,11 @@ function BHelper.auras:_get(unit_id, aura, cast_by_player)
 end
 
 function BHelper.auras:update()
+    wipe(self._auras)
+
+    if (not BHelper.vars._combat_state) then return false end
+    if (not BHelper.player:can_target_attack()) then return false end
+
     for _, unit_id in pairs({'player', 'target'}) do
         self._auras[unit_id] = {}
         for _, filter in pairs({'HARMFUL', 'HELPFUL'}) do

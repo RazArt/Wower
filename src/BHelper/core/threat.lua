@@ -4,6 +4,7 @@ function BHelper.threat:update()
     self.first_unit_GUID = ''
     self.second_unit_GUID = ''
     self.second_unit_treat = 0
+    wipe(self._list)
 
     if (not BHelper.vars._combat_state) then return false end
     if (not BHelper.player:can_target_attack()) then return false end
@@ -11,10 +12,8 @@ function BHelper.threat:update()
     local is_party = GetNumPartyMembers() > 0
     local is_raid = GetNumRaidMembers() > 0
 
-    wipe(self._list)
-
     local player_GUID = BHelper.player:get_GUID()
-    local player_pet_GUID = BHelper.player:get_pet_GUID()
+    local player_pet_GUID = BHelper.pet:get_GUID()
 
     if player_GUID then table.insert(self._list, {'player', player_GUID}) end
     if player_pet_GUID then table.insert(self._list, {'pet', player_pet_GUID}) end
