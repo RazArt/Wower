@@ -64,7 +64,8 @@ function BHelper.modules.mage.default:macros()
     macros:create('Ледяная глыба',
                   '#showtooltip\n/bh c\n/stopcasting\n/cancelaura Ледяная глыба\n/cast Ледяная глыба',
                   10)
-    macros:create('Невидимость', '#showtooltip Невидимость\n/bh c\n/cast Невидимость',
+    macros:create('Невидимость',
+                  '#showtooltip\n/bh c\n/stopcasting\n/cancelaura Невидимость\n/cast Невидимость',
                   11)
     macros:create('Невидимость авто',
                   '#showtooltip Невидимость\n/cast Невидимость\n/bh c 1')
@@ -84,9 +85,8 @@ function BHelper.modules.mage.default:execute()
 
     if (player:aura('Невидимость') > 0) then return true end
 
-    if ((target:player_on_target()) and (player:can_cast('Невидимость')) and (not target:is_player())) then
-        return keybinds:show_macro('Невидимость авто')
-    end
+    if ((not player:check_safety_threat(95)) and (player:can_cast('Невидимость')) and
+        (not target:is_player())) then return keybinds:show_macro('Невидимость авто') end
 
     if ((player:get_mana_on_percent() < 80) and (player:can_use_item('Сапфир маны'))) then
         return keybinds:show_item('Сапфир маны')
@@ -123,8 +123,9 @@ function BHelper.modules.mage.default:rotation_single()
     end
 
     if ((target:aura('Улучшенный ожог') == 0) and (target:aura('Власть над Тенями') == 0) and
-        (not player:check_moving()) and (self.can_cast_scorch) and (self.vars.scorch) and
-        (player:can_cast_on_enemy('Ожог'))) then return keybinds:show_spell('Ожог') end
+        (self.can_cast_scorch) and (self.vars.scorch) and (player:can_cast_on_enemy('Ожог'))) then
+        return keybinds:show_spell('Ожог')
+    end
 
     if ((player:check_burst_mode()) and (not self.burst_cooldown)) then
         if (player:can_cast('Зеркальное изображение')) then
@@ -150,17 +151,17 @@ function BHelper.modules.mage.default:rotation_single()
         return keybinds:show_item('Освященные перчатки волшебника крови')
     end
 
-    if ((not player:check_moving()) and (player:can_cast_on_enemy('Огненный шар'))) then
+    if (player:can_cast_on_enemy('Огненный шар')) then
         return keybinds:show_spell('Огненный шар')
     end
 
-    if ((not player:check_moving()) and (player:can_cast_on_enemy('Огненный взрыв'))) then
+    if (player:can_cast_on_enemy('Огненный взрыв')) then
         return keybinds:show_spell('Огненный взрыв')
     end
 end
 
 function BHelper.modules.mage.default:rotation_multiple()
-    if ((not player:check_moving()) and (player:can_cast_on_point('Огненный столб'))) then
+    if (player:can_cast_on_point('Огненный столб')) then
         return keybinds:show_spell('Огненный столб')
     end
 end

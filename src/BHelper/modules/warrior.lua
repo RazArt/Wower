@@ -142,8 +142,7 @@ function BHelper.modules.warrior.default:rotation()
         return keybinds:show_spell('Казнь')
     end
 
-    if (select(2, target:aura('Раскол брони', true)) < 5) and
-        (player:can_cast_on_enemy('Раскол брони')) then
+    if ((target:aura_count('Раскол брони') < 5) and (player:can_cast_on_enemy('Раскол брони'))) then
         return keybinds:show_spell('Раскол брони')
     end
 end
@@ -242,7 +241,7 @@ function BHelper.modules.warrior.proto:rotation()
         return keybinds:show_spell('Кровавая ярость')
     end
 
-    if ((self.vars.attack_type == '1') and (player:check_low_threat()) and (target:is_boss()) and
+    if ((self.vars.attack_type == '1') and (player:check_stable_threat()) and (target:is_boss()) and
         (player:can_cast_on_enemy('Героический бросок'))) then
         return keybinds:show_spell('Героический бросок')
     end
@@ -250,7 +249,7 @@ function BHelper.modules.warrior.proto:rotation()
     if (((self.vars.attack_type == '2')) and (player:check_spell_range('Сокрушение')) and
         (player:can_cast('Удар грома'))) then return keybinds:show_spell('Удар грома') end
 
-    if (not player:check_low_threat()) then
+    if (not player:check_stable_threat()) then
         if ((target:aura('Деморализующий крик') < 2) and
             (player:check_spell_range('Сокрушение')) and
             (player:can_cast('Деморализующий крик'))) then
@@ -272,7 +271,7 @@ function BHelper.modules.warrior.proto:rotation()
         return keybinds:show_spell('Мощный удар щитом')
     end
 
-    if (((self.vars.attack_type == '2') or (player:check_low_threat())) and (player:can_cast('Блок щитом'))) then
+    if (((self.vars.attack_type == '2') or (player:check_stable_threat())) and (player:can_cast('Блок щитом'))) then
         return keybinds:show_spell('Блок щитом')
     end
 

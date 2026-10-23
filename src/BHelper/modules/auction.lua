@@ -37,7 +37,7 @@ end
 function BHelper.modules.auction.common:step_2()
     if (not self.vars.open) then BHelper.core.action:set('step_1') end
 
-    if (select(1, CanSendAuctionQuery()) == 1) then
+    if (CanSendAuctionQuery() == 1) then
         QueryAuctionItems(self.vars.item_list[self.vars.item_num][1], 0, 0, 0, 0, 0, self.vars.page, false, 0, 0)
         BHelper.core.action:set('step_3')
         BHelper.core:add_cooldown(1)
@@ -52,7 +52,7 @@ function BHelper.modules.auction.common:step_3()
     if (not self.vars.open) then BHelper.core.action:set('step_1') end
 
     if (self.vars.list_updated == true) then
-        local batch = select(1, GetNumAuctionItems('list'))
+        local batch = GetNumAuctionItems('list')
         self.vars.list_updated = false
         self.vars.lot_index = batch
         if (batch > 0) then

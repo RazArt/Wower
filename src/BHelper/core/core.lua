@@ -30,11 +30,10 @@ function BHelper.core:namespace_init()
 end
 
 function BHelper.core:start()
-    if ((core.profile:get().settings.only_combat_start) and (not player:check_combat_state()) and
-        (not target:enemy_on_combat())) then return end
+    if ((core.profile:get().settings.only_combat_start) and (not player:on_combat()) and (not target:on_combat())) then
+        return false
+    end
     if (player:is_mounted()) then return false end
-
-    auras:update()
 
     core.profile:get().burst_cooldown = true
     timers:create(2, function()

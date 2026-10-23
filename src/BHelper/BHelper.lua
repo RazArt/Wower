@@ -13,7 +13,6 @@ BHelper._event_frame:RegisterEvent('PLAYER_CONTROL_GAINED')
 BHelper._event_frame:RegisterEvent('PLAYER_TARGET_CHANGED')
 
 function BHelper:PLAYER_LOGIN()
-    BHelper.auras:namespace_init()
     BHelper.core:namespace_init()
     BHelper.keybinds:namespace_init()
     BHelper.modules:namespace_init()
@@ -24,17 +23,14 @@ function BHelper:PLAYER_LOGIN()
 
     BHelper.core:reload()
 
-    BHelper.timers:create(BHelper.core:get_update_time(), function()
-        BHelper.auras:update()
-    end, 'auras_update', true)
-
-    BHelper.timers:create(BHelper.core:get_update_time(), function()
+    BHelper.timers:create(0.5, function()
         BHelper.threat:update()
     end, 'threat_update', true)
 
     BHelper.timers:create(BHelper.core:get_update_time(), function()
-        local module = BHelper.core.module:get()
-        if ((module) and (BHelper.core:runing()) and (not BHelper.core:cooldown())) then module:_execute() end
+        if ((BHelper.core.module:get()) and (BHelper.core:runing()) and (not BHelper.core:cooldown())) then
+            BHelper.core.module:get():_execute()
+        end
     end, 'main_execute', true)
 
     BHelper:create_state_frame()
@@ -63,12 +59,10 @@ function BHelper:ACTIVE_TALENT_GROUP_CHANGED()
 end
 
 function BHelper:PLAYER_REGEN_DISABLED()
-    BHelper.player._combat_state = true
     BHelper.core:start()
 end
 
 function BHelper:PLAYER_REGEN_ENABLED()
-    BHelper.player._combat_state = false
     BHelper.core:stop()
 end
 
@@ -81,7 +75,7 @@ function BHelper:PLAYER_CONTROL_GAINED()
 end
 
 function BHelper:PLAYER_TARGET_CHANGED()
-    BHelper.target._name = (select(1, UnitName('target'))) or ''
+    BHelper.target._name = (UnitName('target')) or ''
 end
 
 function BHelper:commands(msg)

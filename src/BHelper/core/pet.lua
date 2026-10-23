@@ -45,6 +45,6 @@ end
 function BHelper.pet:check_control()
     if (not UnitExists('pet')) then return false end
     if (UnitIsDeadOrGhost('pet')) then return false end
-    if (select(1, UnitName('pet')) == 'Вепрь') then return false end
+    if (UnitName('pet') == 'Вепрь') then return false end
     return core.profile:get().vars.pet_control
 end

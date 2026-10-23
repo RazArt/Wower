@@ -177,7 +177,7 @@ function BHelper.modules.hunter.default:rotation_single()
         if ((not player:can_cast_on_enemy('Убийственный выстрел', ss_cast_time)) and
             (not player:can_cast_on_enemy('Выстрел химеры', ss_cast_time)) and
             (not player:can_cast_on_enemy('Прицельный выстрел', ss_cast_time)) and
-            (not player:check_moving()) and (player:can_cast_on_enemy('Верный выстрел'))) then
+            (player:can_cast_on_enemy('Верный выстрел'))) then
             return keybinds:show_spell('Верный выстрел')
         end
     else
@@ -192,12 +192,11 @@ function BHelper.modules.hunter.default:rotation_multiple()
         end
 
         if ((player:aura('Перенаправление') == 0) and
-            (player:can_cast_on_point('Бросок ловушки: взрывная ловушка')) and
-            (not player:check_moving())) then
+            (player:can_cast_on_point('Бросок ловушки: взрывная ловушка'))) then
             return keybinds:show_spell('Бросок ловушки: взрывная ловушка')
         end
 
-        if (player:can_cast_on_point('Град стрел') and (not player:check_moving())) then
+        if (player:can_cast_on_point('Град стрел')) then
             return keybinds:show_spell('Град стрел')
         end
     else
@@ -213,7 +212,7 @@ function BHelper.modules.hunter.default:mana_regeneration()
         return keybinds:show_spell('Выстрел химеры')
     end
 
-    if ((not player:check_moving()) and player:can_cast_on_enemy('Верный выстрел')) then
+    if (player:can_cast_on_enemy('Верный выстрел')) then
         return keybinds:show_spell('Верный выстрел')
     end
 end

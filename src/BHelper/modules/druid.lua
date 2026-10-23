@@ -122,7 +122,7 @@ function BHelper.modules.druid.default:execute()
         return keybinds:show_macro('Reform')
     end
 
-    if ((player:check_hight_threat()) and (not target:is_player()) and (player:can_cast('Попятиться'))) then
+    if ((not player:check_safety_threat()) and (not target:is_player()) and (player:can_cast('Попятиться'))) then
         return keybinds:show_spell('Попятиться')
     end
 
@@ -261,7 +261,7 @@ function BHelper.modules.druid.default:bear_single()
         return keybinds:show_spell('Устрашающий рев')
     end
 
-    if (((target:aura('Растерзать', true) <= 2) or (select(2, target:aura('Растерзать', true)) < 5)) and
+    if (((target:aura('Растерзать', true) <= 2) or (target:aura_count('Растерзать', true) < 5)) and
         (player:can_cast_on_enemy('Растерзать'))) then return keybinds:show_spell('Растерзать') end
 
     if (player:can_cast('Размах (медведь)')) then

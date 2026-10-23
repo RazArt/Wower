@@ -104,7 +104,7 @@ function BHelper.modules.deathknight.default:execute()
     if ((player:aura('Зимний горн') == 0) and (player:aura('Сила земли') == 0) and
         (player:can_cast('Зимний горн'))) then return keybinds:show_spell('Зимний горн') end
 
-    if ((player:check_low_threat()) and (player:can_cast('Кровоотвод'))) then
+    if ((not player:check_stable_threat()) and (player:can_cast('Кровоотвод'))) then
         return keybinds:show_spell('Кровоотвод')
     end
 end
@@ -115,12 +115,12 @@ function BHelper.modules.deathknight.default:rotation_single()
         return keybinds:show_spell('Ледяные оковы')
     end
 
-    if (((player:check_low_threat()) or (self.vars.opener) or (target:aura('Озноб', true) < 3)) and
+    if (((not player:check_stable_threat()) or (self.opener) or (target:aura('Озноб', true) < 3)) and
         (player:can_cast_on_enemy('Ледяное прикосновение'))) then
         return keybinds:show_spell('Ледяное прикосновение')
     end
 
-    if (((player:check_low_threat()) or (self.vars.opener)) and (target:is_boss()) and
+    if (((not player:check_stable_threat()) or (self.opener)) and (target:is_boss()) and
         (player:get_spell_cooldown('Ледяное прикосновение') > 3) and
         (player:can_cast('Усиление рунического оружия'))) then
         return keybinds:show_spell('Усиление рунического оружия')
@@ -135,7 +135,7 @@ function BHelper.modules.deathknight.default:rotation_single()
         return keybinds:show_spell('Кровавый удар')
     end
 
-    if ((not player:check_low_threat()) and (player:can_cast_on_enemy('Удар смерти'))) then
+    if ((player:check_stable_threat()) and (player:can_cast_on_enemy('Удар смерти'))) then
         return keybinds:show_spell('Удар смерти')
     end
 
@@ -145,7 +145,7 @@ function BHelper.modules.deathknight.default:rotation_single()
 end
 
 function BHelper.modules.deathknight.default:rotation_multiple()
-    if (((player:check_low_threat()) or (target:aura('Озноб', true) < 3)) and
+    if (((not player:check_stable_threat()) or (target:aura('Озноб', true) < 3)) and
         (player:can_cast_on_enemy('Ледяное прикосновение'))) then
         return keybinds:show_spell('Ледяное прикосновение')
     end
@@ -164,19 +164,13 @@ function BHelper.modules.deathknight.default:rotation_multiple()
         return keybinds:show_spell('Вскипание крови')
     end
 
-    if ((not player:check_low_threat()) and (player:can_cast_on_enemy('Удар смерти'))) then
+    if ((player:check_stable_threat()) and (player:can_cast_on_enemy('Удар смерти'))) then
         return keybinds:show_spell('Удар смерти')
     end
 
     if ((player:get_power() == 100) and (player:can_cast_on_enemy('Лик смерти'))) then
         return keybinds:show_spell('Лик смерти')
     end
-end
-
-function BHelper.modules.deathknight.default:death_ready_rune_count()
-    local count = 0
-    for i = 1, 6 do if (GetRuneType(i) == 4) then count = count + 1 end end
-    return count
 end
 
 function BHelper.modules.deathknight.default:check_blood_rune_cooldown()
@@ -200,9 +194,9 @@ function BHelper.modules.deathknight.default:start()
     self.vars.army_of_the_dead_timeout = true
     self.vars.pestilence_timeout = true
 
-    self.vars.opener = true
+    self.opener = true
     timers:create(20, function()
-        self.vars.opener = false
+        self.opener = false
     end, 'opener')
 end
 

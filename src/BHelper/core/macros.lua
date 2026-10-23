@@ -25,7 +25,7 @@ end
 function BHelper.macros:delete(name)
     name = name:lower()
     for i = 54, 1, -1 do
-        local macro_name = select(1, GetMacroInfo(i))
+        local macro_name = GetMacroInfo(i)
         if ((macro_name) and (macro_name == name)) then if (DeleteMacro(i)) then return true end end
     end
     return false

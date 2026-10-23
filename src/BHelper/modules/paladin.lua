@@ -49,10 +49,11 @@ function BHelper.modules.paladin.default:execute()
         return keybinds:show_spell('Благословение могущества')
     end
 
-    if ((player:get_health_on_percent() < 20) and (not player:check_moving()) and
-        player:can_cast('Вспышка Света')) then return keybinds:show_spell('Вспышка Света') end
+    if ((player:get_health_on_percent() < 20) and player:can_cast('Вспышка Света')) then
+        return keybinds:show_spell('Вспышка Света')
+    end
 
-    if ((player:get_health_on_percent() < 40) and (not player:check_moving()) and player:can_cast('Свет небес')) then
+    if ((player:get_health_on_percent() < 40) and player:can_cast('Свет небес')) then
         return keybinds:show_spell('Свет небес')
     end
 end
