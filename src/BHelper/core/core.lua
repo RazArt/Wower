@@ -10,6 +10,7 @@ local macros = {}
 local modules = {}
 local pet = {}
 local player = {}
+local tables = {}
 local target = {}
 local threat = {}
 local timers = {}
@@ -23,6 +24,7 @@ function BHelper.core:namespace_init()
     modules = BHelper.modules
     pet = BHelper.pet
     player = BHelper.player
+    tables = BHelper.tables
     target = BHelper.target
     threat = BHelper.threat
     timers = BHelper.timers
@@ -216,8 +218,7 @@ function BHelper.core:create_shared_macros()
     macros:create('Баджи',
                   '/script local function buy (n,q) for i=1,100 do if n==GetMerchantItemInfo(i) then BuyMerchantItem(i,q) end end end buy (\'Эмблема героизма\',80)',
                   0, 1374)
-    macros:create('LADY', '/cleartarget\n/equipset LADY', 26, 1545)
-    macros:create('PVE', '/cleartarget\n/equipset pve', 27, 199)
+    macros:create('LADY', '/cleartarget\n/equipset [noequipped:Оружие] pve; LADY', 26, 1545)
 
     macros:create('S', '/startattack\n/bh sa rotation_single\n/bh', 13, 1263)
     macros:create('M', '/startattack\n/bh sa rotation_multiple\n/bh', 14, 1264)

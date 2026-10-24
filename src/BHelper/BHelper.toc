@@ -6,6 +6,7 @@
 BHelper.lua
 
 core\core.lua
+core\tables.lua
 core\timers.lua
 core\auras.lua
 core\keybinds.lua
@@ -15,8 +16,6 @@ core\modules.lua
 core\player.lua
 core\pet.lua
 core\target.lua
-
-
 
 modules\druid.lua
 modules\hunter.lua

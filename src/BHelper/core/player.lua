@@ -7,6 +7,7 @@ local macros = {}
 local modules = {}
 local pet = {}
 local player = {}
+local tables = {}
 local target = {}
 local threat = {}
 local timers = {}
@@ -19,6 +20,7 @@ function BHelper.player:namespace_init()
     modules = BHelper.modules
     pet = BHelper.pet
     player = BHelper.player
+    tables = BHelper.tables
     target = BHelper.target
     threat = BHelper.threat
     timers = BHelper.timers
@@ -247,7 +249,7 @@ end
 
 function BHelper.player:check_stable_threat(limit)
     limit = limit or 80
-
+    -- return false
     if (not target:exist()) then return true end
     if (not player:check_party_or_raid()) then return true end
     if (threat:get_tank_GUID() ~= player:get_GUID()) then return false end
