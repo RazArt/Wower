@@ -98,7 +98,7 @@ end
 
 function BHelper.modules.crafting.common:craft_item(name)
     for i = GetNumTradeSkills(), 1, -1 do
-        if (select(2, GetTradeSkillInfo(i)) == "header") then ExpandTradeSkillSubClass(i) end
+        if (select(2, GetTradeSkillInfo(i)) == 'header') then ExpandTradeSkillSubClass(i) end
     end
     for i = 1, GetNumTradeSkills() do if (GetTradeSkillInfo(i) == name) then index = i end end
     if (index > 0) then if (select(3, GetTradeSkillInfo(index)) > 0) then DoTradeSkill(index) end end

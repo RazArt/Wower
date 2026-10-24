@@ -14,8 +14,8 @@ function BHelper.modules.mage.default:init()
     self.settings.type = 'battle'
     self.settings.only_combat_start = true
 
-    if (self.vars.silence == nil) then self.vars.silence = false end
-    if (self.vars.scorch == nil) then self.vars.scorch = true end
+    if (not self.vars.silence) then self.vars.silence = false end
+    if (not self.vars.scorch) then self.vars.scorch = true end
     self.can_cast_scorch = true
 
     keybinds:bind_spell('Антимагия')
@@ -79,27 +79,27 @@ function BHelper.modules.mage.default:macros()
 end
 
 function BHelper.modules.mage.default:execute()
-    if ((player:get_health_on_percent() < 20) and (player:can_cast('Ледяная глыба'))) then
+    if ((player:health_on_percent() < 20) and (player:can_cast('Ледяная глыба'))) then
         return keybinds:show_spell('Ледяная глыба')
     end
 
     if (player:aura('Невидимость') > 0) then return true end
 
-    if ((not player:check_safety_threat(95)) and (player:can_cast('Невидимость')) and
-        (not target:is_player())) then return keybinds:show_macro('Невидимость авто') end
+    if ((not player:has_safety_threat(95)) and (player:can_cast('Невидимость')) and (not target:is_player())) then
+        return keybinds:show_macro('Невидимость авто')
+    end
 
-    if ((player:get_mana_on_percent() < 80) and (player:can_use_item('Сапфир маны'))) then
+    if ((player:mana_on_percent() < 80) and (player:can_use_item('Сапфир маны'))) then
         return keybinds:show_item('Сапфир маны')
     end
 
-    if ((target:get_name() == 'Имирьярская охотница') and (target:check_cast()) and
+    if ((target:name() == 'Имирьярская охотница') and (target:check_cast()) and
         (player:can_cast_on_enemy('Превращение'))) then
         return keybinds:show_spell('Превращение')
     end
 
-    if ((player:check_location_is_icc()) and
-        ((target:is_player()) or ((target:get_name() == 'Имирьярская охотница') and
-            (target:check_casting_spellname('Быстрострел')))) and
+    if ((player:location_is_icc()) and ((target:is_player()) or
+        ((target:name() == 'Имирьярская охотница') and (target:check_cast('Быстрострел')))) and
         (player:can_cast_on_enemy('Превращение'))) then
         return keybinds:show_spell('Превращение')
     end
@@ -110,15 +110,15 @@ function BHelper.modules.mage.default:rotation_single()
         return keybinds:show_spell('Антимагия')
     end
 
-    if ((not player:check_equipped_item('Трупное окоченение')) and
+    if ((not player:is_equipped_item('Трупное окоченение')) and
         (player:aura('Черная магия') > 0)) then return player:equip_set('MAIN') end
 
     if ((player:aura('Путь огня') > 0) and (player:can_cast_on_enemy('Огненная глыба'))) then
         return keybinds:show_spell('Огненная глыба')
     end
 
-    if ((target:aura('Живая бомба', true) == 0) and (not player:check_heroism_buff()) and
-        ((target:get_name() ~= 'Принц Келесет')) and (player:can_cast_on_enemy('Живая бомба'))) then
+    if ((target:aura('Живая бомба', true) == 0) and (not player:has_heroism_buff()) and
+        ((target:name() ~= 'Принц Келесет')) and (player:can_cast_on_enemy('Живая бомба'))) then
         return keybinds:show_spell('Живая бомба')
     end
 
@@ -127,7 +127,7 @@ function BHelper.modules.mage.default:rotation_single()
         return keybinds:show_spell('Ожог')
     end
 
-    if ((player:check_burst_mode()) and (not self.burst_cooldown)) then
+    if ((player:is_burst()) and (not self.burst_cooldown)) then
         if (player:can_cast('Зеркальное изображение')) then
             return keybinds:show_spell('Зеркальное изображение')
         end
@@ -141,12 +141,12 @@ function BHelper.modules.mage.default:rotation_single()
         end
     end
 
-    if ((player:check_equipped_item('Перчатки ложных знаков')) and
+    if ((player:is_equipped_item('Перчатки ложных знаков')) and
         (player:can_use_item('Перчатки ложных знаков'))) then
         return keybinds:show_item('Перчатки ложных знаков')
     end
 
-    if ((player:check_equipped_item('Освященные перчатки волшебника крови')) and
+    if ((player:is_equipped_item('Освященные перчатки волшебника крови')) and
         (player:can_use_item('Освященные перчатки волшебника крови'))) then
         return keybinds:show_item('Освященные перчатки волшебника крови')
     end

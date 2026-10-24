@@ -61,7 +61,7 @@
 --     --         print(i, threat._list[i].guid, threat._list[i].threat)
 --     --     end
 --     -- end
---     -- print(player:check_stable_threat())
+--     -- print(player:has_stable_threat())
 -- end
 -- function BHelper.threat:init()
 --     self._list = {}
@@ -153,10 +153,10 @@ function BHelper.threat:update()
     -- for i = 1, #threat._list do
     --     if ((threat._list[i]) and (threat._list[i].guid) and (threat._list[i].threat)) then
     --         print(i, threat._list[i].guid, threat._list[i].threat,
-    --               (threat._list[i].guid == player.get_GUID()) and '<<<<<<<<<<<< YOU' or '')
+    --               (threat._list[i].guid == player.GUID()) and '<<<<<<<<<<<< YOU' or '')
     --     end
     -- end
-    -- print(player:check_stable_threat())
+    -- print(player:has_stable_threat())
 end
 
 function BHelper.threat:init()

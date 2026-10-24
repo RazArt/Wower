@@ -32,7 +32,7 @@ function BHelper.modules.mailbox.common:step_2()
     if (select(2, GetInboxNumItems()) > 0) then
         if (GetInboxNumItems() > 0) then
             local _, _, sender, _, money, CODAmount, _, hasItem = GetInboxHeaderInfo(1)
-            if (CODAmount > 0) and (InboxItemCanDelete(1) == nil) then
+            if ((CODAmount > 0) and (not InboxItemCanDelete(1))) then
                 ReturnInboxItem(1)
                 return
             elseif (CODAmount > 0) and (InboxItemCanDelete(1) == 1) then

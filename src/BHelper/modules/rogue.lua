@@ -14,7 +14,7 @@ function BHelper.modules.rogue.default:init()
     self.settings.type = 'battle'
     self.settings.only_combat_start = true
 
-    if (self.vars.sunder == nil) then self.vars.sunder = false end
+    if (not self.vars.sunder) then self.vars.sunder = false end
 
     keybinds:bind_spell('Пинок')
     keybinds:bind_spell('Ослабление доспеха')
@@ -46,8 +46,8 @@ end
 function BHelper.modules.rogue.default:rotation_single()
     if (target:check_cast() and player:can_cast_on_enemy('Пинок')) then return keybinds:show_spell('Пинок') end
 
-    if (player:check_burst_mode() and (not self.burst_cooldown)) then
-        if ((player:check_equipped_item('Знак превосходства')) and
+    if (player:is_burst() and (not self.burst_cooldown)) then
+        if ((player:is_equipped_item('Знак превосходства')) and
             (player:can_use_item('Знак превосходства'))) then
             return keybinds:show_item('Знак превосходства')
         end
@@ -65,14 +65,14 @@ function BHelper.modules.rogue.default:rotation_single()
         end
     end
 
-    if ((self.vars.sunder) and (not BHelper.player:check_heroism_buff())) then
+    if ((self.vars.sunder) and (not BHelper.player:has_heroism_buff())) then
         if ((target:aura('Ослабление доспеха') == 0) and
             (player:can_cast_on_enemy('Ослабление доспеха'))) then
             return keybinds:show_spell('Ослабление доспеха')
         end
 
         if ((target:aura('Ослабление доспеха') <= 3) and
-            (player:can_cast_on_enemy('Ослабление доспеха')) and (player:check_combo_points(4))) then
+            (player:can_cast_on_enemy('Ослабление доспеха')) and (player:has_combo_points(4))) then
             return keybinds:show_spell('Ослабление доспеха')
         end
     end
@@ -82,9 +82,9 @@ function BHelper.modules.rogue.default:rotation_single()
     end
 
     if ((player:aura('Мясорубка') <= 3) and (player:can_cast('Мясорубка')) and
-        (player:check_combo_points(5))) then return keybinds:show_spell('Мясорубка') end
+        (player:has_combo_points(5))) then return keybinds:show_spell('Мясорубка') end
 
-    if ((player:can_cast_on_enemy('Потрошение')) and (player:check_combo_points(4))) then
+    if ((player:can_cast_on_enemy('Потрошение')) and (player:has_combo_points(4))) then
         return keybinds:show_spell('Потрошение')
     end
 

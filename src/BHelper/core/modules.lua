@@ -79,7 +79,7 @@ function BHelper.modules:module(profiles)
         if ((not stop_flag) and (core.profile:get().settings.type == 'battle')) then
             if (not player:can_target_attack()) then
                 stop_flag = keybinds:show_macro('Target')
-            elseif ((pet:check_control()) and (pet:can_target_attack())) then
+            elseif ((pet:has_control()) and (pet:can_target_attack())) then
                 keybinds:show_pet('Attack')
             end
         end

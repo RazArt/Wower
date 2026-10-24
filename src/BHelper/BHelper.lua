@@ -104,7 +104,7 @@ function BHelper:commands(msg)
     elseif (args[1] == 'm') then
         self.modules[self._module]:_macros()
     elseif (args[1] == 'c') then
-        if (args[2] == nil) then args[2] = 0.2 end
+        if (not args[2]) then args[2] = 0.2 end
         self.core:add_cooldown(tonumber(args[2]))
     else
         self.core:print('Неизвестная команда')
@@ -112,7 +112,7 @@ function BHelper:commands(msg)
 end
 
 SLASH_BHELPER1, SLASH_BHELPER2 = '/bhelper', '/bh'
-SlashCmdList["BHELPER"] = function(message)
+SlashCmdList['BHELPER'] = function(message)
     BHelper:commands(message)
 end
 

@@ -47,7 +47,7 @@ function BHelper.keybinds:_bind(class, name)
 
     for index, bind in pairs(keybinds._binds) do
         if ((bind.class == class) and (bind.name == name)) then return true end
-        if (bind.name == nil) then
+        if (not bind.name) then
             if (SetBinding(bind.bind_string, class .. ' ' .. name)) then
                 bind.name = name
                 bind.class = class
@@ -91,7 +91,7 @@ function BHelper.keybinds:unbind_all()
     for _, bind in pairs(keybinds._binds) do
         bind.name = nil
         bind.class = nil
-        if (SetBinding(bind.bind_string) == nil) then result = false end
+        if (not SetBinding(bind.bind_string)) then result = false end
     end
     return result
 end

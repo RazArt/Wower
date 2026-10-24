@@ -15,7 +15,7 @@ function BHelper.modules.druid.default:init()
     self.settings.only_combat_start = true
     self.behind_of_target = true
 
-    if (self.vars.silence == nil) then self.vars.silence = false end
+    if (not self.vars.silence) then self.vars.silence = false end
 
     keybinds:bind_spell('Калечение')
     keybinds:bind_spell('Оглушить')
@@ -95,25 +95,24 @@ function BHelper.modules.druid.default:macros()
 end
 
 function BHelper.modules.druid.default:execute()
-    if ((player:get_health_on_percent() < 30) and (player:can_cast('Инстинкты выживания'))) then
+    if ((player:health_on_percent() < 30) and (player:can_cast('Инстинкты выживания'))) then
         return keybinds:show_spell('Инстинкты выживания')
     end
 
-    if ((player:get_health_on_percent() < 30) and (player:can_cast('Неистовое восстановление'))) then
+    if ((player:health_on_percent() < 30) and (player:can_cast('Неистовое восстановление'))) then
         return keybinds:show_spell('Неистовое восстановление')
     end
 
-    if ((player:get_health_on_percent() < 60) and (player:can_cast('Дубовая кожа'))) then
+    if ((player:health_on_percent() < 60) and (player:can_cast('Дубовая кожа'))) then
         return keybinds:show_spell('Дубовая кожа')
     end
 
-    if ((player:get_health_on_percent() < 60) and (player:can_cast('Исступление'))) then
+    if ((player:health_on_percent() < 60) and (player:can_cast('Исступление'))) then
         return keybinds:show_spell('Исступление')
     end
 
-    if ((player:check_location_is_icc()) and
-        ((target:is_player()) or ((target:get_name() == 'Имирьярская охотница') and
-            (target:check_casting_spellname('Быстрострел')))) and
+    if ((player:location_is_icc()) and ((target:is_player()) or
+        ((target:name() == 'Имирьярская охотница') and (target:check_cast('Быстрострел')))) and
         (player:aura('Облик лютого медведя') == 0) and (player:can_cast_on_enemy('Смерч'))) then
         return keybinds:show_spell('Смерч')
     end
@@ -122,19 +121,19 @@ function BHelper.modules.druid.default:execute()
         return keybinds:show_macro('Reform')
     end
 
-    if ((not player:check_safety_threat()) and (not target:is_player()) and (player:can_cast('Попятиться'))) then
+    if ((not player:has_safety_threat()) and (not target:is_player()) and (player:can_cast('Попятиться'))) then
         return keybinds:show_spell('Попятиться')
     end
 
-    if (player:check_burst_mode() and (not self.burst_cooldown)) then
+    if (player:is_burst() and (not self.burst_cooldown)) then
         if (player:aura('Облик лютого медведя') > 0) and (player:can_cast('Берсерк')) then
             return keybinds:show_spell('Берсерк')
         end
 
-        if ((player:aura('Тигриное неистовство') == 0) and (player:get_power() <= 80) and
+        if ((player:aura('Тигриное неистовство') == 0) and (player:power() <= 80) and
             (player:can_cast('Берсерк'))) then return keybinds:show_spell('Берсерк') end
 
-        if ((player:aura(50334) > 0) and (player:check_equipped_item('Знак превосходства')) and
+        if ((player:aura(50334) > 0) and (player:is_equipped_item('Знак превосходства')) and
             (player:can_use_item('Знак превосходства'))) then
             return keybinds:show_item('Знак превосходства')
         end
@@ -160,7 +159,7 @@ function BHelper.modules.druid.default:cat_single()
         return keybinds:show_spell('Калечение')
     end
 
-    if ((player:get_power() <= 30) and (player:can_cast('Тигриное неистовство'))) then
+    if ((player:power() <= 30) and (player:can_cast('Тигриное неистовство'))) then
         return keybinds:show_spell('Тигриное неистовство')
     end
 
@@ -169,11 +168,11 @@ function BHelper.modules.druid.default:cat_single()
     end
 
     if ((player:aura('Дикий рев') <= 2) and (player:can_cast('Дикий рев')) and
-        (player:check_combo_points(4))) then return keybinds:show_spell('Дикий рев') end
+        (player:has_combo_points(4))) then return keybinds:show_spell('Дикий рев') end
 
     if ((player:aura('Дикий рев') <= 6) and
         (math.abs(target:aura('Разорвать') - player:aura('Дикий рев')) <= 1) and
-        (player:check_combo_points(3)) and (player:can_cast('Дикий рев'))) then
+        (player:has_combo_points(3)) and (player:can_cast('Дикий рев'))) then
         return keybinds:show_spell('Дикий рев')
     end
 
@@ -196,12 +195,12 @@ function BHelper.modules.druid.default:cat_single()
         end
     end
 
-    if ((target:aura('Разорвать', true) == 0) and (player:check_combo_points(5)) and
+    if ((target:aura('Разорвать', true) == 0) and (player:has_combo_points(5)) and
         (player:can_cast_on_enemy('Разорвать'))) then return keybinds:show_spell('Разорвать') end
 
     if ((player:aura('Дикий рев') >= 6) and
         ((target:aura('Разорвать', true) >= 6) or (player:aura(50334) > 0)) and
-        ((player:get_power() <= 55) or (player:aura(50334) > 0)) and (player:check_combo_points(5)) and
+        ((player:power() <= 55) or (player:aura(50334) > 0)) and (player:has_combo_points(5)) and
         (player:can_cast_on_enemy('Свирепый укус'))) then
         return keybinds:show_spell('Свирепый укус')
     end
@@ -226,7 +225,7 @@ function BHelper.modules.druid.default:cat_multiple()
         return keybinds:show_spell('Волшебный огонь (зверь)')
     end
 
-    if ((player:get_power() <= 30) and (player:can_cast('Тигриное неистовство'))) then
+    if ((player:power() <= 30) and (player:can_cast('Тигриное неистовство'))) then
         return keybinds:show_spell('Тигриное неистовство')
     end
 

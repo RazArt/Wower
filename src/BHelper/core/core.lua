@@ -56,7 +56,7 @@ function BHelper.core:stop()
     BHelper.state_frame:Hide()
 
     keybinds:show_macro('Stop', 0.1)
-    if (pet:check_control()) then keybinds:show_pet('Follow', 0.1) end
+    if (pet:has_control()) then keybinds:show_pet('Follow', 0.1) end
     if (core.profile:get().stop) then core.profile:get():stop() end
 end
 
@@ -85,25 +85,24 @@ function BHelper.core:reload()
         return false
     end
 
-    core:print('loaded ->', core.module:get_name(), core.profile:get_name())
+    core:print('loaded ->', core.module:name(), core.profile:name())
 
     core:init_DB()
     keybinds:unbind_all()
     macros:delete_all()
     core:create_shared_macros()
 
-    core.profile:get().settings = DB[player:get_spec()]['modules'][core.module:get_name()][core.profile:get_name()]
-                                      .settings
-    core.profile:get().vars = DB[player:get_spec()]['modules'][core.module:get_name()][core.profile:get_name()].vars
+    core.profile:get().settings = DB[player:spec()]['modules'][core.module:name()][core.profile:name()].settings
+    core.profile:get().vars = DB[player:spec()]['modules'][core.module:name()][core.profile:name()].vars
 
     core.module:get():_init()
     core.module:get():_macros()
 end
 
 function BHelper.core:init_DB()
-    local player_spec = player:get_spec()
-    local module_name = core.module:get_name()
-    local profile_name = core.profile:get_name()
+    local player_spec = player:spec()
+    local module_name = core.module:name()
+    local profile_name = core.profile:name()
 
     if ((not DB[player_spec]) or (type(DB[player_spec]) ~= 'table')) then DB[player_spec] = {} end
 
@@ -134,8 +133,8 @@ end
 function BHelper.core:set_var(var, value)
     local vars = core.profile:get().vars
 
-    if (value == "true") then value = true end
-    if (value == "false") then value = false end
+    if (value == 'true') then value = true end
+    if (value == 'false') then value = false end
     if (vars[var] ~= nil) then vars[var] = value end
 end
 
@@ -177,8 +176,8 @@ function BHelper.core:print(...)
 end
 
 -- function BHelper.core:create_shared_macros()
---     if ((player:get_class() == 'hunter') or (player:get_class() == 'warlock') or
---         (player:get_class() == 'deathknight')) then
+--     if ((player:class() == 'hunter') or (player:class() == 'warlock') or
+--         (player:class() == 'deathknight')) then
 --         macros:create('PetAttack', '/petattack [@target]', 19, 417)
 --         macros:create('PetFollow', '/petfollow', 20, 414)
 --     end
@@ -198,13 +197,14 @@ end
 -- end
 
 function BHelper.core:create_shared_macros()
-    if ((player:get_class() == 'hunter') or (player:get_class() == 'warlock') or (player:get_class() == 'deathknight')) then
+    if ((player:class() == 'hunter') or (player:class() == 'warlock') or (player:class() == 'deathknight')) then
         macros:create('PetAttack', '/petattack [@target]', 19, 973)
         macros:create('PetFollow', '/petfollow', 20, 970)
     end
 
     macros:create('Target', '/targetenemy\n/startattack\n/bh c', 0, 711)
-    macros:create('Stop', '/petfollow\n/stopcasting\n/stopattack\n/cleartarget', 0)
+    macros:create('Stop', '/stopcasting\n/stopattack\n/cleartarget', 0)
+    -- macros:create('Stop', '/petfollow\n/stopcasting\n/stopattack\n/cleartarget', 0)
     macros:create('Аук', '/s .i au', 60, 1935)
     macros:create('Банк', '/s .i b', 59, 1933)
     macros:create('Почта', '/s .i m', 58, 1931)
@@ -225,7 +225,7 @@ function BHelper.core:create_shared_macros()
 end
 
 function BHelper.core.module:load()
-    local name = core.module:get_name():lower()
+    local name = core.module:name():lower()
     if (core.module:exist(name)) then core.module._table = modules[name] end
     return nil
 end
@@ -235,19 +235,19 @@ function BHelper.core.module:get()
 end
 
 function BHelper.core.module:set(name)
-    name = (name) and name:lower() or player:get_class()
+    name = (name) and name:lower() or player:class()
     if (core.module:exist(name)) then
         core:print('set_module -> ', name)
-        DB[player:get_spec()].module_name = name
-        DB[player:get_spec()].profile_name = nil
+        DB[player:spec()].module_name = name
+        DB[player:spec()].profile_name = nil
         core:reload()
         return true
     end
     return false
 end
 
-function BHelper.core.module:get_name()
-    return DB[player:get_spec()].module_name
+function BHelper.core.module:name()
+    return DB[player:spec()].module_name
 end
 
 function BHelper.core.module:exist(name)
@@ -257,7 +257,7 @@ function BHelper.core.module:exist(name)
 end
 
 function BHelper.core.profile:load()
-    local name = core.profile:get_name():lower()
+    local name = core.profile:name():lower()
     if (core.profile:exist(name)) then core.profile._table = core.module:get()[name] end
     return nil
 end
@@ -270,15 +270,15 @@ function BHelper.core.profile:set(name)
     name = (name) and name:lower() or 'default'
     if (core.profile:exist(name)) then
         core:print('set_profile -> ', name)
-        DB[player:get_spec()].profile_name = name
+        DB[player:spec()].profile_name = name
         core:reload()
         return true
     end
     return false
 end
 
-function BHelper.core.profile:get_name()
-    return DB[player:get_spec()].profile_name
+function BHelper.core.profile:name()
+    return DB[player:spec()].profile_name
 end
 
 function BHelper.core.profile:exist(name)

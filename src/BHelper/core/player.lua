@@ -26,30 +26,30 @@ function BHelper.player:namespace_init()
     timers = BHelper.timers
 end
 
-function BHelper.player:get_GUID()
-    if (player.GUID) then return player.GUID end
-    player.GUID = UnitGUID('player')
-    return player.GUID
+function BHelper.player:GUID()
+    if (player._GUID) then return player._GUID end
+    player._GUID = UnitGUID('player')
+    return player._GUID
 end
 
-function BHelper.player:get_name()
-    if (player.name) then return player.name end
-    player.name = UnitName('player')
-    return player.name
+function BHelper.player:name()
+    if (player._name) then return player._name end
+    player._name = UnitName('player')
+    return player._name
 end
 
-function BHelper.player:get_class()
-    if (player.class) then return player.class end
-    player.class = select(2, UnitClass('player')):lower()
-    return player.class
+function BHelper.player:class()
+    if (player._class) then return player._class end
+    player._class = select(2, UnitClass('player')):lower()
+    return player._class
 end
 
-function BHelper.player:get_spec() -- Add cache
+function BHelper.player:spec() -- Add cache
     return GetSpecialization('player') or 1
     -- return 1
 end
 
-function BHelper.player:get_level()
+function BHelper.player:level()
     return UnitLevel('player') or 1
 end
 
@@ -65,43 +65,43 @@ function BHelper.player:moving()
     return (GetUnitSpeed('player') > 0) and true or false
 end
 
-function BHelper.player:has_full_control()
+function BHelper.player:has_control()
     return (HasFullControl()) and true or false
 end
 
-function BHelper.player:get_health()
+function BHelper.player:health()
     return UnitHealth('player') or 0
 end
 
-function BHelper.player:get_mana()
+function BHelper.player:mana()
     return UnitMana('player') or 0
 end
 
-function BHelper.player:get_health_max()
+function BHelper.player:health_max()
     return UnitHealthMax('player') or 0
 end
 
-function BHelper.player:get_mana_max()
+function BHelper.player:mana_max()
     return UnitManaMax('player') or 0
 end
 
-function BHelper.player:get_health_on_percent()
-    return player:get_health() / player:get_health_max() * 100
+function BHelper.player:health_on_percent()
+    return player:health() / player:health_max() * 100
 end
 
-function BHelper.player:get_mana_on_percent()
-    return player:get_mana() / player:get_mana_max() * 100
+function BHelper.player:mana_on_percent()
+    return player:mana() / player:mana_max() * 100
 end
 
-function BHelper.player:get_power()
+function BHelper.player:power()
     return UnitPower('player') or 0
 end
 
-function BHelper.player:get_power_max()
+function BHelper.player:power_max()
     return UnitPowerMax('player') or 0
 end
 
-function BHelper.player:check_combo_points(count)
+function BHelper.player:has_combo_points(count)
     return (GetComboPoints('player', 'target') >= count)
 end
 
@@ -117,13 +117,13 @@ function BHelper.player:can_target_attack()
     if (target:aura('Страх') > 0) then return false end
     if (target:aura('Ослепление') > 0) then return false end
 
-    -- if (target:get_name() == 'Малый слизнюк') then return false end
-    -- if (target:get_name() == 'Дарнаван') then return false end
-    -- if (target:get_name() == 'Большой слизнюк') then return false end
-    -- if (target:get_name() == 'Темное ядро') then return false end
-    -- if (((target:get_name() == 'Принц Валанар') or
-    --     (target:get_name() == 'Принц Келесет') or
-    --     (target:get_name() == 'Принц Талдарам')) and (target:get_health() == 1) and
+    -- if (target:name() == 'Малый слизнюк') then return false end
+    -- if (target:name() == 'Дарнаван') then return false end
+    -- if (target:name() == 'Большой слизнюк') then return false end
+    -- if (target:name() == 'Темное ядро') then return false end
+    -- if (((target:name() == 'Принц Валанар') or
+    --     (target:name() == 'Принц Келесет') or
+    --     (target:name() == 'Принц Талдарам')) and (target:health() == 1) and
     --     (player:aura('Перенаправление') == 0)) then return false end
 
     return true
@@ -143,8 +143,8 @@ function BHelper.player:can_cast(spellname, check_time)
     if (player:spell_is_targeting()) then return false end
     if (player:check_cast()) then return false end
     if (player:check_spell_cooldown(spellname, check_time)) then return false end
-    if (not player:has_full_control()) then return false end
-    if ((player:moving()) and (player:get_spell_casttime(spellname) > 0)) then return false end
+    if (not player:has_control()) then return false end
+    if ((player:moving()) and (player:spell_casttime(spellname) > 0)) then return false end
     return true
 end
 
@@ -176,10 +176,10 @@ function BHelper.player:can_cast_on_point(spellname, check_time)
 end
 
 function BHelper.player:can_use_item(item)
-    if (player:get_item_count(item) == 0) then return false end
-    if (player:check_item_on_cooldown(item)) then return false end
+    if (player:item_count(item) == 0) then return false end
+    if (player:check_item_cooldown(item)) then return false end
     if (player:is_mounted()) then return false end
-    if (not player:has_full_control()) then return false end
+    if (not player:has_control()) then return false end
     return true
 end
 
@@ -192,12 +192,12 @@ function BHelper.player:check_spell_range(spellname, unit_id)
     return (IsSpellInRange(spellname, unit_id) == 1) and true or false
 end
 
-function BHelper.player:get_spell_casttime(spellname)
+function BHelper.player:spell_casttime(spellname)
     local castTime = select(7, GetSpellInfo(spellname))
     return (castTime > 0) and (castTime / 1000) or 0
 end
 
-function BHelper.player:get_spell_cooldown(spellname)
+function BHelper.player:spell_cooldown(spellname)
     local start, duration = GetSpellCooldown(spellname)
     if (not start) or (start == 0) then return 0 end
     return start + duration - GetTime() - 0.2
@@ -206,7 +206,7 @@ end
 function BHelper.player:check_spell_cooldown(spellname, check_time)
     check_time = check_time or 0.2
     check_time = (check_time > 0.2) and (check_time - 0.2) or 0.2
-    return (player:get_spell_cooldown(spellname) > check_time) and true or false
+    return (player:spell_cooldown(spellname) > check_time) and true or false
 end
 
 function BHelper.player:check_cast()
@@ -217,17 +217,17 @@ function BHelper.player:check_cast()
     return false
 end
 
-function BHelper.player:get_item_count(item)
+function BHelper.player:item_count(item)
     return GetItemCount(item)
 end
 
-function BHelper.player:check_item_on_cooldown(item)
+function BHelper.player:check_item_cooldown(item)
     local start, duration = GetItemCooldown(item)
     if (not start) or (start == 0) then return 0 end
     return (start + duration - GetTime() - 0.2 > 0) and true or false
 end
 
-function BHelper.player:check_equipped_item(item)
+function BHelper.player:is_equipped_item(item)
     return (IsEquippedItem(item)) and true or false
 end
 
@@ -235,45 +235,45 @@ function BHelper.player:equip_set(set)
     return UseEquipmentSet(set)
 end
 
-function BHelper.player:check_safety_threat(limit)
+function BHelper.player:has_safety_threat(limit)
     limit = limit or 85
 
     if (not target:exist()) then return true end
-    if (not player:check_party_or_raid()) then return true end
+    if (not player:in_party_or_raid()) then return true end
     if (not target:should_evade()) then return true end
 
-    if (threat:get_tank_GUID() == player:get_GUID()) then return false end
-    if ((threat:get_DD_GUID() == player:get_GUID()) and (threat:get_DD_threat() >= limit)) then return false end
+    if (threat:get_tank_GUID() == player:GUID()) then return false end
+    if ((threat:get_DD_GUID() == player:GUID()) and (threat:get_DD_threat() >= limit)) then return false end
     return true
 end
 
-function BHelper.player:check_stable_threat(limit)
+function BHelper.player:has_stable_threat(limit)
     limit = limit or 80
     -- return false
     if (not target:exist()) then return true end
-    if (not player:check_party_or_raid()) then return true end
-    if (threat:get_tank_GUID() ~= player:get_GUID()) then return false end
+    if (not player:in_party_or_raid()) then return true end
+    if (threat:get_tank_GUID() ~= player:GUID()) then return false end
     if (threat:get_DD_threat() >= limit) then return false end
     return true
 end
 
-function BHelper.player:check_heroism_buff()
+function BHelper.player:has_heroism_buff()
     return ((player:aura('Героизм') > 0) or (player:aura('Жажда крови') > 0)) and true or false
 end
 
-function BHelper.player:check_burst_mode()
-    return ((player:check_heroism_buff()) or (target:is_boss())) and true or false
+function BHelper.player:is_burst()
+    return ((player:has_heroism_buff()) or (target:is_boss())) and true or false
 end
 
 function BHelper.player:is_mounted()
     return IsMounted()
 end
 
-function BHelper.player:check_location_is_icc()
+function BHelper.player:location_is_icc()
     return (GetCurrentMapAreaID() == 605) and true or false
 end
 
-function BHelper.player:check_party_or_raid()
+function BHelper.player:in_party_or_raid()
     return ((GetNumPartyMembers() > 0) or (GetNumRaidMembers() > 0)) and true or false
 end
 

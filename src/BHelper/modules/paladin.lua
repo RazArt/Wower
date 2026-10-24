@@ -14,9 +14,9 @@ function BHelper.modules.paladin.default:init()
     self.settings.type = 'battle'
     self.settings.only_combat_start = true
 
-    if (self.vars.JoW == nil) then self.vars.JoW = true end
-    if (self.vars.JoL == nil) then self.vars.JoL = false end
-    if (self.vars.silence == nil) then self.vars.silence = false end
+    if (not self.vars.JoW) then self.vars.JoW = true end
+    if (not self.vars.JoL) then self.vars.JoL = false end
+    if (not self.vars.silence) then self.vars.silence = false end
 
     keybinds:bind_spell('Свет небес')
     keybinds:bind_spell('Вспышка Света')
@@ -49,11 +49,11 @@ function BHelper.modules.paladin.default:execute()
         return keybinds:show_spell('Благословение могущества')
     end
 
-    if ((player:get_health_on_percent() < 20) and player:can_cast('Вспышка Света')) then
+    if ((player:health_on_percent() < 20) and player:can_cast('Вспышка Света')) then
         return keybinds:show_spell('Вспышка Света')
     end
 
-    if ((player:get_health_on_percent() < 40) and player:can_cast('Свет небес')) then
+    if ((player:health_on_percent() < 40) and player:can_cast('Свет небес')) then
         return keybinds:show_spell('Свет небес')
     end
 end

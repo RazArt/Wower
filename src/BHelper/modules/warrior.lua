@@ -14,11 +14,11 @@ function BHelper.modules.warrior.default:init()
     self.settings.type = 'battle'
     self.settings.only_combat_start = true
 
-    if (self.vars.attack_type == nil) then self.vars.attack_type = '1' end
-    if (self.vars.battle_shout == nil) then self.vars.battle_shout = false end
-    if (self.vars.commanding_shout == nil) then self.vars.commanding_shout = false end
-    if (self.vars.demoralizing_shout == nil) then self.vars.demoralizing_shout = false end
-    if (self.vars.silence == nil) then self.vars.silence = false end
+    if (not self.vars.attack_type) then self.vars.attack_type = '1' end
+    if (not self.vars.battle_shout) then self.vars.battle_shout = false end
+    if (not self.vars.commanding_shout) then self.vars.commanding_shout = false end
+    if (not self.vars.demoralizing_shout) then self.vars.demoralizing_shout = false end
+    if (not self.vars.silence) then self.vars.silence = false end
 
     keybinds:bind_spell('Удар героя')
     keybinds:bind_spell('Рассекающий удар')
@@ -72,7 +72,7 @@ function BHelper.modules.warrior.default:rotation()
         end
     end
 
-    if ((player:get_health_on_percent() < 30) and player:can_cast('Безудержное восстановление')) then
+    if ((player:health_on_percent() < 30) and player:can_cast('Безудержное восстановление')) then
         return keybinds:show_spell('Безудержное восстановление')
     end
 
@@ -102,15 +102,15 @@ function BHelper.modules.warrior.default:rotation()
         return keybinds:show_spell('Раскол брони')
     end
 
-    if ((player:get_power() <= 30) and (player:can_cast('Ярость берсерка'))) then
+    if ((player:power() <= 30) and (player:can_cast('Ярость берсерка'))) then
         return keybinds:show_spell('Ярость берсерка')
     end
 
-    if ((player:get_power() <= 30) and (player:can_cast('Кровавая ярость'))) then
+    if ((player:power() <= 30) and (player:can_cast('Кровавая ярость'))) then
         return keybinds:show_spell('Кровавая ярость')
     end
 
-    if ((player:check_burst_mode()) and (not self.burst_cooldown)) then
+    if ((player:is_burst()) and (not self.burst_cooldown)) then
         if ((player:can_cast('Безрассудство'))) then
             return keybinds:show_spell('Безрассудство')
         end
@@ -124,7 +124,7 @@ function BHelper.modules.warrior.default:rotation()
         end
     end
 
-    if ((player:check_equipped_item('Душители Плети')) and
+    if ((player:is_equipped_item('Душители Плети')) and
         (player:can_use_item('Душители Плети'))) then keybinds:show_item('Душители Плети') end
 
     if (player:can_cast_on_enemy('Кровожадность')) then
@@ -134,7 +134,7 @@ function BHelper.modules.warrior.default:rotation()
     if ((not player:can_cast_on_enemy('Кровожадность', 1)) and (player:aura('Сокрушить!') > 0) and
         (player:can_cast_on_enemy('Мощный удар'))) then return keybinds:show_spell('Мощный удар') end
 
-    if ((target:get_name() ~= 'Принц Келесет') and (player:can_cast('Вихрь'))) then
+    if ((target:name() ~= 'Принц Келесет') and (player:can_cast('Вихрь'))) then
         return keybinds:show_spell('Вихрь')
     end
 
@@ -151,10 +151,10 @@ function BHelper.modules.warrior.proto:init()
     self.settings.type = 'battle'
     self.settings.only_combat_start = true
 
-    if (self.vars.attack_type == nil) then self.vars.attack_type = '1' end
-    if (self.vars.commanding_shout == nil) then self.vars.commanding_shout = false end
-    if (self.vars.demoralizing_shout == nil) then self.vars.demoralizing_shout = false end
-    if (self.vars.silence == nil) then self.vars.silence = false end
+    if (not self.vars.attack_type) then self.vars.attack_type = '1' end
+    if (not self.vars.commanding_shout) then self.vars.commanding_shout = false end
+    if (not self.vars.demoralizing_shout) then self.vars.demoralizing_shout = false end
+    if (not self.vars.silence) then self.vars.silence = false end
 
     keybinds:bind_spell('Удар героя')
     keybinds:bind_spell('Рассекающий удар')
@@ -207,22 +207,22 @@ function BHelper.modules.warrior.proto:macros()
 end
 
 function BHelper.modules.warrior.proto:rotation()
-    if ((self.vars.attack_type == '1') and (player:get_power() >= 20) and (player:can_cast('Удар героя'))) then
+    if ((self.vars.attack_type == '1') and (player:power() >= 20) and (player:can_cast('Удар героя'))) then
         keybinds:show_attack('Удар героя')
-    elseif ((self.vars.attack_type == '2') and (player:get_power() >= 30) and
+    elseif ((self.vars.attack_type == '2') and (player:power() >= 30) and
         (player:can_cast('Рассекающий удар'))) then
         keybinds:show_attack('Рассекающий удар')
     end
 
-    if ((player:get_health_on_percent() < 10) and player:can_cast('Глухая оборона')) then
+    if ((player:health_on_percent() < 10) and player:can_cast('Глухая оборона')) then
         return keybinds:show_spell('Глухая оборона')
     end
 
-    if ((player:get_health_on_percent() < 20) and player:can_cast('Безудержное восстановление')) then
+    if ((player:health_on_percent() < 20) and player:can_cast('Безудержное восстановление')) then
         return keybinds:show_spell('Безудержное восстановление')
     end
 
-    if ((player:get_health_on_percent() < 20) and player:can_cast('Ни шагу назад')) then
+    if ((player:health_on_percent() < 20) and player:can_cast('Ни шагу назад')) then
         return keybinds:show_spell('Ни шагу назад')
     end
 
@@ -233,15 +233,15 @@ function BHelper.modules.warrior.proto:rotation()
     if ((target:aura('Раскол брони') > 0) and (target:aura('Раскол брони') <= 2) and
         (player:can_cast_on_enemy('Сокрушение'))) then return keybinds:show_spell('Сокрушение') end
 
-    if ((player:get_power() <= 30) and (player:can_cast('Ярость берсерка'))) then
+    if ((player:power() <= 30) and (player:can_cast('Ярость берсерка'))) then
         return keybinds:show_spell('Ярость берсерка')
     end
 
-    if ((player:get_power() <= 30) and (player:can_cast('Кровавая ярость'))) then
+    if ((player:power() <= 30) and (player:can_cast('Кровавая ярость'))) then
         return keybinds:show_spell('Кровавая ярость')
     end
 
-    if ((self.vars.attack_type == '1') and (player:check_stable_threat()) and (target:is_boss()) and
+    if ((self.vars.attack_type == '1') and (player:has_stable_threat()) and (target:is_boss()) and
         (player:can_cast_on_enemy('Героический бросок'))) then
         return keybinds:show_spell('Героический бросок')
     end
@@ -249,7 +249,7 @@ function BHelper.modules.warrior.proto:rotation()
     if (((self.vars.attack_type == '2')) and (player:check_spell_range('Сокрушение')) and
         (player:can_cast('Удар грома'))) then return keybinds:show_spell('Удар грома') end
 
-    if (not player:check_stable_threat()) then
+    if (not player:has_stable_threat()) then
         if ((target:aura('Деморализующий крик') < 2) and
             (player:check_spell_range('Сокрушение')) and
             (player:can_cast('Деморализующий крик'))) then
@@ -271,14 +271,14 @@ function BHelper.modules.warrior.proto:rotation()
         return keybinds:show_spell('Мощный удар щитом')
     end
 
-    if (((self.vars.attack_type == '2') or (player:check_stable_threat())) and (player:can_cast('Блок щитом'))) then
+    if (((self.vars.attack_type == '2') or (player:has_stable_threat())) and (player:can_cast('Блок щитом'))) then
         return keybinds:show_spell('Блок щитом')
     end
 
     if ((player:check_spell_range('Сокрушение')) and
-        (player:get_spell_cooldown('Мощный удар щитом') > 1.5) and
+        (player:spell_cooldown('Мощный удар щитом') > 1.5) and
         (player:can_cast('Ударная волна'))) then return keybinds:show_spell('Ударная волна') end
 
-    if ((player:get_spell_cooldown('Мощный удар щитом') > 1.5) and
+    if ((player:spell_cooldown('Мощный удар щитом') > 1.5) and
         (player:can_cast_on_enemy('Сокрушение'))) then return keybinds:show_spell('Сокрушение') end
 end

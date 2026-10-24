@@ -29,7 +29,7 @@ function BHelper.modules.auction.common:open_click()
 end
 
 function BHelper.modules.auction.common:AUCTION_HOUSE_show_spell()
-    SortAuctionItems("list", "bid")
+    SortAuctionItems('list', 'bid')
     BHelper.core.action:set('step_2')
     BHelper.core:add_cooldown(2)
 end
@@ -75,9 +75,9 @@ function BHelper.modules.auction.common:step_4()
     if (self.vars.click_wait == true) then BHelper.keybinds:show_spell(6, false, false, true) end
 
     if (self.vars.lot_index > 0) then
-        local name, _, count, _, _, _, _, _, buyoutPrice, _, _, owner, sold = GetAuctionItemInfo("list",
+        local name, _, count, _, _, _, _, _, buyoutPrice, _, _, owner, sold = GetAuctionItemInfo('list',
                                                                                                  self.vars.lot_index)
-        if ((name == self.vars.item_list[self.vars.item_num][1]) and (BHelper.player:get_name() ~= owner) and
+        if ((name == self.vars.item_list[self.vars.item_num][1]) and (BHelper.player:name() ~= owner) and
             (GetMoney() > buyoutPrice) and (buyoutPrice > 0) and (sold == 0) and
             (buyoutPrice / count <= self.vars.item_list[self.vars.item_num][2])) then
             self.vars.buyout_price = buyoutPrice
@@ -97,7 +97,7 @@ function BHelper.modules.auction.common:buy_click()
     if (self.vars.click_wait == false) then return end
 
     self.vars.click_wait = false
-    PlaceAuctionBid("list", self.vars.lot_index, self.vars.buyout_price)
+    PlaceAuctionBid('list', self.vars.lot_index, self.vars.buyout_price)
     self.vars.lot_index = self.vars.lot_index - 1
     BHelper.core:add_cooldown(1)
 end

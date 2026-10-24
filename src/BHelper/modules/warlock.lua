@@ -2,7 +2,7 @@ function BHelper.modules.warlock.default:init()
     self.settings.type = 'battle'
     self.settings.only_combat_start = true
 
-    if (self.vars.silence == nil) then self.vars.silence = false end
+    if (not self.vars.silence) then self.vars.silence = false end
 
     BHelper.keybinds:bind_spell('Демоническое могущество')
     BHelper.keybinds:bind_spell('Проклятие стихий')
@@ -34,7 +34,7 @@ end
 
 function BHelper.modules.warlock.default:rotation_single()
 
-    if ((BHelper.player:check_equipped_item('Освященные перчатки мрачного шабаша')) and
+    if ((BHelper.player:is_equipped_item('Освященные перчатки мрачного шабаша')) and
         (BHelper.player:can_use_item('Освященные перчатки мрачного шабаша'))) then
         BHelper.keybinds:show_item('Освященные перчатки мрачного шабаша')
         return true
