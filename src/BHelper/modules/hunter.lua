@@ -46,7 +46,6 @@ end
 
 function BHelper.modules.hunter.default:macros()
     macros:create('Отрыв', '#showtooltip\n/bh c\n/stopcasting\n/cast Отрыв', 1)
-
     macros:create('PetControlTV', '/bh tv pet_control', 42, 273)
     macros:create('ManaTV', '/bh tv manual_mana_regeneration')
     macros:create('Быстрая стрельба',

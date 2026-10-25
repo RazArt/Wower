@@ -1,28 +1,12 @@
 BHelper.keybinds = {}
 
-local auras = {}
 local core = {}
 local keybinds = {}
-local macros = {}
-local modules = {}
-local pet = {}
-local player = {}
-local tables = {}
-local target = {}
-local threat = {}
 local timers = {}
 
 function BHelper.keybinds:namespace_init()
-    auras = BHelper.auras
     core = BHelper.core
     keybinds = BHelper.keybinds
-    macros = BHelper.macros
-    modules = BHelper.modules
-    pet = BHelper.pet
-    player = BHelper.player
-    tables = BHelper.tables
-    target = BHelper.target
-    threat = BHelper.threat
     timers = BHelper.timers
 end
 

@@ -8,7 +8,7 @@ function BHelper.macros:create(name, command, slot, icon)
     if (GetNumMacros() == 36) then per_char = true end
 
     self:delete(name)
-    if (CreateMacro(name, icon, command, per_char) > 0) then
+    if (CreateMacro(name, icon, command, per_char)) then
         if (slot > 0) then self:put_to_panel(name, slot) end
         return true
     end
@@ -24,15 +24,10 @@ end
 
 function BHelper.macros:delete(name)
     name = name:lower()
-    for i = 54, 1, -1 do
-        local macro_name = GetMacroInfo(i)
-        if ((macro_name) and (macro_name == name)) then if (DeleteMacro(i)) then return true end end
-    end
+    for i = 54, 1, -1 do if (GetMacroInfo(i) == name) then if (DeleteMacro(i)) then return true end end end
     return false
 end
 
-function BHelper.macros:delete_all()
-    local result = false
-    for i = 54, 1, -1 do if (DeleteMacro(i)) then result = true end end
-    return result
+function BHelper.macros:clear()
+    for i = 54, 1, -1 do DeleteMacro(i) end
 end

@@ -7,6 +7,7 @@ BHelper.lua
 
 core\pool.lua
 core\core.lua
+core\DB.lua
 core\timers.lua
 core\auras.lua
 core\keybinds.lua

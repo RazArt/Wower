@@ -3,7 +3,7 @@ BHelper.pool = {}
 local pools = {}
 local max_pool_size = 200
 
-function BHelper.pool:get(tag)
+function BHelper.pool:fetch(tag)
     tag = tag or 'default'
 
     local pool = pools[tag]
@@ -57,7 +57,7 @@ end
 -- function BHelper.pool:test()
 --     local test = {}
 --     for i = 1, 1000 do
---         local test2 = BHelper.pool:get('threat')
+--         local test2 = BHelper.pool:fetch('threat')
 --         test2.guid = 'asdgsedfghserh'
 --         test2.threat = 75
 --         table.insert(test, test2)

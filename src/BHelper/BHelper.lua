@@ -1,16 +1,16 @@
 BHelper = {}
 
-BHelper._event_frame = CreateFrame('Frame')
-BHelper._event_frame:SetScript('OnEvent', function(_, event, ...)
+local event_frame = CreateFrame('Frame')
+event_frame:SetScript('OnEvent', function(_, event, ...)
     BHelper[event](BHelper, ...)
 end)
-BHelper._event_frame:RegisterEvent('PLAYER_LOGIN')
-BHelper._event_frame:RegisterEvent('ACTIVE_TALENT_GROUP_CHANGED')
-BHelper._event_frame:RegisterEvent('PLAYER_REGEN_DISABLED')
-BHelper._event_frame:RegisterEvent('PLAYER_REGEN_ENABLED')
-BHelper._event_frame:RegisterEvent('PLAYER_CONTROL_LOST')
-BHelper._event_frame:RegisterEvent('PLAYER_CONTROL_GAINED')
-BHelper._event_frame:RegisterEvent('PLAYER_TARGET_CHANGED')
+event_frame:RegisterEvent('PLAYER_LOGIN')
+event_frame:RegisterEvent('ACTIVE_TALENT_GROUP_CHANGED')
+event_frame:RegisterEvent('PLAYER_REGEN_DISABLED')
+event_frame:RegisterEvent('PLAYER_REGEN_ENABLED')
+event_frame:RegisterEvent('PLAYER_CONTROL_LOST')
+event_frame:RegisterEvent('PLAYER_CONTROL_GAINED')
+event_frame:RegisterEvent('PLAYER_TARGET_CHANGED')
 
 function BHelper:PLAYER_LOGIN()
     BHelper.core:namespace_init()
@@ -39,20 +39,7 @@ function BHelper:PLAYER_LOGIN()
     -- for i = 1, GetNumMacroIcons() do BHelperDBIcons[i] = GetMacroIconInfo(i) end
 end
 
-function BHelper:create_state_frame()
-    self.state_frame = CreateFrame('Frame')
-    self.state_frame:SetSize(50, 50)
-    self.state_frame:SetFrameStrata('tooltip')
-    self.state_frame:SetPoint('center', UIParent, 'center', 0, -160)
-    self.state_frame.texture = self.state_frame:CreateTexture(nil, 'tooltip')
-    self.state_frame.texture:SetAllPoints(self.state_frame)
-    self.state_frame.texture:SetTexture('Interface\\AddOns\\BHelper\\textures\\warning.tga')
-    self.state_frame:Hide()
-end
-
 function BHelper:ACTIVE_TALENT_GROUP_CHANGED()
-    BHelper.core:init_DB()
-
     self.timers:create(1, function()
         self.core:reload()
     end)
@@ -76,6 +63,17 @@ end
 
 function BHelper:PLAYER_TARGET_CHANGED()
     BHelper.target._name = (UnitName('target')) or ''
+end
+
+function BHelper:create_state_frame()
+    self.state_frame = CreateFrame('Frame')
+    self.state_frame:SetSize(50, 50)
+    self.state_frame:SetFrameStrata('tooltip')
+    self.state_frame:SetPoint('center', UIParent, 'center', 0, -160)
+    self.state_frame.texture = self.state_frame:CreateTexture(nil, 'tooltip')
+    self.state_frame.texture:SetAllPoints(self.state_frame)
+    self.state_frame.texture:SetTexture('Interface\\AddOns\\BHelper\\textures\\warning.tga')
+    self.state_frame:Hide()
 end
 
 function BHelper:commands(msg)

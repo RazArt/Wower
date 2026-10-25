@@ -70,10 +70,8 @@ function BHelper.modules.mage.default:macros()
     macros:create('Невидимость авто',
                   '#showtooltip Невидимость\n/cast Невидимость\n/bh c 1')
     macros:create('Прилив сил', '#showtooltip Прилив сил\n/bh c\n/cast Прилив сил', 12)
-
     macros:create('ОжогTV', '#showtooltip Ожог\n/bh tv scorch', 40)
     macros:create('АнтимагияTV', '#showtooltip Антимагия\n/bh tv silence', 41)
-
     macros:create('S', '/cast Огненная глыба\n/bh sa rotation_single\n/bh', 13, 1263)
     macros:create('M', '/cast Огненный столб\n/bh sa rotation_multiple\n/bh', 14, 1264)
 end

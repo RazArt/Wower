@@ -44,13 +44,12 @@ function BHelper.player:class()
     return player._class
 end
 
-function BHelper.player:spec() -- Add cache
-    return GetSpecialization('player') or 1
-    -- return 1
+function BHelper.player:spec()
+    return (player._spec) or 1
 end
 
 function BHelper.player:level()
-    return UnitLevel('player') or 1
+    return (UnitLevel('player')) or 1
 end
 
 function BHelper.player:alive()
@@ -117,7 +116,7 @@ function BHelper.player:can_target_attack()
     if (target:aura('Страх') > 0) then return false end
     if (target:aura('Ослепление') > 0) then return false end
 
-    -- if (target:name() == 'Малый слизнюк') then return false end
+    if (target:name() == 'Малый слизнюк') then return false end
     -- if (target:name() == 'Дарнаван') then return false end
     -- if (target:name() == 'Большой слизнюк') then return false end
     -- if (target:name() == 'Темное ядро') then return false end
@@ -175,14 +174,6 @@ function BHelper.player:can_cast_on_point(spellname, check_time)
     return true
 end
 
-function BHelper.player:can_use_item(item)
-    if (player:item_count(item) == 0) then return false end
-    if (player:check_item_cooldown(item)) then return false end
-    if (player:is_mounted()) then return false end
-    if (not player:has_control()) then return false end
-    return true
-end
-
 function BHelper.player:spell_is_targeting()
     return (SpellIsTargeting()) and true or false
 end
@@ -204,17 +195,24 @@ function BHelper.player:spell_cooldown(spellname)
 end
 
 function BHelper.player:check_spell_cooldown(spellname, check_time)
-    check_time = check_time or 0.2
-    check_time = (check_time > 0.2) and (check_time - 0.2) or 0.2
+    check_time = check_time or 0
     return (player:spell_cooldown(spellname) > check_time) and true or false
 end
 
 function BHelper.player:check_cast()
     local time = select(6, UnitCastingInfo('player'))
-    if (time) then return (time / 1000 - GetTime() > 0.2) and true or false end
+    if (time) then return (time / 1000 - GetTime() - 0.2 > 0) and true or false end
     local time = select(6, UnitChannelInfo('player'))
-    if (time) then return (time / 1000 - GetTime() > 0.2) and true or false end
+    if (time) then return (time / 1000 - GetTime() - 0.2 > 0) and true or false end
     return false
+end
+
+function BHelper.player:can_use_item(item)
+    if (player:item_count(item) == 0) then return false end
+    if (player:check_item_cooldown(item)) then return false end
+    if (player:is_mounted()) then return false end
+    if (not player:has_control()) then return false end
+    return true
 end
 
 function BHelper.player:item_count(item)
@@ -223,7 +221,7 @@ end
 
 function BHelper.player:check_item_cooldown(item)
     local start, duration = GetItemCooldown(item)
-    if (not start) or (start == 0) then return 0 end
+    if ((not start) or (start == 0)) then return false end
     return (start + duration - GetTime() - 0.2 > 0) and true or false
 end
 
@@ -241,7 +239,6 @@ function BHelper.player:has_safety_threat(limit)
     if (not target:exist()) then return true end
     if (not player:in_party_or_raid()) then return true end
     if (not target:should_evade()) then return true end
-
     if (threat:get_tank_GUID() == player:GUID()) then return false end
     if ((threat:get_DD_GUID() == player:GUID()) and (threat:get_DD_threat() >= limit)) then return false end
     return true
@@ -249,7 +246,7 @@ end
 
 function BHelper.player:has_stable_threat(limit)
     limit = limit or 80
-    -- return false
+
     if (not target:exist()) then return true end
     if (not player:in_party_or_raid()) then return true end
     if (threat:get_tank_GUID() ~= player:GUID()) then return false end
@@ -276,4 +273,3 @@ end
 function BHelper.player:in_party_or_raid()
     return ((GetNumPartyMembers() > 0) or (GetNumRaidMembers() > 0)) and true or false
 end
-

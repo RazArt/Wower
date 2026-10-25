@@ -69,7 +69,7 @@ function BHelper.threat:update()
         if (unit_GUID) then
             local _, _, threat_pct = UnitDetailedThreatSituation(units_ID[i], 'target')
             if ((threat_pct) and (type(threat_pct) == 'number')) then
-                local unit_info = pool:get('threat')
+                local unit_info = pool:fetch('threat')
                 unit_info.guid = unit_GUID
                 unit_info.threat = threat_pct
                 threat_list[#threat_list + 1] = unit_info
