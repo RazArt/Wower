@@ -10,7 +10,7 @@ local macros = {}
 local modules = {}
 local pet = {}
 local player = {}
-local tables = {}
+local pool = {}
 local target = {}
 local threat = {}
 local timers = {}
@@ -24,7 +24,7 @@ function BHelper.core:namespace_init()
     modules = BHelper.modules
     pet = BHelper.pet
     player = BHelper.player
-    tables = BHelper.tables
+    pool = BHelper.pool
     target = BHelper.target
     threat = BHelper.threat
     timers = BHelper.timers

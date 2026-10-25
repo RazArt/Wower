@@ -14,7 +14,6 @@ BHelper._event_frame:RegisterEvent('PLAYER_TARGET_CHANGED')
 
 function BHelper:PLAYER_LOGIN()
     BHelper.core:namespace_init()
-    BHelper.tables:namespace_init()
     BHelper.keybinds:namespace_init()
     BHelper.modules:namespace_init()
     BHelper.pet:namespace_init()
