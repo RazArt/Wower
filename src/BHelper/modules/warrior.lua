@@ -13,6 +13,7 @@ local module = BHelper.modules.warrior
 function BHelper.modules.warrior.default:init()
     self.settings.type = 'battle'
     self.settings.only_combat_start = true
+    self.settings.usable_equip = 'DPS'
 
     if (not self.vars.attack_type) then self.vars.attack_type = '1' end
     if (not self.vars.battle_shout) then self.vars.battle_shout = false end
@@ -150,6 +151,7 @@ end
 function BHelper.modules.warrior.proto:init()
     self.settings.type = 'battle'
     self.settings.only_combat_start = true
+    self.settings.usable_equip = 'TANK'
 
     if (not self.vars.attack_type) then self.vars.attack_type = '1' end
     if (not self.vars.commanding_shout) then self.vars.commanding_shout = false end

@@ -6,6 +6,7 @@ event_frame:SetScript('OnEvent', function(_, event, ...)
 end)
 event_frame:RegisterEvent('PLAYER_LOGIN')
 event_frame:RegisterEvent('ACTIVE_TALENT_GROUP_CHANGED')
+event_frame:RegisterEvent('GLYPH_UPDATED')
 event_frame:RegisterEvent('PLAYER_REGEN_DISABLED')
 event_frame:RegisterEvent('PLAYER_REGEN_ENABLED')
 event_frame:RegisterEvent('PLAYER_CONTROL_LOST')
@@ -15,7 +16,6 @@ event_frame:RegisterEvent('PLAYER_TARGET_CHANGED')
 function BHelper:PLAYER_LOGIN()
     BHelper.core:namespace_init()
     BHelper.keybinds:namespace_init()
-    BHelper.modules:namespace_init()
     BHelper.pet:namespace_init()
     BHelper.player:namespace_init()
     BHelper.target:namespace_init()
@@ -28,9 +28,7 @@ function BHelper:PLAYER_LOGIN()
     end, 'threat_update', true)
 
     BHelper.timers:create(BHelper.core:get_update_time(), function()
-        if ((BHelper.core.module:get()) and (BHelper.core:runing()) and (not BHelper.core:cooldown())) then
-            BHelper.core.module:get():_execute()
-        end
+        BHelper.core:execute()
     end, 'main_execute', true)
 
     BHelper:create_state_frame()
@@ -42,7 +40,13 @@ end
 function BHelper:ACTIVE_TALENT_GROUP_CHANGED()
     self.timers:create(1, function()
         self.core:reload()
-    end)
+    end, 'reload')
+end
+
+function BHelper:GLYPH_UPDATED()
+    self.timers:create(1, function()
+        self.core:reload()
+    end, 'reload')
 end
 
 function BHelper:PLAYER_REGEN_DISABLED()
@@ -98,8 +102,8 @@ function BHelper:commands(msg)
         self.core.profile:set(args[2])
     elseif (args[1] == 'sa') then
         self.core.action:set(args[2])
-    elseif (args[1] == 'm') then
-        self.modules[self._module]:_macros()
+    elseif (args[1] == 'r') then
+        self.core:reload()
     elseif (args[1] == 'c') then
         if (not args[2]) then args[2] = 0.2 end
         self.core:add_cooldown(tonumber(args[2]))

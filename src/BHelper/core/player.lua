@@ -45,7 +45,7 @@ function BHelper.player:class()
 end
 
 function BHelper.player:spec()
-    return (player._spec) or 1
+    return (GetActiveTalentGroup()) or 1
 end
 
 function BHelper.player:level()
@@ -229,8 +229,8 @@ function BHelper.player:is_equipped_item(item)
     return (IsEquippedItem(item)) and true or false
 end
 
-function BHelper.player:equip_set(set)
-    return UseEquipmentSet(set)
+function BHelper.player:equip_set(equip_name)
+    return UseEquipmentSet(equip_name)
 end
 
 function BHelper.player:has_safety_threat(limit)

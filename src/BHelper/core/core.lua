@@ -88,31 +88,50 @@ function BHelper.core:reload()
         return false
     end
 
-    core.profile:get().settings = DB:profile_settings()
-    core.profile:get().vars = DB:profile_vars()
+    profile.settings = DB:profile_settings()
+    profile.vars = DB:profile_vars()
 
     keybinds:unbind_all()
     macros:clear()
     core:create_shared_macros()
 
-    core.module:get():_init()
-    core.module:get():_macros()
+    if (module.init) then module:init() end
+    if (module.macros) then module:macros() end
 
-    core.profile:get():_init()
-    core.profile:get():_macros()
+    if (profile.init) then profile:init() end
+    if (profile.macros) then profile:macros() end
 
-    -- core.profile:get().settings = DB:profile_settings()
-    -- core.profile:get().vars = DB:profile_vars()
+    if (profile.settings.usable_equip) then player:equip_set(profile.settings.usable_equip) end
 
-    -- keybinds:unbind_all()
-    -- macros:clear()
-    -- core:create_shared_macros()
+    if (profile.settings.type == 'battle') then
+        keybinds:bind_macro('Target')
+        keybinds:bind_macro('Stop')
+        keybinds:bind_macro('PetAttack')
+        keybinds:bind_macro('PetFollow')
+    end
+end
 
-    -- core.module:get():_init()
-    -- core.module:get():_macros()
+function BHelper.core:execute()
+    if ((core:runing()) and (not core:cooldown())) then
+        local stop_flag = false
+        local module = BHelper.core.module:get()
+        local profile = BHelper.core.profile:get()
+        local action = BHelper.core.action:get()
 
-    -- core.module:get():_init()
-    -- core.module:get():_macros()
+        if (BHelper.player:spell_is_targeting()) then BHelper.keybinds:show_click() end
+
+        if ((not stop_flag) and (profile.settings.type == 'battle')) then
+            if (not BHelper.player:can_target_attack()) then
+                stop_flag = BHelper.keybinds:show_macro('Target')
+            elseif ((BHelper.pet:has_control()) and (BHelper.pet:can_target_attack())) then
+                BHelper.keybinds:show_pet('Attack')
+            end
+        end
+
+        if ((not stop_flag) and (module.execute)) then stop_flag = module:execute() end
+        if ((not stop_flag) and (profile.execute)) then stop_flag = profile:execute() end
+        if ((not stop_flag) and (action)) then action(profile) end
+    end
 end
 
 function BHelper.core:set_var(var, value)
@@ -120,7 +139,10 @@ function BHelper.core:set_var(var, value)
 
     if (value == 'true') then value = true end
     if (value == 'false') then value = false end
-    if (vars[var] ~= nil) then vars[var] = value end
+    if (vars[var] ~= nil) then
+        core:print('var set <', var, '>', value)
+        vars[var] = value
+    end
 end
 
 function BHelper.core:toggle_var(var)
@@ -128,10 +150,10 @@ function BHelper.core:toggle_var(var)
 
     if (vars[var] ~= nil) then
         if (vars[var]) then
-            core:print('var_toggle <', var, '>', false)
+            core:print('var toggle <', var, '>', false)
             vars[var] = false
         else
-            core:print('var_toggle <', var, '>', true)
+            core:print('var toggle <', var, '>', true)
             vars[var] = true
         end
     end
@@ -209,14 +231,17 @@ end
 function BHelper.core.module:get()
     if (module) then return module end
     local name = DB:module_name()
-    if (core.module:exist(name)) then module = modules[name] end
+    if (core.module:exist(name)) then
+        core:print('load module -> ', name)
+        module = modules[name]
+    end
     return module
 end
 
 function BHelper.core.module:set(name)
     name = (name) and name:lower() or player:class()
     if (core.module:exist(name)) then
-        core:print('set_module -> ', name)
+        core:print('set module -> ', name)
         DB:module_name(name)
         core:reload()
         return true
@@ -233,14 +258,17 @@ end
 function BHelper.core.profile:get()
     if (profile) then return profile end
     local name = DB:profile_name()
-    if (core.profile:exist(name)) then profile = core.module:get()[name] end
+    if (core.profile:exist(name)) then
+        core:print('load profile -> ', name)
+        profile = core.module:get()[name]
+    end
     return profile
 end
 
 function BHelper.core.profile:set(name)
     name = (name) and name:lower() or 'default'
     if (core.profile:exist(name)) then
-        core:print('set_profile -> ', name)
+        core:print('set profile -> ', name)
         DB:profile_name(name)
         core:reload()
         return true

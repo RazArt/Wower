@@ -71,13 +71,11 @@ function BHelper.keybinds:bind_item(name, key)
 end
 
 function BHelper.keybinds:unbind_all()
-    local result = true
-    for _, bind in pairs(keybinds._binds) do
-        bind.name = nil
-        bind.class = nil
-        if (not SetBinding(bind.bind_string)) then result = false end
+    for i = 1, #keybinds._binds do
+        keybinds._binds[i].name = nil
+        keybinds._binds[i].class = nil
+        SetBinding(keybinds._binds[i].bind_string)
     end
-    return result
 end
 
 function BHelper.keybinds:_show(num, class, name, time_count)

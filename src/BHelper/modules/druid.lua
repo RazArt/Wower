@@ -15,6 +15,12 @@ function BHelper.modules.druid.default:init()
     self.settings.only_combat_start = true
     self.behind_of_target = true
 
+    if (player:spec() == 1) then
+        self.settings.usable_equip = 'DPS'
+    else
+        self.settings.usable_equip = 'TANK'
+    end
+
     if (not self.vars.silence) then self.vars.silence = false end
 
     keybinds:bind_spell('Калечение')

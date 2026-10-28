@@ -5,6 +5,8 @@ local talent_group = 1
 local module_name = nil
 local profile_name = nil
 local profile = nil
+local profile_settings = nil
+local profile_vars = nil
 
 function BHelper.DB:recache()
     DB = nil
@@ -12,6 +14,8 @@ function BHelper.DB:recache()
     module_name = nil
     profile_name = nil
     profile = nil
+    profile_settings = nil
+    profile_vars = nil
 end
 
 local function correct_name(name)
