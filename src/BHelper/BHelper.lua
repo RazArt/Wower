@@ -32,19 +32,16 @@ function BHelper:PLAYER_LOGIN()
     end, 'main_execute', true)
 
     BHelper:create_state_frame()
-
-    -- if ((not BHelperDBIcons) or (type(BHelperDBIcons) ~= 'table')) then BHelperDBIcons = {} end
-    -- for i = 1, GetNumMacroIcons() do BHelperDBIcons[i] = GetMacroIconInfo(i) end
 end
 
 function BHelper:ACTIVE_TALENT_GROUP_CHANGED()
-    self.timers:create(1, function()
+    self.timers:create(5, function()
         self.core:reload()
     end, 'reload')
 end
 
 function BHelper:GLYPH_UPDATED()
-    self.timers:create(1, function()
+    self.timers:create(5, function()
         self.core:reload()
     end, 'reload')
 end
@@ -87,7 +84,7 @@ function BHelper:commands(msg)
     for arg in string.gmatch(msg, '([^%s]+)') do table.insert(args, arg) end
 
     if ((args[1] == 'toggle') or (#args == 0)) then
-        self.core:toggle()
+        self.core:start_stop_toggle()
     elseif (args[1] == 'start') then
         self.core:start()
     elseif (args[1] == 'stop') then
@@ -102,8 +99,19 @@ function BHelper:commands(msg)
         self.core.profile:set(args[2])
     elseif (args[1] == 'sa') then
         self.core.action:set(args[2])
+    elseif (args[1] == 'sr') then
+        if (not BHelper.core:execution()) then
+            self.core.action:set(args[2])
+            self.core:start()
+        elseif ((BHelper.core:execution()) and (not self.core.action:set(args[2]))) then
+            self.core:stop()
+        end
     elseif (args[1] == 'r') then
         self.core:reload()
+    elseif (args[1] == 'l') then
+        self.core:locked_toggle()
+    elseif (args[1] == 'h') then
+        self.keybinds:hide(2)
     elseif (args[1] == 'c') then
         if (not args[2]) then args[2] = 0.2 end
         self.core:add_cooldown(tonumber(args[2]))

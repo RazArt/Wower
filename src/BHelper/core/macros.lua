@@ -1,9 +1,11 @@
 BHelper.macros = {}
 
+local icons = {}
+
 function BHelper.macros:create(name, command, slot, icon)
     name = name:lower()
     slot = slot or 0
-    icon = icon or 1
+    icon = (icon) and self:icon(icon) or 1
 
     self:delete(name)
     if (CreateMacro(name, icon, command, (GetNumMacros() == 36))) then
@@ -24,3 +26,13 @@ end
 function BHelper.macros:clear()
     for i = 54, 1, -1 do DeleteMacro(i) end
 end
+
+function BHelper.macros:icon(name)
+    name = ((name) and (type(name) == 'string')) and ('Interface\\Icons\\' .. name) or ''
+    for index, icon in pairs(icons) do if (icon == name) then return index end end
+end
+
+function BHelper.macros:init()
+    for i = 1, GetNumMacroIcons() do icons[i] = GetMacroIconInfo(i) end
+end
+BHelper.macros:init()

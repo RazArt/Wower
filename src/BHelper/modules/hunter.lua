@@ -10,13 +10,16 @@ local threat = BHelper.threat
 local timers = BHelper.timers
 local module = BHelper.modules.hunter
 
+local vars = nil
+
 function BHelper.modules.hunter.default:init()
+    vars = self.vars
     self.settings.type = 'battle'
     self.settings.only_combat_start = true
 
-    if (not self.vars.mana_regeneration) then self.vars.mana_regeneration = false end
-    if (not self.vars.manual_mana_regeneration) then self.vars.manual_mana_regeneration = false end
-    if (not self.vars.pet_control) then self.vars.pet_control = true end
+    if (not vars.mana_regeneration) then vars.mana_regeneration = false end
+    if (not vars.manual_mana_regeneration) then vars.manual_mana_regeneration = false end
+    if (not vars.pet_control) then vars.pet_control = true end
 
     keybinds:bind_spell('Дух дракондора')
     keybinds:bind_spell('Дух гадюки')
@@ -76,12 +79,12 @@ function BHelper.modules.hunter.default:macros()
 end
 
 function BHelper.modules.hunter.default:execute()
-    if (player:mana_on_percent() >= 95) then self.vars.manual_mana_regeneration = false end
+    if (player:mana_on_percent() >= 95) then vars.manual_mana_regeneration = false end
 
     if ((player:mana() < 500)) then
-        self.vars.mana_regeneration = true
+        vars.mana_regeneration = true
     elseif ((player:mana() > 3000)) then
-        self.vars.mana_regeneration = false
+        vars.mana_regeneration = false
     end
 
     if ((not self:mana_regeneration()) and (player:aura('Дух дракондора') == 0) and
@@ -207,6 +210,9 @@ function BHelper.modules.hunter.default:rotation_mana()
     if ((target:mana_max() > 1) and (target:aura('Укус гадюки', true) == 0) and
         (player:can_cast_on_enemy('Укус гадюки'))) then return keybinds:show_spell('Укус гадюки') end
 
+    if ((target:mana_max() == 0) and (target:aura('Укус змеи', true) == 0) and
+        (player:can_cast_on_enemy('Укус змеи'))) then return keybinds:show_spell('Укус змеи') end
+
     if ((target:aura('Укус гадюки', true) > 0) and player:can_cast_on_enemy('Выстрел химеры')) then
         return keybinds:show_spell('Выстрел химеры')
     end
@@ -217,10 +223,10 @@ function BHelper.modules.hunter.default:rotation_mana()
 end
 
 function BHelper.modules.hunter.default:stop()
-    self.vars.manual_mana_regeneration = false
+    vars.manual_mana_regeneration = false
     core.action:set('rotation_single')
 end
 
 function BHelper.modules.hunter.default:mana_regeneration()
-    return ((self.vars.mana_regeneration) or (self.vars.manual_mana_regeneration)) and true or false
+    return ((vars.mana_regeneration) or (vars.manual_mana_regeneration)) and true or false
 end

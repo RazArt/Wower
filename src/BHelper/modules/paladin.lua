@@ -10,13 +10,16 @@ local threat = BHelper.threat
 local timers = BHelper.timers
 local module = BHelper.modules.paladin
 
+local vars = nil
+
 function BHelper.modules.paladin.default:init()
+    vars = self.vars
     self.settings.type = 'battle'
     self.settings.only_combat_start = true
 
-    if (not self.vars.JoW) then self.vars.JoW = true end
-    if (not self.vars.JoL) then self.vars.JoL = false end
-    if (not self.vars.silence) then self.vars.silence = false end
+    if (not vars.JoW) then vars.JoW = true end
+    if (not vars.JoL) then vars.JoL = false end
+    if (not vars.silence) then vars.silence = false end
 
     keybinds:bind_spell('Свет небес')
     keybinds:bind_spell('Вспышка Света')
@@ -59,11 +62,11 @@ function BHelper.modules.paladin.default:execute()
 end
 
 function BHelper.modules.paladin.default:rotation_single()
-    if (player:can_cast_on_enemy('Правосудие мудрости') and (self.vars.JoW)) then
+    if (player:can_cast_on_enemy('Правосудие мудрости') and (vars.JoW)) then
         return keybinds:show_spell('Правосудие мудрости')
     end
 
-    if (player:can_cast_on_enemy('Правосудие света') and (self.vars.JoL)) then
+    if (player:can_cast_on_enemy('Правосудие света') and (vars.JoL)) then
         return keybinds:show_spell('Правосудие света')
     end
 

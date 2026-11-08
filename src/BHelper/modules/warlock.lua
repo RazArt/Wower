@@ -1,8 +1,9 @@
 function BHelper.modules.warlock.default:init()
+    vars = self.vars
     self.settings.type = 'battle'
     self.settings.only_combat_start = true
 
-    if (not self.vars.silence) then self.vars.silence = false end
+    if (not vars.silence) then vars.silence = false end
 
     BHelper.keybinds:bind_spell('Демоническое могущество')
     BHelper.keybinds:bind_spell('Проклятие стихий')

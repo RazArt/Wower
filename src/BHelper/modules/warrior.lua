@@ -10,16 +10,20 @@ local threat = BHelper.threat
 local timers = BHelper.timers
 local module = BHelper.modules.warrior
 
+local vars = nil
+
 function BHelper.modules.warrior.default:init()
+    vars = self.vars
+
     self.settings.type = 'battle'
     self.settings.only_combat_start = true
     self.settings.usable_equip = 'DPS'
 
-    if (not self.vars.attack_type) then self.vars.attack_type = '1' end
-    if (not self.vars.battle_shout) then self.vars.battle_shout = false end
-    if (not self.vars.commanding_shout) then self.vars.commanding_shout = false end
-    if (not self.vars.demoralizing_shout) then self.vars.demoralizing_shout = false end
-    if (not self.vars.silence) then self.vars.silence = false end
+    if (not vars.attack_type) then vars.attack_type = '1' end
+    if (not vars.battle_shout) then vars.battle_shout = false end
+    if (not vars.commanding_shout) then vars.commanding_shout = false end
+    if (not vars.demoralizing_shout) then vars.demoralizing_shout = false end
+    if (not vars.silence) then vars.silence = false end
 
     keybinds:bind_spell('Удар героя')
     keybinds:bind_spell('Рассекающий удар')
@@ -31,6 +35,7 @@ function BHelper.modules.warrior.default:init()
     keybinds:bind_spell('Ярость берсерка')
     keybinds:bind_spell('Кровавая ярость')
     keybinds:bind_spell('Раскол брони')
+    keybinds:bind_spell('Сокрушительный бросок')
     keybinds:bind_spell('Кровожадность')
     keybinds:bind_spell('Мощный удар')
     keybinds:bind_spell('Вихрь')
@@ -59,15 +64,22 @@ function BHelper.modules.warrior.default:macros()
     macros:create('Рывок',
                   '#showtooltip\n/bh c\n/cast [noharm]Вмешательство;[stance:2]Рывок;Перехват',
                   15)
+end
 
-    macros:create('S', '/startattack\n/bh sv attack_type 1\n/bh', 13, 1263)
-    macros:create('M', '/startattack\n/bh sv attack_type 2\n/bh', 14, 1264)
+function BHelper.modules.warrior.default:rotation_single()
+    vars.attack_type = '1'
+    return self:rotation()
+end
+
+function BHelper.modules.warrior.default:rotation_multiple()
+    vars.attack_type = '2'
+    return self:rotation()
 end
 
 function BHelper.modules.warrior.default:rotation()
-    if (self.vars.attack_type == '1') then
+    if (vars.attack_type == '1') then
         if (player:can_cast('Удар героя')) then keybinds:show_attack('Удар героя') end
-    elseif (self.vars.attack_type == '2') then
+    elseif (vars.attack_type == '2') then
         if (player:can_cast('Рассекающий удар')) then
             keybinds:show_attack('Рассекающий удар')
         end
@@ -77,25 +89,28 @@ function BHelper.modules.warrior.default:rotation()
         return keybinds:show_spell('Безудержное восстановление')
     end
 
-    if ((target:aura('Деморализующий крик') == 0) and (self.vars.demoralizing_shout) and
+    if ((target:aura('Деморализующий крик') == 0) and (vars.demoralizing_shout) and
         (player:can_cast('Деморализующий крик'))) then
         return keybinds:show_spell('Деморализующий крик')
     end
 
     if ((player:aura('Боевой крик') == 0) and
         (player:aura('Благословение могущества') == 0) and
-        (player:aura('Великое благословение могущества') == 0) and
-        (self.vars.battle_shout) and (player:can_cast('Боевой крик'))) then
-        return keybinds:show_spell('Боевой крик')
-    end
+        (player:aura('Великое благословение могущества') == 0) and (vars.battle_shout) and
+        (player:can_cast('Боевой крик'))) then return keybinds:show_spell('Боевой крик') end
 
-    if ((player:aura('Командирский крик') == 0) and (self.vars.commanding_shout) and
+    if ((player:aura('Командирский крик') == 0) and (vars.commanding_shout) and
         (player:can_cast('Командирский крик'))) then
         return keybinds:show_spell('Командирский крик')
     end
 
-    if (target:check_cast() and (self.vars.silence) and player:can_cast_on_enemy('Зуботычина')) then
+    if (target:check_cast() and (vars.silence) and player:can_cast_on_enemy('Зуботычина')) then
         return keybinds:show_spell('Зуботычина')
+    end
+
+    if ((target:aura('Сокрушительный бросок') == 0) and
+        (player:can_cast_on_enemy('Сокрушительный бросок'))) then
+        return keybinds:show_spell('Сокрушительный бросок')
     end
 
     if ((target:aura('Раскол брони') > 0) and (target:aura('Раскол брони') <= 2) and
@@ -135,28 +150,31 @@ function BHelper.modules.warrior.default:rotation()
     if ((not player:can_cast_on_enemy('Кровожадность', 1)) and (player:aura('Сокрушить!') > 0) and
         (player:can_cast_on_enemy('Мощный удар'))) then return keybinds:show_spell('Мощный удар') end
 
-    if ((target:name() ~= 'Принц Келесет') and (player:can_cast('Вихрь'))) then
-        return keybinds:show_spell('Вихрь')
-    end
+    if ((target:name() ~= 'Принц Келесет') and (player:check_spell_range('Раскол брони')) and
+        (player:can_cast('Вихрь'))) then return keybinds:show_spell('Вихрь') end
 
     if ((not player:can_cast_on_enemy('Кровожадность', 1)) and (player:can_cast_on_enemy('Казнь'))) then
         return keybinds:show_spell('Казнь')
     end
 
-    if ((target:aura_count('Раскол брони') < 5) and (player:can_cast_on_enemy('Раскол брони'))) then
+    if ((not player:can_cast_on_enemy('Кровожадность', 1)) and
+        (target:aura_count('Раскол брони') < 5) and (player:can_cast_on_enemy('Раскол брони'))) then
         return keybinds:show_spell('Раскол брони')
     end
 end
 
 function BHelper.modules.warrior.proto:init()
+    vars = self.vars
+
     self.settings.type = 'battle'
     self.settings.only_combat_start = true
     self.settings.usable_equip = 'TANK'
 
-    if (not self.vars.attack_type) then self.vars.attack_type = '1' end
-    if (not self.vars.commanding_shout) then self.vars.commanding_shout = false end
-    if (not self.vars.demoralizing_shout) then self.vars.demoralizing_shout = false end
-    if (not self.vars.silence) then self.vars.silence = false end
+    if (not vars.attack_type) then vars.attack_type = '1' end
+    if (not vars.battle_shout) then vars.battle_shout = false end
+    if (not vars.commanding_shout) then vars.commanding_shout = false end
+    if (not vars.demoralizing_shout) then vars.demoralizing_shout = false end
+    if (not vars.silence) then vars.silence = false end
 
     keybinds:bind_spell('Удар героя')
     keybinds:bind_spell('Рассекающий удар')
@@ -183,17 +201,27 @@ function BHelper.modules.warrior.proto:init()
     keybinds:bind_spell('Блок щитом')
     keybinds:bind_spell('Отражение заклинания')
 
+    keybinds:bind_spell('Кровопускание')
+
     core.action:set('rotation')
 end
 
 function BHelper.modules.warrior.proto:macros()
     macros:create('Удар щитомTV', '#showtooltip Удар щитом\n/bh tv silence', 41)
+    macros:create('Боевой крикTV', '#showtooltip Боевой крик\n/bh tv battle_shout', 42)
     macros:create('Командирский крикTV',
-                  '#showtooltip Командирский крик\n/bh tv commanding_shout', 42)
+                  '#showtooltip Командирский крик\n/bh tv commanding_shout', 43)
     macros:create('Рывок',
-                  '#showtooltip\n/bh c\n/cast [noharm]Вмешательство;Рывок;Перехват', 15)
+                  '#showtooltip\n/bh c\n/cast [stance:2] Боевая стойка\n/cast [noharm]Вмешательство;Рывок;Перехват\n/cast [stance:1] Оборонительная стойка',
+                  15)
+    -- macros:create('Рывок',
+    --               '#showtooltip\n/bh c\n/cast [noharm]Вмешательство;Рывок;Перехват', 15)
+    -- macros:create('Провокация',
+    --               '#showtooltip Провокация\n/bh c\n/cast [stance:1/3] Оборонительная стойка\n/cast [@targettarget,help] Бдительность\n/castsequence reset=target/8 Провокация, Дразнящий удар',
+    --               16)
     macros:create('Провокация',
-                  '#showtooltip\n/bh c\n/cast Провокация\n/cast Дразнящий удар', 16)
+                  '#showtooltip\n/bh c\n/cast [stance:1/3] Оборонительная стойка\n/cast Провокация\n/cast Дразнящий удар',
+                  16)
     macros:create('Возмездие',
                   '#showtooltip Возмездие\n/bh c\n/cast [stance:2/3] Боевая стойка\n/cast [stance:1] Возмездие',
                   24)
@@ -203,15 +231,22 @@ function BHelper.modules.warrior.proto:macros()
     macros:create('Блок щитом', '#showtooltip\n/bh c\n/cast Блок щитом', 81)
     macros:create('Отражение заклинания',
                   '#showtooltip\n/bh c\n/cast Отражение заклинания', 82)
+end
 
-    macros:create('S', '/startattack\n/bh sv attack_type 1\n/bh', 13, 1263)
-    macros:create('M', '/startattack\n/bh sv attack_type 2\n/bh', 14, 1264)
+function BHelper.modules.warrior.proto:rotation_single()
+    vars.attack_type = '1'
+    return self:rotation()
+end
+
+function BHelper.modules.warrior.proto:rotation_multiple()
+    vars.attack_type = '2'
+    return self:rotation()
 end
 
 function BHelper.modules.warrior.proto:rotation()
-    if ((self.vars.attack_type == '1') and (player:power() >= 20) and (player:can_cast('Удар героя'))) then
+    if ((vars.attack_type == '1') and (player:power() >= 20) and (player:can_cast('Удар героя'))) then
         keybinds:show_attack('Удар героя')
-    elseif ((self.vars.attack_type == '2') and (player:power() >= 30) and
+    elseif ((vars.attack_type == '2') and (player:power() >= 30) and
         (player:can_cast('Рассекающий удар'))) then
         keybinds:show_attack('Рассекающий удар')
     end
@@ -228,7 +263,7 @@ function BHelper.modules.warrior.proto:rotation()
         return keybinds:show_spell('Ни шагу назад')
     end
 
-    if (target:check_cast() and (self.vars.silence) and player:can_cast_on_enemy('Удар щитом')) then
+    if (target:check_cast() and (vars.silence) and player:can_cast_on_enemy('Удар щитом')) then
         return keybinds:show_spell('Удар щитом')
     end
 
@@ -243,44 +278,67 @@ function BHelper.modules.warrior.proto:rotation()
         return keybinds:show_spell('Кровавая ярость')
     end
 
-    if ((self.vars.attack_type == '1') and (player:has_stable_threat()) and (target:is_boss()) and
-        (player:can_cast_on_enemy('Героический бросок'))) then
-        return keybinds:show_spell('Героический бросок')
-    end
+    if (player:has_stable_threat()) then
+        if ((target:aura('Удар грома', true) < 2) and (player:check_spell_range('Раскол брони')) and
+            (player:can_cast('Удар грома'))) then return keybinds:show_spell('Удар грома') end
 
-    if (((self.vars.attack_type == '2')) and (player:check_spell_range('Сокрушение')) and
-        (player:can_cast('Удар грома'))) then return keybinds:show_spell('Удар грома') end
-
-    if (not player:has_stable_threat()) then
         if ((target:aura('Деморализующий крик') < 2) and
-            (player:check_spell_range('Сокрушение')) and
+            (player:check_spell_range('Раскол брони')) and
             (player:can_cast('Деморализующий крик'))) then
             return keybinds:show_spell('Деморализующий крик')
         end
 
-        if ((target:aura('Удар грома') < 2) and (player:check_spell_range('Сокрушение')) and
-            (player:can_cast('Удар грома'))) then return keybinds:show_spell('Удар грома') end
-
-        if ((player:aura('Командирский крик') == 0) and (self.vars.commanding_shout) and
+        if ((player:aura('Командирский крик') == 0) and (vars.commanding_shout) and
             (player:can_cast('Командирский крик'))) then
             return keybinds:show_spell('Командирский крик')
         end
+
+        if ((player:aura('Боевой крик') == 0) and
+            (player:aura('Благословение могущества') == 0) and
+            (player:aura('Великое благословение могущества') == 0) and (vars.battle_shout) and
+            (player:can_cast('Боевой крик'))) then return keybinds:show_spell('Боевой крик') end
     end
 
-    if ((player:can_cast_on_enemy('Реванш'))) then return keybinds:show_spell('Реванш') end
-
-    if ((player:can_cast_on_enemy('Мощный удар щитом'))) then
-        return keybinds:show_spell('Мощный удар щитом')
-    end
-
-    if (((self.vars.attack_type == '2') or (player:has_stable_threat())) and (player:can_cast('Блок щитом'))) then
+    if (((vars.attack_type == '2') or (not player:has_stable_threat())) and (player:can_cast('Блок щитом'))) then
         return keybinds:show_spell('Блок щитом')
     end
 
-    if ((player:check_spell_range('Сокрушение')) and
-        (player:spell_cooldown('Мощный удар щитом') > 1.5) and
-        (player:can_cast('Ударная волна'))) then return keybinds:show_spell('Ударная волна') end
+    if ((vars.attack_type == '1') and (not player:has_stable_threat()) and (target:is_boss()) and
+        (player:can_cast_on_enemy('Героический бросок'))) then
+        return keybinds:show_spell('Героический бросок')
+    end
 
-    if ((player:spell_cooldown('Мощный удар щитом') > 1.5) and
+    if ((vars.attack_type == '1') and (target:aura('Кровопускание', true) == 0) and
+        (player:can_cast_on_enemy('Кровопускание'))) then
+        return keybinds:show_spell('Кровопускание')
+    end
+
+    if (((vars.attack_type == '2')) and (player:check_spell_range('Раскол брони')) and
+        (player:can_cast('Удар грома'))) then return keybinds:show_spell('Удар грома') end
+
+    if (player:can_cast_on_enemy('Реванш')) then return keybinds:show_spell('Реванш') end
+
+    if (player:can_cast_on_enemy('Мощный удар щитом')) then
+        return keybinds:show_spell('Мощный удар щитом')
+    end
+
+    if ((not player:can_cast_on_enemy('Реванш', 1)) and
+        (not player:can_cast_on_enemy('Мощный удар щитом', 1)) and
+        (player:check_spell_range('Раскол брони')) and (player:can_cast('Ударная волна'))) then
+        return keybinds:show_spell('Ударная волна')
+    end
+
+    if ((not player:can_cast_on_enemy('Реванш', 1)) and
+        (not player:can_cast_on_enemy('Мощный удар щитом', 1)) and
         (player:can_cast_on_enemy('Сокрушение'))) then return keybinds:show_spell('Сокрушение') end
+
+    if ((not player:can_cast_on_enemy('Реванш', 1)) and
+        (not player:can_cast_on_enemy('Мощный удар щитом', 1)) and
+        (target:aura_count('Раскол брони') < 5) and (player:can_cast_on_enemy('Раскол брони'))) then
+        return keybinds:show_spell('Раскол брони')
+    end
+end
+
+function BHelper.modules.warrior.proto:stop()
+    vars.attack_type = '1'
 end

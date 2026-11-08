@@ -101,7 +101,7 @@ function BHelper.keybinds:_show(num, class, name, time_count)
     keybinds._frames.frame[num]:Show()
 
     timers:create(time_count, function()
-        keybinds._frames.frame[num]:Hide()
+        keybinds:hide(num)
     end, 'keybinds_hide_' .. num)
     return true
 end
@@ -132,6 +132,10 @@ end
 
 function BHelper.keybinds:show_pet(name, time_count)
     return keybinds:_show(5, 'macro', 'pet' .. name, time_count)
+end
+
+function BHelper.keybinds:hide(num)
+    return keybinds._frames.frame[num]:Hide()
 end
 
 function BHelper.keybinds:init()

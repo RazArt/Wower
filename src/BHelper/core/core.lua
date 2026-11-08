@@ -20,6 +20,9 @@ local module = nil
 local profile = nil
 local action = nil
 
+local execution = false
+local locked = false
+
 function BHelper.core:namespace_init()
     auras = BHelper.auras
     core = BHelper.core
@@ -35,7 +38,19 @@ function BHelper.core:namespace_init()
     DB = BHelper.DB
 end
 
+function BHelper.core:locked_toggle()
+    if (locked) then
+        core:print('Execution is unlocked')
+        locked = false
+    else
+        core:print('Execution is locked')
+        core:stop()
+        locked = true
+    end
+end
+
 function BHelper.core:start()
+    if (locked) then return false end
     if ((core.profile:get().settings.only_combat_start) and (not player:on_combat()) and (not target:on_combat())) then
         return false
     end
@@ -46,26 +61,26 @@ function BHelper.core:start()
         core.profile:get().burst_cooldown = false
     end, 'burst_cooldown')
 
-    core._runing = true
+    execution = true
     BHelper.state_frame:Show()
 
     if (core.profile:get().start) then core.profile:get():start() end
 end
 
 function BHelper.core:stop()
-    core._runing = false
+    execution = false
     core._cooldown = false
     core.profile:get().burst_cooldown = false
 
     BHelper.state_frame:Hide()
 
-    keybinds:show_macro('Stop', 0.1)
-    if (pet:has_control()) then keybinds:show_pet('Follow', 0.1) end
+    keybinds:show_macro('Stop', 0.4)
+    if (pet:has_control()) then keybinds:show_pet('Follow', 0.4) end
     if (core.profile:get().stop) then core.profile:get():stop() end
 end
 
-function BHelper.core:toggle()
-    if (core._runing) then
+function BHelper.core:start_stop_toggle()
+    if (execution) then
         core:stop()
     else
         core:start()
@@ -112,7 +127,7 @@ function BHelper.core:reload()
 end
 
 function BHelper.core:execute()
-    if ((core:runing()) and (not core:cooldown())) then
+    if ((core:execution()) and (not core:cooldown())) then
         local stop_flag = false
         local module = BHelper.core.module:get()
         local profile = BHelper.core.profile:get()
@@ -166,8 +181,8 @@ function BHelper.core:add_cooldown(count)
     end, 'cooldown')
 end
 
-function BHelper.core:runing()
-    return core._runing
+function BHelper.core:execution()
+    return execution
 end
 
 function BHelper.core:cooldown()
@@ -183,49 +198,68 @@ function BHelper.core:print(...)
 end
 
 -- function BHelper.core:create_shared_macros()
---     if ((player:class() == 'hunter') or (player:class() == 'warlock') or
---         (player:class() == 'deathknight')) then
+--     if ((player:class() == 'hunter') or (player:class() == 'warlock') or (player:class() == 'deathknight')) then
 --         macros:create('PetAttack', '/petattack [@target]', 19, 417)
 --         macros:create('PetFollow', '/petfollow', 20, 414)
 --     end
 
 --     macros:create('Target', '/targetenemy\n/startattack\n/bh c', 0)
 --     macros:create('Stop', '/stopcasting\n/stopattack\n/cleartarget', 0)
---     macros:create('Макросы', '/macro', 60, 524)
---     macros:create('Roll', '/roll', 52, 1056)
 --     macros:create('Reload', '/reload', 49, 1058)
+--     macros:create('Roll', '/roll', 52, 1056)
 --     macros:create('Focus', '/focus', 53, 395)
+--     macros:create('Макросы', '/macro', 55, 524)
+
 --     macros:create('Баджи',
---                           '/script local function buy (n,q) for i=1,100 do if n==GetMerchantItemInfo(i) then BuyMerchantItem(i,q) end end end buy (\'Эмблема героизма\',80)',
---                           0, 689)
+--                   '/script local function buy (n,q) for i=1,100 do if n==GetMerchantItemInfo(i) then BuyMerchantItem(i,q) end end end buy (\'Эмблема героизма\',80)',
+--                   0, 689)
 
 --     macros:create('S', '/startattack\n/bh sa rotation_single\n/bh', 13, 605)
 --     macros:create('M', '/startattack\n/bh sa rotation_multiple\n/bh', 14, 606)
+
+--     macros:create('lock', '/bh l', 48)
+--     keybinds:bind_macro('lock', 'F12')
 -- end
 
 function BHelper.core:create_shared_macros()
     if ((player:class() == 'hunter') or (player:class() == 'warlock') or (player:class() == 'deathknight')) then
-        macros:create('PetAttack', '/petattack [@target]', 19, 973)
-        macros:create('PetFollow', '/petfollow', 20, 970)
+        macros:create('PetAttack', '/petattack [@target]', 19, 'Ability_Vehicle_PlayerLoaded')
+        macros:create('PetFollow', '/petfollow', 20, 'Ability_Vehicle_LoadSelfCatapult')
     end
-    macros:create('Target', '/targetenemy\n/startattack\n/bh c', 0, 711)
+    macros:create('Target', '/targetenemy\n/startattack\n/bh c', 0)
     macros:create('Stop', '/stopcasting\n/stopattack\n/cleartarget', 0)
-    macros:create('Аук', '/s .i au', 60, 1935)
-    macros:create('Банк', '/s .i b', 59, 1933)
-    macros:create('Почта', '/s .i m', 58, 1931)
-    macros:create('Магазин', '/s .i v', 57, 1929)
-    macros:create('Воскрешение', '/s .i massrevive', 56, 1927)
-    macros:create('Макросы', '/macro', 55, 1123)
-    macros:create('Тренер', '/s .i t', 0, 1930)
-    macros:create('Roll', '/roll', 52, 1836)
-    macros:create('Reload', '/reload', 49, 1838)
-    macros:create('Focus', '/focus', 53, 921)
+
+    macros:create('Reload', '/reload', 49, 'Spell_Shadow_SoulLeech_2')
+    macros:create('Roll', '/roll', 52, 'Spell_Shadow_SoulLeech')
+    macros:create('Focus', '/focus', 53, 'Ability_Spy')
+    macros:create('Макросы', '/macro', 55, 'Spell_Arcane_Rune')
+
+    if (GetRealmName() == 'WoW Circle 3.3.5a x1') then
+        macros:create('Домой', '/s .vip home', 56, 'Spell_Arcane_PortalDalaran')
+        macros:create('ГХ', '/s .gh tele', 57, 'Spell_Arcane_TeleportShattrath')
+        macros:create('Тренер', '/s .vip class', 58, 'Spell_Arcane_FocusedPower')
+        macros:create('Почта', '/s .vip mail', 59, 'Ability_Hunter_MarkedForDeath')
+        macros:create('Банк', '/s .vip bank', 60, 'Spell_Shadow_GhostKey')
+    else
+        macros:create('Воскрешение', '/s .i massrevive', 56, 'spell_yorsahj_bloodboil_blue')
+        macros:create('Магазин', '/s .i v', 57, 'spell_yorsahj_bloodboil_blue')
+        macros:create('Почта', '/s .i m', 58, 'spell_yorsahj_bloodboil_green')
+        macros:create('Банк', '/s .i b', 59, 'spell_yorsahj_bloodboil_orange')
+        macros:create('Аук', '/s .i au', 60, 'spell_yorsahj_bloodboil_purple')
+        macros:create('Тренер', '/s .i t', 0, 'Spell_Arcane_FocusedPower')
+    end
+
     macros:create('Баджи',
                   '/script local function buy (n,q) for i=1,100 do if n==GetMerchantItemInfo(i) then BuyMerchantItem(i,q) end end end buy (\'Эмблема героизма\',80)',
-                  0, 1374)
-    macros:create('LADY', '/cleartarget\n/equipset [noequipped:Оружие] pve; LADY', 26, 1545)
-    macros:create('S', '/startattack\n/bh sa rotation_single\n/bh', 13, 1263)
-    macros:create('M', '/startattack\n/bh sa rotation_multiple\n/bh', 14, 1264)
+                  0, 'Spell_Holy_EmpowerChampion')
+    macros:create('LADY', '/cleartarget\n/equipset [noequipped:Оружие] pve; LADY', 26,
+                  'Spell_Magic_PolymorphRabbit')
+
+    macros:create('S', '/targetlastenemy\n/startattack\n/bh sr rotation_single', 13, 'Spell_Fire_FelPyroblast')
+    macros:create('M', '/targetlastenemy\n/startattack\n/bh sr rotation_multiple', 14, 'Spell_Fire_FelRainOfFire')
+
+    macros:create('lock', '/bh l', 48)
+    keybinds:bind_macro('lock', 'F12')
 end
 
 function BHelper.core.module:get()
@@ -288,7 +322,7 @@ end
 
 function BHelper.core.action:set(name)
     name = (name) and name:lower() or 'default'
-    if ((core.profile:get()) and (rawget(core.profile:get(), name))) then
+    if ((core.profile:get()) and (rawget(core.profile:get(), name)) and (action ~= core.profile:get()[name])) then
         action = core.profile:get()[name]
         return true
     end
@@ -296,7 +330,6 @@ function BHelper.core.action:set(name)
 end
 
 function BHelper.core:init()
-    self._runing = false
     self._cooldown = false
     self._debug = true
     self.update_time = 0.1

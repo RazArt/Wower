@@ -1,4 +1,5 @@
 function BHelper.modules.mailbox.common:init()
+    vars = self.vars
     self.vars.open = false
 
     self:register_event('MAIL_CLOSED')

@@ -10,7 +10,11 @@ local threat = BHelper.threat
 local timers = BHelper.timers
 local module = BHelper.modules.druid
 
+local vars = nil
+
 function BHelper.modules.druid.default:init()
+    vars = self.vars
+
     self.settings.type = 'battle'
     self.settings.only_combat_start = true
     self.behind_of_target = true
@@ -21,7 +25,7 @@ function BHelper.modules.druid.default:init()
         self.settings.usable_equip = 'TANK'
     end
 
-    if (not self.vars.silence) then self.vars.silence = false end
+    if (not vars.silence) then vars.silence = false end
 
     keybinds:bind_spell('Калечение')
     keybinds:bind_spell('Оглушить')
@@ -161,7 +165,7 @@ function BHelper.modules.druid.default:rotation_multiple()
 end
 
 function BHelper.modules.druid.default:cat_single()
-    if ((target:check_cast()) and (self.vars.silence) and (player:can_cast_on_enemy('Калечение'))) then
+    if ((target:check_cast()) and (vars.silence) and (player:can_cast_on_enemy('Калечение'))) then
         return keybinds:show_spell('Калечение')
     end
 
@@ -251,7 +255,7 @@ end
 function BHelper.modules.druid.default:bear_single()
     if (player:can_cast('Трепка')) then keybinds:show_attack('Трепка') end
 
-    if ((target:check_cast()) and (self.vars.silence) and (player:can_cast_on_enemy('Оглушить'))) then
+    if ((target:check_cast()) and (vars.silence) and (player:can_cast_on_enemy('Оглушить'))) then
         return keybinds:show_spell('Оглушить')
     end
 
@@ -277,7 +281,7 @@ end
 function BHelper.modules.druid.default:bear_multiple()
     if (player:can_cast('Трепка')) then keybinds:show_attack('Трепка') end
 
-    if ((target:check_cast()) and (self.vars.silence) and (player:can_cast_on_enemy('Оглушить'))) then
+    if ((target:check_cast()) and (vars.silence) and (player:can_cast_on_enemy('Оглушить'))) then
         return keybinds:show_spell('Оглушить')
     end
 

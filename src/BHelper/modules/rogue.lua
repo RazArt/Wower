@@ -10,11 +10,14 @@ local threat = BHelper.threat
 local timers = BHelper.timers
 local module = BHelper.modules.rogue
 
+local vars = nil
+
 function BHelper.modules.rogue.default:init()
+    vars = self.vars
     self.settings.type = 'battle'
     self.settings.only_combat_start = true
 
-    if (not self.vars.sunder) then self.vars.sunder = false end
+    if (not vars.sunder) then vars.sunder = false end
 
     keybinds:bind_spell('Пинок')
     keybinds:bind_spell('Ослабление доспеха')
@@ -65,7 +68,7 @@ function BHelper.modules.rogue.default:rotation_single()
         end
     end
 
-    if ((self.vars.sunder) and (not BHelper.player:has_heroism_buff())) then
+    if ((vars.sunder) and (not BHelper.player:has_heroism_buff())) then
         if ((target:aura('Ослабление доспеха') == 0) and
             (player:can_cast_on_enemy('Ослабление доспеха'))) then
             return keybinds:show_spell('Ослабление доспеха')

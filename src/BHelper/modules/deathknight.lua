@@ -20,6 +20,8 @@ local can_use_blood_rune = false
 
 local usable_spec = ''
 
+local vars = nil
+
 function BHelper.modules.deathknight:init()
     usable_spec = (GetSpellInfo('Ледяной удар')) and 'frost' or usable_spec
     usable_spec = (GetSpellInfo('Удар плети')) and 'unholy' or usable_spec
@@ -63,11 +65,13 @@ end
 
 do -- Танк ГДК
     function BHelper.modules.deathknight.default:init()
+        vars = self.vars
+
         self.settings.type = 'battle'
         self.settings.only_combat_start = true
         self.settings.usable_equip = 'TANK'
 
-        if (not self.vars.silence) then self.vars.silence = false end
+        if (not vars.silence) then vars.silence = false end
 
         keybinds:bind_spell('Власть льда')
         keybinds:bind_spell('Кровь вампира')
@@ -88,17 +92,16 @@ do -- Танк ГДК
         keybinds:bind_spell('Войско мертвых')
         keybinds:bind_spell('Усиление рунического оружия')
         keybinds:bind_spell('Истерия')
+        keybinds:bind_spell('Кровавое неистовство(Расовая)')
 
         keybinds:bind_macro('Смертельный союз')
 
         self:register_event('UNIT_SPELLCAST_SUCCEEDED')
-        self:register_event('PLAYER_TARGET_CHANGED')
     end
 
     function BHelper.modules.deathknight.default:macros()
         macros:create('Заморозка разума', '#showtooltip Заморозка разума\n/bh tv silence',
                       41)
-
         macros:create('Смертельный союз',
                       '#showtooltip Смертельный союз\n/castsequence reset=120 Воскрешение мертвых, Смертельный союз')
         macros:create('Незыблемость льда',
@@ -113,18 +116,27 @@ do -- Танк ГДК
         macros:create('Темная власть', '#showtooltip\n/bh c\n/cast Темная власть', 16)
         macros:create('Ледяные оковы', '#showtooltip\n/bh c\n/cast Ледяные оковы', 19)
         macros:create('Войско мертвых',
-                      '#showtooltip\n/bh sv army_of_the_dead_timeout false\n/bh c\n/cast Войско мертвых',
-                      20)
+                      '#showtooltip\n/bh sv army_timeout false\n/bh c\n/cast Войско мертвых', 20)
         macros:create('Усиление рунического оружия',
                       '#showtooltip\n/bh c\n/cast Усиление рунического оружия', 21)
         macros:create('Истерия',
                       '#showtooltip Истерия\n/bh c\n/cast [@focus,help,nodead] Истерия\n/cast [@target,help,nodead] Истерия\n/cast [@mouseover,help,nodead] Истерия',
                       22)
         macros:create('Смерть и разложение',
-                      '#showtooltip\n/bh c\n/cast Смерть и разложение', 2)
+                      '#showtooltip\n/bh c 1\n/cast Смерть и разложение', 2)
     end
 
-    function BHelper.modules.deathknight.default:execute()
+    function BHelper.modules.deathknight.default:rotation_single()
+        vars.attack_type = '1'
+        return self:rotation()
+    end
+
+    function BHelper.modules.deathknight.default:rotation_multiple()
+        vars.attack_type = '2'
+        return self:rotation()
+    end
+
+    function BHelper.modules.deathknight.default:rotation()
         if (player:can_cast('Рунический удар')) then
             keybinds:show_attack('Рунический удар')
         end
@@ -143,18 +155,15 @@ do -- Танк ГДК
             return keybinds:show_spell('Захват рун')
         end
 
-        if (player:spell_cooldown('Войско мертвых') > 10) then
-            self.vars.army_of_the_dead_timeout = true
-        end
-        if (not self.vars.army_of_the_dead_timeout) then
+        if (player:spell_cooldown('Войско мертвых') > 10) then vars.army_timeout = true end
+        if (not vars.army_timeout) then
             if (player:can_cast('Войско мертвых')) then
                 return keybinds:show_spell('Войско мертвых')
             end
             return true
         end
 
-        if ((target:check_cast()) and (self.vars.silence) and
-            (player:can_cast_on_enemy('Заморозка разума'))) then
+        if ((target:check_cast()) and (vars.silence) and (player:can_cast_on_enemy('Заморозка разума'))) then
             return keybinds:show_spell('Заморозка разума')
         end
 
@@ -162,14 +171,20 @@ do -- Танк ГДК
             return keybinds:show_spell('Власть льда')
         end
 
-        if ((player:aura('Зимний горн') == 0) and (player:aura('Сила земли') == 0) and
-            (player:can_cast('Зимний горн'))) then return keybinds:show_spell('Зимний горн') end
-    end
-
-    function BHelper.modules.deathknight.default:rotation_single()
-        if ((target:name() == 'Волдырный зомби') and (target:name() == 'Большой слизнюк') and
+        if (((target:name() == 'Волдырный зомби') or (target:name() == 'Большой слизнюк')) and
             (target:aura('Ледяные оковы') == 0) and (player:can_cast_on_enemy('Ледяные оковы'))) then
             return keybinds:show_spell('Ледяные оковы')
+        end
+
+        if ((vars.attack_type == '2') and (disease_exists)) then
+            if ((not vars.pestilence_timeout) and (player:can_cast_on_enemy('Мор'))) then
+                return keybinds:show_spell('Мор')
+            end
+
+            if ((rune_cooldown[1] == 0) and (rune_cooldown[2] == 0) and (player:check_spell_range('Удар чумы')) and
+                (player:can_cast('Вскипание крови'))) then
+                return keybinds:show_spell('Вскипание крови')
+            end
         end
 
         if (((not player:has_stable_threat()) or (self.opener) or (target:aura('Озноб', true) == 0)) and
@@ -183,77 +198,72 @@ do -- Танк ГДК
             return keybinds:show_spell('Усиление рунического оружия')
         end
 
+        if ((not player:has_stable_threat()) and (target:is_boss()) and
+            (player:spell_cooldown('Ледяное прикосновение') > 3) and
+            (player:can_cast('Кровоотвод'))) then return keybinds:show_spell('Кровоотвод') end
+
         if ((target:aura('Кровавая чума', true) == 0) and (player:can_cast_on_enemy('Удар чумы'))) then
             return keybinds:show_spell('Удар чумы')
         end
 
-        if (((player:aura('Клинковая ограда') == 0) or
-            ((rune_cooldown[1] == 0) and (rune_cooldown[2] == 0))) and
-            (player:can_cast_on_enemy('Кровавый удар'))) then
-            return keybinds:show_spell('Кровавый удар')
+        if ((player:aura('Клинковая ограда') == 0) and (player:health_on_percent() > 80)) then
+            if (player:can_cast_on_enemy('Удар в сердце')) then
+                return keybinds:show_spell('Удар в сердце')
+            end
+            if (player:can_cast_on_enemy('Кровавый удар')) then
+                return keybinds:show_spell('Кровавый удар')
+            end
         end
 
         if ((player:has_stable_threat()) and (player:can_cast_on_enemy('Удар смерти'))) then
             return keybinds:show_spell('Удар смерти')
         end
 
-        if ((player:power() == 100) and (player:can_cast_on_enemy('Лик смерти'))) then
-            return keybinds:show_spell('Лик смерти')
-        end
-    end
-
-    function BHelper.modules.deathknight.default:rotation_multiple()
-        if (((not player:has_stable_threat()) or (target:aura('Озноб', true) < 3)) and
-            (player:can_cast_on_enemy('Ледяное прикосновение'))) then
-            return keybinds:show_spell('Ледяное прикосновение')
-        end
-
-        if ((target:aura('Кровавая чума', true) < 3) and (player:can_cast_on_enemy('Удар чумы'))) then
-            return keybinds:show_spell('Удар чумы')
-        end
-
-        if (((target:aura('Озноб', true) > 0) or (target:aura('Кровавая чума', true) > 0)) and
-            (not self.vars.pestilence_timeout) and (player:can_cast_on_enemy('Мор'))) then
-            return keybinds:show_spell('Мор')
-        end
-
-        if ((disease_exists) and (player:check_spell_range('Удар чумы')) and
-            (player:can_cast('Вскипание крови'))) then
-            return keybinds:show_spell('Вскипание крови')
-        end
-
-        if ((player:has_stable_threat()) and (player:can_cast_on_enemy('Удар смерти'))) then
-            return keybinds:show_spell('Удар смерти')
+        if ((rune_cooldown[1] == 0) and (rune_cooldown[2] == 0)) then
+            if (player:can_cast_on_enemy('Удар в сердце')) then
+                return keybinds:show_spell('Удар в сердце')
+            end
+            if (player:can_cast_on_enemy('Кровавый удар')) then
+                return keybinds:show_spell('Кровавый удар')
+            end
         end
 
         if ((player:power() == 100) and (player:can_cast_on_enemy('Лик смерти'))) then
             return keybinds:show_spell('Лик смерти')
         end
+
+        if ((player:aura('Зимний горн') == 0) and (player:aura('Сила земли') == 0) and
+            (player:can_cast('Зимний горн'))) then return keybinds:show_spell('Зимний горн') end
     end
 
-    function BHelper.modules.deathknight.default:UNIT_SPELLCAST_SUCCEEDED(castGUID, spellName)
-        if (spellName == 'Удар чумы') then self.vars.pestilence_timeout = false end
-        if (spellName == 'Мор') then self.vars.pestilence_timeout = true end
-        if (spellName == 'Войско мертвых') then self.vars.army_of_the_dead_timeout = true end
-    end
+    function BHelper.modules.deathknight.default:UNIT_SPELLCAST_SUCCEEDED(unit_id, spellName)
+        if (unit_id ~= 'player') then return end
 
-    function BHelper.modules.deathknight.default:PLAYER_TARGET_CHANGED()
-        self:start()
+        if (spellName == 'Ледяное прикосновение') then vars.pestilence_timeout = false end
+        if (spellName == 'Удар чумы') then vars.pestilence_timeout = false end
+        if (spellName == 'Мор') then vars.pestilence_timeout = true end
+        if (spellName == 'Войско мертвых') then vars.army_timeout = true end
     end
 
     function BHelper.modules.deathknight.default:start()
-        self.vars.army_of_the_dead_timeout = true
-        self.vars.pestilence_timeout = true
+        vars.army_timeout = true
+        vars.pestilence_timeout = true
 
         self.opener = true
+        self.opener = false
         timers:create(20, function()
             self.opener = false
         end, 'opener')
+    end
+
+    function BHelper.modules.deathknight.default:stop()
+        core.action:set('rotation_single')
     end
 end
 
 do -- ДД ФДК
     function BHelper.modules.deathknight.damage:init()
+        vars = self.vars
         self.settings.type = 'battle'
         self.settings.only_combat_start = true
         if (usable_spec == 'frost') then
@@ -262,12 +272,12 @@ do -- ДД ФДК
             self.settings.usable_equip = 'DPS Unh'
         end
 
-        if (not self.vars.attack_type) then self.vars.attack_type = '1' end
-        if (not self.vars.silence) then self.vars.silence = false end
-        if (not self.vars.pet_control) then self.vars.pet_control = true end
+        if (not vars.attack_type) then vars.attack_type = '1' end
+        if (not vars.silence) then vars.silence = false end
+        if (not vars.pet_control) then vars.pet_control = true end
 
-        self.vars.army_of_the_dead_timeout = true
-        self.vars.pestilence_timeout = true
+        vars.army_timeout = true
+        vars.pestilence_timeout = true
 
         keybinds:bind_spell('Власть крови')
         keybinds:bind_spell('Власть льда')
@@ -298,6 +308,7 @@ do -- ДД ФДК
         keybinds:bind_spell('Мор')
         keybinds:bind_spell('Вскипание крови')
         keybinds:bind_spell('Войско мертвых')
+        keybinds:bind_spell('Кровавое неистовство(Расовая)')
 
         keybinds:bind_macro('Кровоотвод')
 
@@ -305,7 +316,6 @@ do -- ДД ФДК
         keybinds:bind_item('Отмщение Отрекшихся')
 
         self:register_event('UNIT_SPELLCAST_SUCCEEDED')
-        self:register_event('PLAYER_TARGET_CHANGED')
 
         core.action:set('rotation')
     end
@@ -315,7 +325,6 @@ do -- ДД ФДК
                       '#showtooltip Заморозка разума\n/bh tv silence', 41)
         macros:create('Кровоотвод',
                       '#showtooltip\n/bh c\n/cancelaura Кровоотвод\n/cast Кровоотвод', 7)
-        macros:create('PetControlTV', '/bh tv pet_control', 42, 273)
         if (usable_spec == 'frost') then
             macros:create('Несокрушимая броня',
                           '#showtooltip\n/bh c\n/cast Несокрушимая броня', 8)
@@ -324,6 +333,7 @@ do -- ДД ФДК
         elseif (usable_spec == 'unholy') then
             macros:create('Костяной щит', '#showtooltip\n/bh c\n/cast Костяной щит', 8)
             macros:create('Призыв горгульи', '#showtooltip\n/bh c\n/cast Призыв горгульи', 9)
+            macros:create('PetControlTV', '/bh tv pet_control', 42, 273)
         end
 
         macros:create('Усиление рунического оружия',
@@ -336,8 +346,7 @@ do -- ДД ФДК
         macros:create('Хватка смерти', '#showtooltip\n/bh c\n/cast Хватка смерти', 15)
         macros:create('Темная власть', '#showtooltip\n/bh c\n/cast Темная власть', 16)
         macros:create('Войско мертвых',
-                      '#showtooltip\n/bh sv army_of_the_dead_timeout false\n/bh c\n/cast Войско мертвых',
-                      28)
+                      '#showtooltip\n/bh sv army_timeout false\n/bh c\n/cast Войско мертвых', 28)
         macros:create('Ледяные оковы', '#showtooltip\n/bh c\n/cast Ледяные оковы', 29)
         macros:create('Смерть и разложение',
                       '#showtooltip\n/bh c\n/cast Смерть и разложение', 2)
@@ -358,9 +367,16 @@ do -- ДД ФДК
             macros:create('Воскрешение мертвых',
                           '#showtooltip\n/bh c\n/cast Воскрешение мертвых', 34)
         end
+    end
 
-        macros:create('S', '/startattack\n/bh sv attack_type 1\n/bh', 13, 1263)
-        macros:create('M', '/startattack\n/bh sv attack_type 2\n/bh', 14, 1264)
+    function BHelper.modules.deathknight.damage:rotation_single()
+        vars.attack_type = '1'
+        return self:rotation()
+    end
+
+    function BHelper.modules.deathknight.damage:rotation_multiple()
+        vars.attack_type = '2'
+        return self:rotation()
     end
 
     function BHelper.modules.deathknight.damage:rotation()
@@ -368,18 +384,15 @@ do -- ДД ФДК
             keybinds:show_attack('Рунический удар')
         end
 
-        if (player:spell_cooldown('Войско мертвых') > 10) then
-            self.vars.army_of_the_dead_timeout = true
-        end
-        if (not self.vars.army_of_the_dead_timeout) then
+        if (player:spell_cooldown('Войско мертвых') > 10) then vars.army_timeout = true end
+        if (not vars.army_timeout) then
             if (player:can_cast('Войско мертвых')) then
                 return keybinds:show_spell('Войско мертвых')
             end
             return true
         end
 
-        if ((target:check_cast()) and (self.vars.silence) and
-            (player:can_cast_on_enemy('Заморозка разума'))) then
+        if ((target:check_cast()) and (vars.silence) and (player:can_cast_on_enemy('Заморозка разума'))) then
             return keybinds:show_spell('Заморозка разума')
         end
 
@@ -388,8 +401,10 @@ do -- ДД ФДК
             return keybinds:show_spell('Власть крови')
         end
 
-        if ((player:aura('Зимний горн') == 0) and (player:aura('Сила земли') == 0) and
-            (player:can_cast('Зимний горн'))) then return keybinds:show_spell('Зимний горн') end
+        if (((target:name() == 'Волдырный зомби') or (target:name() == 'Большой слизнюк')) and
+            (target:aura('Ледяные оковы') == 0) and (player:can_cast_on_enemy('Ледяные оковы'))) then
+            return keybinds:show_spell('Ледяные оковы')
+        end
 
         if ((player:is_burst()) and (not self.burst_cooldown)) then
             if ((player:is_equipped_item('Знак превосходства')) and
@@ -433,6 +448,10 @@ do -- ДД ФДК
                     return keybinds:show_spell('Призыв горгульи')
                 end
             end
+
+            if (player:can_cast('Кровавое неистовство(Расовая)')) then
+                return keybinds:show_spell('Кровавое неистовство(Расовая)')
+            end
         end
 
         if (usable_spec == 'frost') then
@@ -447,8 +466,8 @@ do -- ДД ФДК
             end
         end
 
-        if ((self.vars.attack_type == '2') and (disease_exists)) then
-            if ((not self.vars.pestilence_timeout) and (player:can_cast_on_enemy('Мор'))) then
+        if ((vars.attack_type == '2') and (disease_exists)) then
+            if ((not vars.pestilence_timeout) and (player:can_cast_on_enemy('Мор'))) then
                 return keybinds:show_spell('Мор')
             end
 
@@ -499,28 +518,25 @@ do -- ДД ФДК
             end
         end
 
-        if ((player:power() <= 120) and (player:can_cast('Зимний горн'))) then
-            return keybinds:show_spell('Зимний горн')
-        end
+        if ((player:aura('Зимний горн') == 0) and (player:aura('Сила земли') == 0) and
+            (player:can_cast('Зимний горн'))) then return keybinds:show_spell('Зимний горн') end
     end
 
-    function BHelper.modules.deathknight.damage:UNIT_SPELLCAST_SUCCEEDED(castGUID, spellName)
-        if (spellName == 'Удар чумы') then self.vars.pestilence_timeout = false end
-        if (spellName == 'Мор') then self.vars.pestilence_timeout = true end
-        if (spellName == 'Войско мертвых') then self.vars.army_of_the_dead_timeout = true end
-    end
+    function BHelper.modules.deathknight.damage:UNIT_SPELLCAST_SUCCEEDED(unit_id, spellName)
+        if (unit_id ~= 'player') then return end
 
-    function BHelper.modules.deathknight.damage:PLAYER_TARGET_CHANGED()
-        self:start()
+        if (spellName == 'Удар чумы') then vars.pestilence_timeout = false end
+        if (spellName == 'Мор') then vars.pestilence_timeout = true end
+        if (spellName == 'Войско мертвых') then vars.army_timeout = true end
     end
 
     function BHelper.modules.deathknight.damage:start()
-        self.vars.army_of_the_dead_timeout = true
-        self.vars.pestilence_timeout = true
+        vars.army_timeout = true
+        vars.pestilence_timeout = true
     end
 
     function BHelper.modules.deathknight.damage:stop()
-        self.vars.attack_type = '1'
+        core.action:set('rotation_single')
     end
 
     -- if (player:can_cast_on_enemy('Удар Плети')) then

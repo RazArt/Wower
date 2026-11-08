@@ -10,12 +10,15 @@ local threat = BHelper.threat
 local timers = BHelper.timers
 local module = BHelper.modules.mage
 
+local vars = nil
+
 function BHelper.modules.mage.default:init()
+    vars = self.vars
     self.settings.type = 'battle'
     self.settings.only_combat_start = true
 
-    if (not self.vars.silence) then self.vars.silence = false end
-    if (not self.vars.scorch) then self.vars.scorch = true end
+    if (not vars.silence) then vars.silence = false end
+    if (not vars.scorch) then vars.scorch = true end
     self.can_cast_scorch = true
 
     keybinds:bind_spell('Антимагия')
@@ -42,7 +45,7 @@ function BHelper.modules.mage.default:init()
     keybinds:bind_item('Сапфир маны')
     keybinds:bind_item('Перчатки ложных знаков')
 
-    self:register_event('UNIT_SPELLCAST_START')
+    self:register_event('UNIT_SPELLCAST_SUCCEEDED')
     self:register_event('PLAYER_REGEN_ENABLED')
 end
 
@@ -104,7 +107,7 @@ function BHelper.modules.mage.default:execute()
 end
 
 function BHelper.modules.mage.default:rotation_single()
-    if ((target:check_cast()) and (self.vars.silence) and (player:can_cast_on_enemy('Антимагия'))) then
+    if ((target:check_cast()) and (vars.silence) and (player:can_cast_on_enemy('Антимагия'))) then
         return keybinds:show_spell('Антимагия')
     end
 
@@ -121,7 +124,7 @@ function BHelper.modules.mage.default:rotation_single()
     end
 
     if ((target:aura('Улучшенный ожог') == 0) and (target:aura('Власть над Тенями') == 0) and
-        (self.can_cast_scorch) and (self.vars.scorch) and (player:can_cast_on_enemy('Ожог'))) then
+        (self.can_cast_scorch) and (vars.scorch) and (player:can_cast_on_enemy('Ожог'))) then
         return keybinds:show_spell('Ожог')
     end
 
@@ -164,7 +167,9 @@ function BHelper.modules.mage.default:rotation_multiple()
     end
 end
 
-function BHelper.modules.mage.default:UNIT_SPELLCAST_START(castGUID, spellName)
+function BHelper.modules.mage.default:UNIT_SPELLCAST_SUCCEEDED(unit_id, spellName)
+    if (unit_id ~= 'player') then return end
+
     if (spellName == 'Ожог') then
         self.can_cast_scorch = false
         timers:create(2, function()
