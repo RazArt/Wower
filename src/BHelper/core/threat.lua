@@ -1,29 +1,11 @@
 BHelper.threat = {}
 
-local auras = {}
-local core = {}
-local keybinds = {}
-local macros = {}
-local modules = {}
-local pet = {}
 local player = {}
 local pool = {}
-local target = {}
-local threat = {}
-local timers = {}
 
 function BHelper.threat:namespace_init()
-    auras = BHelper.auras
-    core = BHelper.core
-    keybinds = BHelper.keybinds
-    macros = BHelper.macros
-    modules = BHelper.modules
-    pet = BHelper.pet
     player = BHelper.player
     pool = BHelper.pool
-    target = BHelper.target
-    threat = BHelper.threat
-    timers = BHelper.timers
 end
 
 local threat_list = {}

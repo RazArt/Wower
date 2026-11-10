@@ -80,8 +80,7 @@ function BHelper.modules.paladin.default:rotation_single()
 
     if (player:can_cast_on_enemy('Молот гнева')) then return keybinds:show_spell('Молот гнева') end
 
-    -- if ((player:check_spell_range('Удар воина света')) and
-    --     (player:can_cast('Освящение'))) then
+    -- if (player:can_cast('Освящение', true)) then
     --     return keybinds:show_spell('Освящение')
     -- end
 
@@ -95,9 +94,7 @@ function BHelper.modules.paladin.default:rotation_single()
 end
 
 function BHelper.modules.paladin.default:rotation_multiple()
-    if ((player:check_spell_range('Удар воина света')) and (player:can_cast('Освящение'))) then
-        return keybinds:show_spell('Освящение')
-    end
+    if (player:can_cast('Освящение', true)) then return keybinds:show_spell('Освящение') end
 
     return BHelper.modules.paladin.default:rotation_single()
 end

@@ -31,7 +31,11 @@ function BHelper:PLAYER_LOGIN()
         BHelper.core:execute()
     end, 'main_execute', true)
 
-    BHelper:create_state_frame()
+    -- BHelper.icons:add('icon1', 25, 25, 'Interface\\AddOns\\BHelper\\textures\\warning.tga')
+    -- BHelper.icons:add('icon2', 50, 50, 'Interface\\AddOns\\BHelper\\textures\\warning.tga')
+    -- BHelper.icons:add('icon3', 25, 25, 'Interface\\AddOns\\BHelper\\textures\\warning.tga')
+    -- BHelper.icons:add('icon2', 50, 50, 'Interface\\AddOns\\BHelper\\textures\\warning.tga')
+    -- BHelper.icons:add('icon3', 25, 25, 'Interface\\AddOns\\BHelper\\textures\\warning.tga')
 end
 
 function BHelper:ACTIVE_TALENT_GROUP_CHANGED()
@@ -64,17 +68,6 @@ end
 
 function BHelper:PLAYER_TARGET_CHANGED()
     BHelper.target._name = (UnitName('target')) or ''
-end
-
-function BHelper:create_state_frame()
-    self.state_frame = CreateFrame('Frame')
-    self.state_frame:SetSize(50, 50)
-    self.state_frame:SetFrameStrata('tooltip')
-    self.state_frame:SetPoint('center', UIParent, 'center', 0, -160)
-    self.state_frame.texture = self.state_frame:CreateTexture(nil, 'tooltip')
-    self.state_frame.texture:SetAllPoints(self.state_frame)
-    self.state_frame.texture:SetTexture('Interface\\AddOns\\BHelper\\textures\\warning.tga')
-    self.state_frame:Hide()
 end
 
 function BHelper:commands(msg)

@@ -1,6 +1,6 @@
 BHelper.modules = {}
 
-function BHelper.modules:module(profiles)
+local function module_init(profiles)
     profiles = profiles or {}
     local obj = {}
 
@@ -21,20 +21,20 @@ function BHelper.modules:module(profiles)
     return obj
 end
 
-function BHelper.modules:init()
-    self.auction = self:module({'common'})
-    self.crafting = self:module({'common'})
-    self.mailbox = self:module({'common'})
+local function init()
+    BHelper.modules.auction = module_init({'common'})
+    BHelper.modules.crafting = module_init({'common'})
+    BHelper.modules.mailbox = module_init({'common'})
 
-    self.deathknight = self:module({'default', 'damage', 'adk'})
-    self.druid = self:module({'default', 'balance'})
-    self.hunter = self:module({'default'})
-    self.mage = self:module({'default'})
-    self.paladin = self:module({'default', 'proto'})
-    self.priest = self:module({'default'})
-    self.rogue = self:module({'default'})
-    self.shaman = self:module({'default'})
-    self.warlock = self:module({'default'})
-    self.warrior = self:module({'default', 'proto', 'proto_farm'})
+    BHelper.modules.deathknight = module_init({'default', 'damage', 'adk'})
+    BHelper.modules.druid = module_init({'default', 'balance'})
+    BHelper.modules.hunter = module_init({'default'})
+    BHelper.modules.mage = module_init({'default'})
+    BHelper.modules.paladin = module_init({'default', 'proto'})
+    BHelper.modules.priest = module_init({'default'})
+    BHelper.modules.rogue = module_init({'default'})
+    BHelper.modules.shaman = module_init({'default'})
+    BHelper.modules.warlock = module_init({'default'})
+    BHelper.modules.warrior = module_init({'default', 'proto', 'proto_farm'})
 end
-BHelper.modules:init()
+init()

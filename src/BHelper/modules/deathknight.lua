@@ -102,8 +102,9 @@ do -- Танк ГДК
     function BHelper.modules.deathknight.default:macros()
         macros:create('Заморозка разума', '#showtooltip Заморозка разума\n/bh tv silence',
                       41)
-        macros:create('Смертельный союз',
-                      '#showtooltip Смертельный союз\n/castsequence reset=120 Воскрешение мертвых, Смертельный союз')
+
+        macros:create('Смерть и разложение',
+                      '#showtooltip\n/bh c 1\n/cast Смерть и разложение', 2)
         macros:create('Незыблемость льда',
                       '#showtooltip\n/bh c\n/cast Незыблемость льда', 7)
         macros:create('Антимагический панцирь',
@@ -122,8 +123,9 @@ do -- Танк ГДК
         macros:create('Истерия',
                       '#showtooltip Истерия\n/bh c\n/cast [@focus,help,nodead] Истерия\n/cast [@target,help,nodead] Истерия\n/cast [@mouseover,help,nodead] Истерия',
                       22)
-        macros:create('Смерть и разложение',
-                      '#showtooltip\n/bh c 1\n/cast Смерть и разложение', 2)
+        macros:create('Смертельный союз',
+                      '#showtooltip Смертельный союз\n/castsequence reset=120 Воскрешение мертвых, Смертельный союз',
+                      24)
     end
 
     function BHelper.modules.deathknight.default:rotation_single()
@@ -151,7 +153,7 @@ do -- Танк ГДК
             return keybinds:show_spell('Кровь вампира')
         end
 
-        if ((player:health_on_percent() < 40) and (player:can_cast('Захват рун'))) then
+        if ((player:health_on_percent() < 60) and (player:can_cast('Захват рун'))) then
             return keybinds:show_spell('Захват рун')
         end
 
@@ -167,24 +169,12 @@ do -- Танк ГДК
             return keybinds:show_spell('Заморозка разума')
         end
 
-        if ((player:aura('Власть льда') == 0) and (player:can_cast('Власть льда'))) then
-            return keybinds:show_spell('Власть льда')
-        end
+        if ((player:aura('Власть льда') == 0) and (player:aura('Власть крови') == 0) and
+            (player:can_cast('Власть льда'))) then return keybinds:show_spell('Власть льда') end
 
         if (((target:name() == 'Волдырный зомби') or (target:name() == 'Большой слизнюк')) and
             (target:aura('Ледяные оковы') == 0) and (player:can_cast_on_enemy('Ледяные оковы'))) then
             return keybinds:show_spell('Ледяные оковы')
-        end
-
-        if ((vars.attack_type == '2') and (disease_exists)) then
-            if ((not vars.pestilence_timeout) and (player:can_cast_on_enemy('Мор'))) then
-                return keybinds:show_spell('Мор')
-            end
-
-            if ((rune_cooldown[1] == 0) and (rune_cooldown[2] == 0) and (player:check_spell_range('Удар чумы')) and
-                (player:can_cast('Вскипание крови'))) then
-                return keybinds:show_spell('Вскипание крови')
-            end
         end
 
         if (((not player:has_stable_threat()) or (self.opener) or (target:aura('Озноб', true) == 0)) and
@@ -206,11 +196,26 @@ do -- Танк ГДК
             return keybinds:show_spell('Удар чумы')
         end
 
+        if ((vars.attack_type == '2') and (disease_exists)) then
+            if ((not vars.pestilence_timeout) and (player:can_cast_on_enemy('Мор'))) then
+                return keybinds:show_spell('Мор')
+            end
+
+            if ((rune_cooldown[1] == 0) and (rune_cooldown[2] == 0) and
+                (player:can_cast('Вскипание крови', true))) then
+                return keybinds:show_spell('Вскипание крови')
+            end
+        end
+
         if ((player:aura('Клинковая ограда') == 0) and (player:health_on_percent() > 80)) then
-            if (player:can_cast_on_enemy('Удар в сердце')) then
+            if ((vars.attack_type == '2') and (disease_exists) and
+                (player:can_cast('Вскипание крови', true))) then
+                return keybinds:show_spell('Вскипание крови')
+            end
+            if ((vars.attack_type == '1') and (player:can_cast_on_enemy('Удар в сердце'))) then
                 return keybinds:show_spell('Удар в сердце')
             end
-            if (player:can_cast_on_enemy('Кровавый удар')) then
+            if ((vars.attack_type == '1') and (player:can_cast_on_enemy('Кровавый удар'))) then
                 return keybinds:show_spell('Кровавый удар')
             end
         end
@@ -220,10 +225,10 @@ do -- Танк ГДК
         end
 
         if ((rune_cooldown[1] == 0) and (rune_cooldown[2] == 0)) then
-            if (player:can_cast_on_enemy('Удар в сердце')) then
+            if ((vars.attack_type == '1') and (player:can_cast_on_enemy('Удар в сердце'))) then
                 return keybinds:show_spell('Удар в сердце')
             end
-            if (player:can_cast_on_enemy('Кровавый удар')) then
+            if ((vars.attack_type == '1') and (player:can_cast_on_enemy('Кровавый удар'))) then
                 return keybinds:show_spell('Кровавый удар')
             end
         end
@@ -247,7 +252,6 @@ do -- Танк ГДК
 
     function BHelper.modules.deathknight.default:start()
         vars.army_timeout = true
-        vars.pestilence_timeout = true
 
         self.opener = true
         self.opener = false
@@ -256,9 +260,9 @@ do -- Танк ГДК
         end, 'opener')
     end
 
-    function BHelper.modules.deathknight.default:stop()
-        core.action:set('rotation_single')
-    end
+    -- function BHelper.modules.deathknight.default:stop()
+    --     core.action:set('rotation_single')
+    -- end
 end
 
 do -- ДД ФДК
@@ -456,7 +460,7 @@ do -- ДД ФДК
 
         if (usable_spec == 'frost') then
             if ((player:aura('Морозная дымка', true) > 0) and
-                (player:check_spell_range('Удар чумы')) and (player:can_cast('Воющий ветер'))) then
+                (player:can_cast('Воющий ветер', true))) then
                 return keybinds:show_spell('Воющий ветер')
             end
 
@@ -472,12 +476,12 @@ do -- ДД ФДК
             end
 
             if (usable_spec == 'frost') then
-                if ((player:check_spell_range('Удар чумы')) and (player:can_cast('Воющий ветер'))) then
+                if (player:can_cast('Воющий ветер', true)) then
                     return keybinds:show_spell('Воющий ветер')
                 end
             end
 
-            if ((player:check_spell_range('Удар чумы')) and (player:can_cast('Вскипание крови'))) then
+            if (player:can_cast('Вскипание крови', true)) then
                 return keybinds:show_spell('Вскипание крови')
             end
         end
@@ -532,7 +536,6 @@ do -- ДД ФДК
 
     function BHelper.modules.deathknight.damage:start()
         vars.army_timeout = true
-        vars.pestilence_timeout = true
     end
 
     function BHelper.modules.deathknight.damage:stop()

@@ -273,7 +273,7 @@ function BHelper.modules.druid.default:bear_single()
     if (((target:aura('Растерзать', true) <= 2) or (target:aura_count('Растерзать', true) < 5)) and
         (player:can_cast_on_enemy('Растерзать'))) then return keybinds:show_spell('Растерзать') end
 
-    if (player:can_cast('Размах (медведь)')) then
+    if (player:can_cast('Размах (медведь)', true)) then
         return keybinds:show_spell('Размах (медведь)')
     end
 end
@@ -293,7 +293,7 @@ function BHelper.modules.druid.default:bear_multiple()
         return keybinds:show_spell('Устрашающий рев')
     end
 
-    if (player:can_cast('Размах (медведь)')) then
+    if (player:can_cast('Размах (медведь)', true)) then
         return keybinds:show_spell('Размах (медведь)')
     end
 end

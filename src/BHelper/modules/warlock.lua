@@ -4,6 +4,7 @@ function BHelper.modules.warlock.default:init()
     self.settings.only_combat_start = true
 
     if (not vars.silence) then vars.silence = false end
+    if (not vars.pet_control) then vars.pet_control = true end
 
     BHelper.keybinds:bind_spell('Демоническое могущество')
     BHelper.keybinds:bind_spell('Проклятие стихий')

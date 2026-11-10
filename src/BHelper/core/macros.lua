@@ -32,7 +32,7 @@ function BHelper.macros:icon(name)
     for index, icon in pairs(icons) do if (icon == name) then return index end end
 end
 
-function BHelper.macros:init()
+local function init()
     for i = 1, GetNumMacroIcons() do icons[i] = GetMacroIconInfo(i) end
 end
-BHelper.macros:init()
+init()

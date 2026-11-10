@@ -1,29 +1,15 @@
 BHelper.player = {}
 
 local auras = {}
-local core = {}
-local keybinds = {}
-local macros = {}
-local modules = {}
-local pet = {}
 local player = {}
-local pool = {}
 local target = {}
 local threat = {}
-local timers = {}
 
 function BHelper.player:namespace_init()
     auras = BHelper.auras
-    core = BHelper.core
-    keybinds = BHelper.keybinds
-    macros = BHelper.macros
-    modules = BHelper.modules
-    pet = BHelper.pet
     player = BHelper.player
-    pool = BHelper.pool
     target = BHelper.target
     threat = BHelper.threat
-    timers = BHelper.timers
 end
 
 function BHelper.player:GUID()
@@ -136,10 +122,11 @@ function BHelper.player:aura_count(aura, cast_by_player)
     return select(2, auras:get('player', aura, cast_by_player))
 end
 
-function BHelper.player:can_cast(spellname, check_time)
+function BHelper.player:can_cast(spellname, melee_only, check_time)
     if (not player:alive()) then return false end
     if (not IsUsableSpell(spellname)) then return false end
     if (player:spell_is_targeting()) then return false end
+    if ((melee_only) and (not player:check_melee_range())) then return false end
     if (player:check_cast()) then return false end
     if (player:check_spell_cooldown(spellname, check_time)) then return false end
     if (not player:has_control()) then return false end
@@ -148,7 +135,7 @@ function BHelper.player:can_cast(spellname, check_time)
 end
 
 function BHelper.player:can_cast_on_enemy(spellname, check_time)
-    if (not player:can_cast(spellname, check_time)) then return false end
+    if (not player:can_cast(spellname, false, check_time)) then return false end
     if (not player:can_target_attack()) then return false end
     if (not player:check_spell_range(spellname)) then return false end
     return true
@@ -156,7 +143,7 @@ end
 
 -- function BHelper.player:can_cast_on_friend(spellname, unit_id, check_time)
 --     unit_id = unit_id or 'target'
---     if (not player:can_cast(spellname, check_time)) then return false end
+--     if (not player:can_cast(spellname, false, check_time)) then return false end
 --     if (not UnitExists(unit_id)) then return false end
 --     if (UnitIsDeadOrGhost(unit_id)) then return false end
 --     if (not UnitCanAssist('player', unit_id)) then return false end
@@ -165,7 +152,7 @@ end
 -- end
 
 function BHelper.player:can_cast_on_point(spellname, check_time)
-    if (not player:can_cast(spellname, check_time)) then return false end
+    if (not player:can_cast(spellname, false, check_time)) then return false end
     if (not UnitExists('mouseover')) then return false end
     if (player:moving()) then return false end
     if (IsMouseButtonDown('RightButton')) then return false end
@@ -181,6 +168,23 @@ end
 function BHelper.player:check_spell_range(spellname, unit_id)
     unit_id = unit_id or 'target'
     return (IsSpellInRange(spellname, unit_id) == 1) and true or false
+end
+
+local melee_spells = {}
+
+melee_spells['deathknight'] = 'Удар чумы'
+melee_spells['druid'] = 'Цапнуть'
+melee_spells['hunter'] = ''
+melee_spells['mage'] = ''
+melee_spells['paladin'] = ''
+melee_spells['priest'] = ''
+melee_spells['rogue'] = ''
+melee_spells['shaman'] = ''
+melee_spells['warlock'] = ''
+melee_spells['warrior'] = 'Раскол брони'
+
+function BHelper.player:check_melee_range()
+    return player:check_spell_range(melee_spells[player:class()])
 end
 
 function BHelper.player:spell_casttime(spellname)

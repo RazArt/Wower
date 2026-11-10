@@ -2,6 +2,7 @@ import win32gui
 import win32api
 import win32con
 import keyboard
+import mouse
 from time import sleep
 
 
@@ -48,18 +49,40 @@ def click_send(hWnd):
 
 
 hWnd_wow = 0
+key_state = False
 while True:
     try:
         pixel_color = get_pixels_color(hWnd_wow)
+
+        if ((not key_state) and ((keyboard.is_pressed(18)) or keyboard.is_pressed(19))):
+            key_state = True
+            key_press(hWnd_wow, 45)
+            key_release(hWnd_wow, 45)
+        elif ((key_state) and (not keyboard.is_pressed(18)) and (not keyboard.is_pressed(19))):
+            key_state = False
+            key_press(hWnd_wow, 46)
+            key_release(hWnd_wow, 46)
+
+            if (pixel_color[2][0] == 56):
+                key_press(hWnd_wow, 35)
+                key_release(hWnd_wow, 35)
+
         if (pixel_color[0] == (31, 11, 12)):
             if ((not keyboard.is_pressed(42)) and (not keyboard.is_pressed(56))
-                    and (not keyboard.is_pressed(29))):
+                    and (not keyboard.is_pressed(29))
+                    and ((keyboard.is_pressed(18)) or (keyboard.is_pressed(19)))):
+
+                if (pixel_color[1][0] == 56):
+                    click_send(hWnd_wow)
+
+                if ((pixel_color[2][0] == 56) and (pixel_color[2][1] == 1)):
+                    key_press(hWnd_wow, 36)
+                    key_release(hWnd_wow, 36)
+
                 for i in range(1, 6):
                     if (pixel_color[i][0] == 44):
                         key_send(hWnd_wow, pixel_color[i][1], pixel_color[i][2])
 
-                    if (pixel_color[i][0] == 56):
-                        click_send(hWnd_wow)
     except:
         hWnd_wow = win32gui.FindWindow(None, 'World of Warcraft')
 

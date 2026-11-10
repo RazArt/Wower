@@ -4,32 +4,35 @@ local core = {}
 local keybinds = {}
 local timers = {}
 
+local binds = {}
+local base = {}
+
 function BHelper.keybinds:namespace_init()
     core = BHelper.core
     keybinds = BHelper.keybinds
     timers = BHelper.timers
 end
 
-function BHelper.keybinds:_get_bind_index(class, name)
+local function get_bind_index(class, name)
     class = class:lower()
     name = name:lower()
 
-    for num, bind in pairs(keybinds._binds) do if ((bind.class == class) and (bind.name == name)) then return num end end
+    for num, bind in pairs(binds) do if ((bind.class == class) and (bind.name == name)) then return num end end
     return 0
 end
 
-function BHelper.keybinds:_get_bind_string(key, modifier)
+local function get_bind_string(key, modifier)
     if (modifier == 1) then return 'ALT-' .. key end
     if (modifier == 2) then return 'CTRL-' .. key end
     if (modifier == 3) then return 'ALT-CTRL-' .. key end
     return ''
 end
 
-function BHelper.keybinds:_bind(class, name)
+local function bind(class, name)
     class = class:lower()
     name = name:lower()
 
-    for index, bind in pairs(keybinds._binds) do
+    for index, bind in pairs(binds) do
         if ((bind.class == class) and (bind.name == name)) then return true end
         if (not bind.name) then
             if (SetBinding(bind.bind_string, class .. ' ' .. name)) then
@@ -48,7 +51,7 @@ function BHelper.keybinds:bind_macro(name, key)
         if (SetBinding(key, 'macro ' .. name)) then return true end
         return false
     else
-        return keybinds:_bind('macro', name)
+        return bind('macro', name)
     end
 end
 
@@ -57,7 +60,7 @@ function BHelper.keybinds:bind_spell(name, key)
         if (SetBinding(key, 'spell ' .. name)) then return true end
         return false
     else
-        return keybinds:_bind('spell', name)
+        return bind('spell', name)
     end
 end
 
@@ -66,82 +69,84 @@ function BHelper.keybinds:bind_item(name, key)
         if (SetBinding(key, 'item ' .. name)) then return true end
         return false
     else
-        return keybinds:_bind('item', name)
+        return bind('item', name)
     end
 end
 
 function BHelper.keybinds:unbind_all()
-    for i = 1, #keybinds._binds do
-        keybinds._binds[i].name = nil
-        keybinds._binds[i].class = nil
-        SetBinding(keybinds._binds[i].bind_string)
+    for i = 1, #binds do
+        binds[i].name = nil
+        binds[i].class = nil
+        SetBinding(binds[i].bind_string)
     end
 end
 
-function BHelper.keybinds:_show(num, class, name, time_count)
-    time_count = time_count or core:get_update_time()
+local function show(num, r, g, b)
+    r = r or 0
+    g = g or 0
+    b = b or 0
+
+    base.frame[num].texture:SetTexture(r / 255, g / 255, b / 255)
+    base.frame[num]:Show()
+
+    timers:create(core:get_update_time(), function()
+        keybinds:hide(num)
+    end, 'keybinds_hide_' .. num)
+    return true
+end
+
+local function show_bind(num, class, name)
     if (ACTIVE_CHAT_EDIT_BOX) then return false end
 
     local flag = 0
     local info = 0
     local modifier = 0
 
-    if (num > 1) then
-        flag = 44 / 255
-        local index = keybinds:_get_bind_index(class, name)
-        if (index == 0) then return false end
-        info = keybinds._binds[index].key
-        modifier = keybinds._binds[index].modifier
-    else
-        flag = 56 / 255
-        info = 1 / 255
-    end
+    flag = 44
+    local index = get_bind_index(class, name)
+    if (index == 0) then return false end
+    info = binds[index].key
+    modifier = binds[index].modifier
 
-    keybinds._frames.frame[num].texture:SetTexture(flag, info, modifier)
-    keybinds._frames.frame[num]:Show()
-
-    timers:create(time_count, function()
-        keybinds:hide(num)
-    end, 'keybinds_hide_' .. num)
-    return true
+    show(num, flag, info, modifier)
 end
 
 function BHelper.keybinds:show_click()
-    return keybinds:_show(1)
+    return show(1, 56)
 end
 
-function BHelper.keybinds:show_macro(name, time_count)
-    return keybinds:_show(2, 'macro', name, time_count)
+function BHelper.keybinds:show_pet(can_attack)
+    return show(2, 56, can_attack)
 end
 
-function BHelper.keybinds:show_spell(name, time_count)
-    return keybinds:_show(2, 'spell', name, time_count)
+function BHelper.keybinds:show_macro(name)
+    return show_bind(3, 'macro', name)
 end
 
-function BHelper.keybinds:show_item(name, time_count)
-    return keybinds:_show(2, 'item', name, time_count)
+function BHelper.keybinds:show_spell(name)
+    return show_bind(3, 'spell', name)
 end
 
-function BHelper.keybinds:show_attack(name, time_count)
-    return keybinds:_show(3, 'spell', name, time_count)
+function BHelper.keybinds:show_item(name)
+    return show_bind(3, 'item', name)
 end
 
-function BHelper.keybinds:show_help(name, time_count)
-    return keybinds:_show(4, 'spell', name, time_count)
+function BHelper.keybinds:show_attack(name)
+    return show_bind(4, 'spell', name)
 end
 
-function BHelper.keybinds:show_pet(name, time_count)
-    return keybinds:_show(5, 'macro', 'pet' .. name, time_count)
+function BHelper.keybinds:show_help(name)
+    return show_bind(5, 'spell', name)
 end
 
 function BHelper.keybinds:hide(num)
-    return keybinds._frames.frame[num]:Hide()
+    return base.frame[num]:Hide()
 end
 
-function BHelper.keybinds:init()
-    self._binds = {}
+local function init()
+    binds = {}
 
-    local binds = {
+    local keys = {
         {'T', 1}, {'Y', 1}, {'U', 1}, {'I', 1}, {'O', 1}, {'P', 1}, {'H', 1}, {'G', 1}, {'J', 1}, {'K', 1}, {'L', 1},
         {'Z', 1}, {'X', 1}, {'C', 1}, {'V', 1}, {'B', 1}, {'N', 1}, {'M', 1}, {'T', 2}, {'Y', 2}, {'U', 2}, {'I', 2},
         {'O', 2}, {'P', 2}, {'H', 2}, {'G', 2}, {'J', 2}, {'K', 2}, {'L', 2}, {'Z', 2}, {'X', 2}, {'C', 2}, {'V', 2},
@@ -150,29 +155,29 @@ function BHelper.keybinds:init()
         {'K', 3}, {'L', 3}, {'Z', 3}, {'X', 3}, {'C', 3}, {'V', 3}, {'B', 3}, {'N', 3}, {'M', 3}
     }
 
-    for i = 1, #binds do
-        self._binds[i] = {}
-        self._binds[i].key = string.byte(binds[i][1], 1) / 255
-        self._binds[i].modifier = binds[i][2] / 255
-        self._binds[i].bind_string = self:_get_bind_string(binds[i][1], binds[i][2])
+    for i = 1, #keys do
+        binds[i] = {}
+        binds[i].key = string.byte(keys[i][1], 1)
+        binds[i].modifier = keys[i][2]
+        binds[i].bind_string = get_bind_string(keys[i][1], keys[i][2])
     end
 
-    self._frames = CreateFrame('Frame')
-    self._frames:SetScale(0.71)
-    self._frames:SetSize(6, 1)
-    self._frames:SetFrameStrata('tooltip')
-    self._frames:SetPoint('topleft', UIParent, 0, 0)
-    self._frames.texture = self._frames:CreateTexture(nil, 'tooltip')
-    self._frames.texture:SetAllPoints(self._frames)
-    self._frames.texture:SetTexture(31 / 255, 11 / 255, 12 / 255)
-    self._frames.frame = {}
+    base = CreateFrame('Frame')
+    base:SetScale(0.71)
+    base:SetSize(6, 1)
+    base:SetFrameStrata('tooltip')
+    base:SetPoint('topleft', UIParent, 0, 0)
+    base.texture = base:CreateTexture(nil, 'tooltip')
+    base.texture:SetAllPoints(base)
+    base.texture:SetTexture(31 / 255, 11 / 255, 12 / 255)
+    base.frame = {}
     for i = 1, 5 do
-        self._frames.frame[i] = CreateFrame('Frame', nil, self._frames)
-        self._frames.frame[i]:SetSize(1, 1)
-        self._frames.frame[i]:SetPoint('topleft', self._frames, i, 0)
-        self._frames.frame[i].texture = self._frames.frame[i]:CreateTexture(nil, 'tooltip')
-        self._frames.frame[i].texture:SetAllPoints(self._frames.frame[i])
-        self._frames.frame[i]:Hide()
+        base.frame[i] = CreateFrame('Frame', nil, base)
+        base.frame[i]:SetSize(1, 1)
+        base.frame[i]:SetPoint('topleft', base, i, 0)
+        base.frame[i].texture = base.frame[i]:CreateTexture(nil, 'tooltip')
+        base.frame[i].texture:SetAllPoints(base.frame[i])
+        base.frame[i]:Hide()
     end
 end
-BHelper.keybinds:init()
+init()

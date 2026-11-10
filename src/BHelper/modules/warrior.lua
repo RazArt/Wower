@@ -90,7 +90,7 @@ function BHelper.modules.warrior.default:rotation()
     end
 
     if ((target:aura('Деморализующий крик') == 0) and (vars.demoralizing_shout) and
-        (player:can_cast('Деморализующий крик'))) then
+        (player:can_cast('Деморализующий крик', true))) then
         return keybinds:show_spell('Деморализующий крик')
     end
 
@@ -150,8 +150,9 @@ function BHelper.modules.warrior.default:rotation()
     if ((not player:can_cast_on_enemy('Кровожадность', 1)) and (player:aura('Сокрушить!') > 0) and
         (player:can_cast_on_enemy('Мощный удар'))) then return keybinds:show_spell('Мощный удар') end
 
-    if ((target:name() ~= 'Принц Келесет') and (player:check_spell_range('Раскол брони')) and
-        (player:can_cast('Вихрь'))) then return keybinds:show_spell('Вихрь') end
+    if ((target:name() ~= 'Принц Келесет') and (player:can_cast('Вихрь', true))) then
+        return keybinds:show_spell('Вихрь')
+    end
 
     if ((not player:can_cast_on_enemy('Кровожадность', 1)) and (player:can_cast_on_enemy('Казнь'))) then
         return keybinds:show_spell('Казнь')
@@ -279,12 +280,12 @@ function BHelper.modules.warrior.proto:rotation()
     end
 
     if (player:has_stable_threat()) then
-        if ((target:aura('Удар грома', true) < 2) and (player:check_spell_range('Раскол брони')) and
-            (player:can_cast('Удар грома'))) then return keybinds:show_spell('Удар грома') end
+        if ((target:aura('Удар грома', true) < 2) and (player:can_cast('Удар грома', true))) then
+            return keybinds:show_spell('Удар грома')
+        end
 
         if ((target:aura('Деморализующий крик') < 2) and
-            (player:check_spell_range('Раскол брони')) and
-            (player:can_cast('Деморализующий крик'))) then
+            (player:can_cast('Деморализующий крик', true))) then
             return keybinds:show_spell('Деморализующий крик')
         end
 
@@ -313,8 +314,9 @@ function BHelper.modules.warrior.proto:rotation()
         return keybinds:show_spell('Кровопускание')
     end
 
-    if (((vars.attack_type == '2')) and (player:check_spell_range('Раскол брони')) and
-        (player:can_cast('Удар грома'))) then return keybinds:show_spell('Удар грома') end
+    if (((vars.attack_type == '2')) and (player:can_cast('Удар грома', true))) then
+        return keybinds:show_spell('Удар грома')
+    end
 
     if (player:can_cast_on_enemy('Реванш')) then return keybinds:show_spell('Реванш') end
 
@@ -324,7 +326,7 @@ function BHelper.modules.warrior.proto:rotation()
 
     if ((not player:can_cast_on_enemy('Реванш', 1)) and
         (not player:can_cast_on_enemy('Мощный удар щитом', 1)) and
-        (player:check_spell_range('Раскол брони')) and (player:can_cast('Ударная волна'))) then
+        (player:can_cast('Ударная волна', true))) then
         return keybinds:show_spell('Ударная волна')
     end
 
