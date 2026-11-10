@@ -14,10 +14,7 @@ local vars = nil
 
 function BHelper.modules.mage.default:init()
     vars = self.vars
-    self.settings.type = 'battle'
-    self.settings.only_combat_start = true
 
-    if (not vars.silence) then vars.silence = false end
     if (not vars.scorch) then vars.scorch = true end
     self.can_cast_scorch = true
 
@@ -50,29 +47,26 @@ function BHelper.modules.mage.default:init()
 end
 
 function BHelper.modules.mage.default:macros()
-    macros:create('Щит маны', '#showtooltip Щит маны\n/bh c\n/stopcasting\n/cast Щит маны', 2)
-    macros:create('Скачок', '#showtooltip Скачок\n/bh c\n/stopcasting\n/cast Скачок', 15)
-    macros:create('Антимагия',
-                  '#showtooltip Антимагия\n/bh c\n/stopcasting\n/cast Антимагия', 17)
+    macros:create('Щит маны', '#showtooltip Щит маны\n/stopcasting\n/cast Щит маны', 2)
+    macros:create('Скачок', '#showtooltip Скачок\n/stopcasting\n/cast Скачок', 15)
+    macros:create('Антимагия', '#showtooltip Антимагия\n/stopcasting\n/cast Антимагия', 17)
     macros:create('Превращение',
-                  '#showtooltip Превращение\n/bh c\n/stopcasting\n/cast Превращение', 18)
-    macros:create('Возгорание',
-                  '#showtooltip Возгорание\n/bh c\n/stopcasting\n/cast Возгорание', 7)
+                  '#showtooltip Превращение\n/stopcasting\n/cast Превращение', 18)
+    macros:create('Возгорание', '#showtooltip Возгорание\n/stopcasting\n/cast Возгорание',
+                  7)
     macros:create('Зеркальное изображение',
-                  '#showtooltip Зеркальное изображение\n/bh c\n/stopcasting\n/cast Зеркальное изображение',
+                  '#showtooltip Зеркальное изображение\n/stopcasting\n/cast Зеркальное изображение',
                   8)
     macros:create('Берсерк(Расовая)',
-                  '#showtooltip Берсерк(Расовая)\n/bh c\n/stopcasting\n/cast Берсерк(Расовая)',
-                  9)
+                  '#showtooltip Берсерк(Расовая)\n/stopcasting\n/cast Берсерк(Расовая)', 9)
     macros:create('Ледяная глыба',
-                  '#showtooltip\n/bh c\n/stopcasting\n/cancelaura Ледяная глыба\n/cast Ледяная глыба',
+                  '#showtooltip\n/stopcasting\n/cancelaura Ледяная глыба\n/cast Ледяная глыба',
                   10)
     macros:create('Невидимость',
-                  '#showtooltip\n/bh c\n/stopcasting\n/cancelaura Невидимость\n/cast Невидимость',
-                  11)
+                  '#showtooltip\n/stopcasting\n/cancelaura Невидимость\n/cast Невидимость', 11)
     macros:create('Невидимость авто',
-                  '#showtooltip Невидимость\n/cast Невидимость\n/bh c 1')
-    macros:create('Прилив сил', '#showtooltip Прилив сил\n/bh c\n/cast Прилив сил', 12)
+                  '#showtooltip Невидимость\n/cast Невидимость 1')
+    macros:create('Прилив сил', '#showtooltip Прилив сил\n/cast Прилив сил', 12)
     macros:create('ОжогTV', '#showtooltip Ожог\n/bh tv scorch', 40)
     macros:create('АнтимагияTV', '#showtooltip Антимагия\n/bh tv silence', 41)
     macros:create('S', '/cast Огненная глыба\n/bh sa rotation_single\n/bh', 13, 1263)

@@ -14,8 +14,6 @@ local vars = nil
 
 function BHelper.modules.rogue.default:init()
     vars = self.vars
-    self.settings.type = 'battle'
-    self.settings.only_combat_start = true
 
     if (not vars.sunder) then vars.sunder = false end
 
@@ -37,13 +35,12 @@ function BHelper.modules.rogue.default:macros()
     macros:create('Ослабление доспеха',
                   '#showtooltip Ослабление доспеха\n/bh tv sunder', 41)
     macros:create('Маленькие хитрости',
-                  '#showtooltip Маленькие хитрости\n/bh c\n/cancelaura Маленькие хитрости\n/cast [@focus,help,nodead] Маленькие хитрости\n/cast [@target,help,nodead] Маленькие хитрости\n/cast [@mouseover,help,nodead] Маленькие хитрости',
+                  '#showtooltip Маленькие хитрости\n/cancelaura Маленькие хитрости\n/cast [@focus,help,nodead] Маленькие хитрости\n/cast [@target,help,nodead] Маленькие хитрости\n/cast [@mouseover,help,nodead] Маленькие хитрости',
                   15)
-    macros:create('Берсерк(Расовая)', '#showtooltip\n/bh c\n/cast Берсерк(Расовая)', 9)
-    macros:create('Шквал клинков', '#showtooltip\n/bh c\n/cast Шквал клинков', 10)
-    macros:create('Выброс адреналина', '#showtooltip\n/bh c\n/cast Выброс адреналина',
-                  11)
-    macros:create('Череда убийств', '#showtooltip\n/bh c\n/cast Череда убийств', 12)
+    macros:create('Берсерк(Расовая)', '#showtooltip\n/cast Берсерк(Расовая)', 9)
+    macros:create('Шквал клинков', '#showtooltip\n/cast Шквал клинков', 10)
+    macros:create('Выброс адреналина', '#showtooltip\n/cast Выброс адреналина', 11)
+    macros:create('Череда убийств', '#showtooltip\n/cast Череда убийств', 12)
 end
 
 function BHelper.modules.rogue.default:rotation_single()

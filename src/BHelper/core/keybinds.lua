@@ -28,9 +28,26 @@ local function get_bind_string(key, modifier)
     return ''
 end
 
-local function bind(class, name)
-    class = class:lower()
-    name = name:lower()
+local function put(class, name, slot)
+    name = ((name) and (type(name) == 'string')) and name:lower() or ''
+    slot = ((slot) and (type(slot) == 'number')) and slot or 0
+
+    if (slot == 0) then return end
+
+    if (class == 'macro') then PickupMacro(name) end
+    if (class == 'spell') then PickupSpell(name) end
+    if (class == 'item') then PickupItem(name) end
+    PlaceAction(slot)
+    ClearCursor()
+end
+
+local function bind(class, name, key, slot)
+    name = ((name) and (type(name) == 'string')) and name:lower() or ''
+    key = ((key) and (type(key) == 'string')) and key:upper() or false
+    slot = ((slot) and (type(slot) == 'number')) and slot or 0
+
+    if (slot > 0) then put(class, name, slot) end
+    if (key) then SetBinding(key, class .. ' ' .. name) end
 
     for index, bind in pairs(binds) do
         if ((bind.class == class) and (bind.name == name)) then return true end
@@ -43,42 +60,8 @@ local function bind(class, name)
             return false
         end
     end
+
     return false
-end
-
-function BHelper.keybinds:bind_macro(name, key)
-    if (key) then
-        if (SetBinding(key, 'macro ' .. name)) then return true end
-        return false
-    else
-        return bind('macro', name)
-    end
-end
-
-function BHelper.keybinds:bind_spell(name, key)
-    if (key) then
-        if (SetBinding(key, 'spell ' .. name)) then return true end
-        return false
-    else
-        return bind('spell', name)
-    end
-end
-
-function BHelper.keybinds:bind_item(name, key)
-    if (key) then
-        if (SetBinding(key, 'item ' .. name)) then return true end
-        return false
-    else
-        return bind('item', name)
-    end
-end
-
-function BHelper.keybinds:unbind_all()
-    for i = 1, #binds do
-        binds[i].name = nil
-        binds[i].class = nil
-        SetBinding(binds[i].bind_string)
-    end
 end
 
 local function show(num, r, g, b)
@@ -90,13 +73,13 @@ local function show(num, r, g, b)
     base.frame[num]:Show()
 
     timers:create(core:get_update_time(), function()
-        keybinds:hide(num)
+        base.frame[num]:Hide()
     end, 'keybinds_hide_' .. num)
     return true
 end
 
 local function show_bind(num, class, name)
-    if (ACTIVE_CHAT_EDIT_BOX) then return false end
+    if (GetCurrentKeyBoardFocus()) then return false end
 
     local flag = 0
     local info = 0
@@ -105,10 +88,35 @@ local function show_bind(num, class, name)
     flag = 44
     local index = get_bind_index(class, name)
     if (index == 0) then return false end
+
     info = binds[index].key
     modifier = binds[index].modifier
 
     show(num, flag, info, modifier)
+end
+
+function BHelper.keybinds:bind_spell(name, key, slot)
+    return bind('spell', name, key, slot)
+end
+
+function BHelper.keybinds:bind_macro(name, key, slot)
+    return bind('macro', name, key, slot)
+end
+
+function BHelper.keybinds:bind_item(name, key, slot)
+    return bind('item', name, key, slot)
+end
+
+function BHelper.keybinds:put_spell(name, slot)
+    return put('spell', name, slot)
+end
+
+function BHelper.keybinds:put_macro(name, slot)
+    return put('macro', name, slot)
+end
+
+function BHelper.keybinds:put_item(name, slot)
+    return put('item', name, slot)
 end
 
 function BHelper.keybinds:show_click()
@@ -119,12 +127,12 @@ function BHelper.keybinds:show_pet(can_attack)
     return show(2, 56, can_attack)
 end
 
-function BHelper.keybinds:show_macro(name)
-    return show_bind(3, 'macro', name)
-end
-
 function BHelper.keybinds:show_spell(name)
     return show_bind(3, 'spell', name)
+end
+
+function BHelper.keybinds:show_macro(name)
+    return show_bind(3, 'macro', name)
 end
 
 function BHelper.keybinds:show_item(name)
@@ -139,8 +147,12 @@ function BHelper.keybinds:show_help(name)
     return show_bind(5, 'spell', name)
 end
 
-function BHelper.keybinds:hide(num)
-    return base.frame[num]:Hide()
+function BHelper.keybinds:unbind_all()
+    for i = 1, #binds do
+        binds[i].name = nil
+        binds[i].class = nil
+        SetBinding(binds[i].bind_string)
+    end
 end
 
 local function init()

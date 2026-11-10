@@ -122,6 +122,10 @@ function BHelper.player:aura_count(aura, cast_by_player)
     return select(2, auras:get('player', aura, cast_by_player))
 end
 
+function BHelper.player:know_spell(spellname)
+    return (GetSpellInfo(spellname)) and true or false
+end
+
 function BHelper.player:can_cast(spellname, melee_only, check_time)
     if (not player:alive()) then return false end
     if (not IsUsableSpell(spellname)) then return false end

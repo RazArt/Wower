@@ -62,16 +62,15 @@ while True:
             key_state = False
             key_press(hWnd_wow, 46)
             key_release(hWnd_wow, 46)
-
             if (pixel_color[2][0] == 56):
                 key_press(hWnd_wow, 35)
                 key_release(hWnd_wow, 35)
 
         if (pixel_color[0] == (31, 11, 12)):
-            if ((not keyboard.is_pressed(42)) and (not keyboard.is_pressed(56))
-                    and (not keyboard.is_pressed(29))
-                    and ((keyboard.is_pressed(18)) or (keyboard.is_pressed(19)))):
-
+            # if ((not keyboard.is_pressed(42)) and (not keyboard.is_pressed(56))
+            #         and (not keyboard.is_pressed(29))
+            #         and ((keyboard.is_pressed(18)) or (keyboard.is_pressed(19)))):
+            if ((keyboard.is_pressed(18)) or (keyboard.is_pressed(19))):
                 if (pixel_color[1][0] == 56):
                     click_send(hWnd_wow)
 

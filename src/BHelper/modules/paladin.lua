@@ -14,12 +14,9 @@ local vars = nil
 
 function BHelper.modules.paladin.default:init()
     vars = self.vars
-    self.settings.type = 'battle'
-    self.settings.only_combat_start = true
 
     if (not vars.JoW) then vars.JoW = true end
     if (not vars.JoL) then vars.JoL = false end
-    if (not vars.silence) then vars.silence = false end
 
     keybinds:bind_spell('Свет небес')
     keybinds:bind_spell('Вспышка Света')

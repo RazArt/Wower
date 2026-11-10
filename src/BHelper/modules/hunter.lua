@@ -14,8 +14,6 @@ local vars = nil
 
 function BHelper.modules.hunter.default:init()
     vars = self.vars
-    self.settings.type = 'battle'
-    self.settings.only_combat_start = true
 
     if (not vars.mana_regeneration) then vars.mana_regeneration = false end
     if (not vars.manual_mana_regeneration) then vars.manual_mana_regeneration = false end
@@ -44,38 +42,37 @@ function BHelper.modules.hunter.default:init()
     keybinds:bind_item('Знак превосходства')
 
     keybinds:bind_macro('Перенаправление')
-    keybinds:bind_macro('ManaTV', 'BUTTON5')
+    keybinds:bind_macro('ManaTV', _, 'BUTTON5')
 end
 
 function BHelper.modules.hunter.default:macros()
-    macros:create('Отрыв', '#showtooltip\n/bh c\n/stopcasting\n/cast Отрыв', 1)
+    macros:create('Отрыв', '#showtooltip\n/stopcasting\n/cast Отрыв', 1)
     macros:create('PetControlTV', '/bh tv pet_control', 42, 273)
     macros:create('ManaTV', '/bh tv manual_mana_regeneration')
     macros:create('Быстрая стрельба',
-                  '#showtooltip Быстрая стрельба\n/bh c\n/use Зов берсерка\n/cast Зов дикой природы\n/stopcasting\n/cast Быстрая стрельба\n',
+                  '#showtooltip Быстрая стрельба\n/use Зов берсерка\n/cast Зов дикой природы\n/stopcasting\n/cast Быстрая стрельба\n',
                   9)
     macros:create('Берсерк(Расовая)',
-                  '#showtooltip Берсерк(Расовая)\n/bh c\n/cast Берсерк(Расовая)', 10)
-    macros:create('Готовность',
-                  '#showtooltip Готовность\n/bh c\n/stopcasting\n/cast Готовность', 11)
+                  '#showtooltip Берсерк(Расовая)\n/cast Берсерк(Расовая)', 10)
+    macros:create('Готовность', '#showtooltip Готовность\n/stopcasting\n/cast Готовность',
+                  11)
     macros:create('Притвориться мертвым',
                   '#showtooltip Притвориться мертвым\n/bh stop\n/stopcasting\n/cast Притвориться мертвым',
                   12)
     macros:create('Метка охотника',
-                  '#showtooltip Метка охотника\n/bh c\n/stopcasting\n/cast Метка охотника', 21)
+                  '#showtooltip Метка охотника\n/stopcasting\n/cast Метка охотника', 21)
     macros:create('Ледяная ловушка',
-                  '#showtooltip Ледяная ловушка\n/bh c\n/stopcasting\n/cast Ледяная ловушка',
-                  22)
+                  '#showtooltip Ледяная ловушка\n/stopcasting\n/cast Ледяная ловушка', 22)
     macros:create('Сдерживание',
                   '#showtooltip Сдерживание\n/bh stop\n/stopcasting\n/cancelaura Сдерживание\n/cast Сдерживание',
                   24)
     macros:create('Перенаправление',
-                  '#showtooltip Перенаправление\n/stopcasting\n/bh c\n/cast [@focus,help,nodead] Перенаправление\n/cast [@target,help,nodead] Перенаправление\n/cast [@targettarget,help,nodead] Перенаправление',
+                  '#showtooltip Перенаправление\n/stopcasting\n/cast [@focus,help,nodead] Перенаправление\n/cast [@target,help,nodead] Перенаправление\n/cast [@targettarget,help,nodead] Перенаправление',
                   15)
     macros:create('Глушащий выстрел',
-                  '#showtooltip\n/bh c\n/stopcasting\n/cast Глушащий выстрел', 17)
+                  '#showtooltip\n/stopcasting\n/cast Глушащий выстрел', 17)
     macros:create('Усмиряющий выстрел',
-                  '#showtooltip\n/bh c\n/stopcasting\n/cast Усмиряющий выстрел', 18)
+                  '#showtooltip\n/stopcasting\n/cast Усмиряющий выстрел', 18)
 end
 
 function BHelper.modules.hunter.default:execute()

@@ -54,10 +54,7 @@ end
 
 function BHelper.core:start()
     if (locked) then return false end
-    if ((core.profile:get().settings.only_combat_start) and (not player:on_combat()) and (not target:on_combat())) then
-        return false
-    end
-    if (player:is_mounted()) then return false end
+    -- if ((not player:on_combat()) and (not target:on_combat())) then return false end
 
     core.profile:get().burst_cooldown = true
     timers:create(2, function()
@@ -75,14 +72,6 @@ function BHelper.core:stop()
     core.profile:get().burst_cooldown = false
 
     if (core.profile:get().stop) then core.profile:get():stop() end
-end
-
-function BHelper.core:start_stop_toggle()
-    if (execution) then
-        core:stop()
-    else
-        core:start()
-    end
 end
 
 function BHelper.core:reload()
@@ -105,6 +94,8 @@ function BHelper.core:reload()
     profile.vars = DB:profile_vars()
 
     keybinds:unbind_all()
+    keybinds:bind_macro('Target')
+
     macros:clear()
     core:create_shared_macros()
 
@@ -114,9 +105,10 @@ function BHelper.core:reload()
     if (profile.init) then profile:init() end
     if (profile.macros) then profile:macros() end
 
-    if (profile.settings.usable_equip) then player:equip_set(profile.settings.usable_equip) end
+    if (not profile.settings.type) then profile.settings.type = 'battle' end
+    if ((profile.settings.type == 'battle') and (not profile.vars.silence)) then profile.vars.silence = false end
 
-    if (profile.settings.type == 'battle') then keybinds:bind_macro('Target') end
+    if (profile.settings.usable_equip) then player:equip_set(profile.settings.usable_equip) end
 end
 
 function BHelper.core:execute()
@@ -130,10 +122,8 @@ function BHelper.core:execute()
 
         if (BHelper.player:spell_is_targeting()) then BHelper.keybinds:show_click() end
 
-        if ((not stop_flag) and (profile.settings.type == 'battle')) then
-            if (not BHelper.player:can_target_attack()) then
-                stop_flag = BHelper.keybinds:show_macro('Target')
-            end
+        if ((not stop_flag) and (profile.settings.type == 'battle') and (not BHelper.player:can_target_attack())) then
+            stop_flag = BHelper.keybinds:show_macro('Target')
         end
 
         if ((not stop_flag) and (module.execute)) then stop_flag = module:execute() end
@@ -259,17 +249,17 @@ end
 
 function BHelper.core:create_shared_macros()
     if ((player:class() == 'hunter') or (player:class() == 'warlock') or (player:class() == 'deathknight')) then
-        macros:create('PetAttack', '/run print(\'Pet start\')\n/petattack [@target]', 19, 'Ability_Vehicle_PlayerLoaded')
-        macros:create('PetFollow', '/run print(\'Pet stop\')\n/petfollow', 20, 'Ability_Vehicle_LoadSelfCatapult')
-        keybinds:bind_macro('PetAttack', 'HOME')
-        keybinds:bind_macro('PetFollow', 'END')
+        macros:create('PetAttack', '/petattack [@target]', 19, 'Ability_Vehicle_PlayerLoaded')
+        macros:create('PetFollow', '/petfollow', 20, 'Ability_Vehicle_LoadSelfCatapult')
+        keybinds:bind_macro('PetAttack', _, 'HOME')
+        keybinds:bind_macro('PetFollow', _, 'END')
     end
-    macros:create('Target', '/targetenemy\n/startattack\n/bh c', 0)
+    macros:create('Target', '/targetenemy\n/startattack', 0)
 
-    macros:create('Start', '/run print(\'Start\')\n/bh start')
-    macros:create('Stop', '/run print(\'Stop\')\n/bh stop\n/stopcasting\n/stopattack\n/cleartarget')
-    keybinds:bind_macro('Start', 'INSERT')
-    keybinds:bind_macro('Stop', 'DELETE')
+    macros:create('Start', '/bh start\n/targetlastenemy\n/startattack\n')
+    macros:create('Stop', '/bh stop\n/stopcasting\n/stopattack')
+    keybinds:bind_macro('Start', _, 'INSERT')
+    keybinds:bind_macro('Stop', _, 'DELETE')
 
     macros:create('Reload', '/reload', 49, 'Spell_Shadow_SoulLeech_2')
     macros:create('Roll', '/roll', 52, 'Spell_Shadow_SoulLeech')
@@ -297,8 +287,8 @@ function BHelper.core:create_shared_macros()
     macros:create('LADY', '/cleartarget\n/equipset [noequipped:Оружие] pve; LADY', 26,
                   'Spell_Magic_PolymorphRabbit')
 
-    macros:create('S', '/targetlastenemy\n/startattack\n/bh sr rotation_single', 13, 'Spell_Fire_FelPyroblast')
-    macros:create('M', '/targetlastenemy\n/startattack\n/bh sr rotation_multiple', 14, 'Spell_Fire_FelRainOfFire')
+    macros:create('S', '/bh sa rotation_single', 13, 'Spell_Fire_FelPyroblast')
+    macros:create('M', '/bh sa rotation_multiple', 14, 'Spell_Fire_FelRainOfFire')
 
     macros:create('lock', '/bh l', 48)
     keybinds:bind_macro('lock', 'F12')

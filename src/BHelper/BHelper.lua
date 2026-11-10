@@ -6,9 +6,7 @@ event_frame:SetScript('OnEvent', function(_, event, ...)
 end)
 event_frame:RegisterEvent('PLAYER_LOGIN')
 event_frame:RegisterEvent('ACTIVE_TALENT_GROUP_CHANGED')
-event_frame:RegisterEvent('GLYPH_UPDATED')
-event_frame:RegisterEvent('PLAYER_REGEN_DISABLED')
-event_frame:RegisterEvent('PLAYER_REGEN_ENABLED')
+-- event_frame:RegisterEvent('GLYPH_UPDATED')
 event_frame:RegisterEvent('PLAYER_CONTROL_LOST')
 event_frame:RegisterEvent('PLAYER_CONTROL_GAINED')
 event_frame:RegisterEvent('PLAYER_TARGET_CHANGED')
@@ -16,6 +14,7 @@ event_frame:RegisterEvent('PLAYER_TARGET_CHANGED')
 function BHelper:PLAYER_LOGIN()
     BHelper.core:namespace_init()
     BHelper.keybinds:namespace_init()
+    BHelper.macros:namespace_init()
     BHelper.pet:namespace_init()
     BHelper.player:namespace_init()
     BHelper.target:namespace_init()
@@ -44,19 +43,11 @@ function BHelper:ACTIVE_TALENT_GROUP_CHANGED()
     end, 'reload')
 end
 
-function BHelper:GLYPH_UPDATED()
-    self.timers:create(5, function()
-        self.core:reload()
-    end, 'reload')
-end
-
-function BHelper:PLAYER_REGEN_DISABLED()
-    BHelper.core:start()
-end
-
-function BHelper:PLAYER_REGEN_ENABLED()
-    BHelper.core:stop()
-end
+-- function BHelper:GLYPH_UPDATED()
+--     self.timers:create(5, function()
+--         self.core:reload()
+--     end, 'reload')
+-- end
 
 function BHelper:PLAYER_CONTROL_LOST()
     BHelper.core._cooldown = true
@@ -76,9 +67,7 @@ function BHelper:commands(msg)
 
     for arg in string.gmatch(msg, '([^%s]+)') do table.insert(args, arg) end
 
-    if ((args[1] == 'toggle') or (#args == 0)) then
-        self.core:start_stop_toggle()
-    elseif (args[1] == 'start') then
+    if (args[1] == 'start') then
         self.core:start()
     elseif (args[1] == 'stop') then
         self.core:stop()
@@ -92,13 +81,6 @@ function BHelper:commands(msg)
         self.core.profile:set(args[2])
     elseif (args[1] == 'sa') then
         self.core.action:set(args[2])
-    elseif (args[1] == 'sr') then
-        if (not BHelper.core:execution()) then
-            self.core.action:set(args[2])
-            self.core:start()
-        elseif ((BHelper.core:execution()) and (not self.core.action:set(args[2]))) then
-            self.core:stop()
-        end
     elseif (args[1] == 'r') then
         self.core:reload()
     elseif (args[1] == 'l') then

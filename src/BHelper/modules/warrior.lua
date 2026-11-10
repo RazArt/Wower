@@ -11,19 +11,17 @@ local timers = BHelper.timers
 local module = BHelper.modules.warrior
 
 local vars = nil
+local multiple_attack = false
 
 function BHelper.modules.warrior.default:init()
     vars = self.vars
 
-    self.settings.type = 'battle'
-    self.settings.only_combat_start = true
     self.settings.usable_equip = 'DPS'
 
-    if (not vars.attack_type) then vars.attack_type = '1' end
+    if (not vars.attack_type) then multiple_attack = false end
     if (not vars.battle_shout) then vars.battle_shout = false end
     if (not vars.commanding_shout) then vars.commanding_shout = false end
     if (not vars.demoralizing_shout) then vars.demoralizing_shout = false end
-    if (not vars.silence) then vars.silence = false end
 
     keybinds:bind_spell('Удар героя')
     keybinds:bind_spell('Рассекающий удар')
@@ -55,31 +53,30 @@ function BHelper.modules.warrior.default:macros()
     macros:create('Командирский крикTV',
                   '#showtooltip Командирский крик\n/bh tv commanding_shout', 43)
     macros:create('ЗуботычинаTV', '#showtooltip Зуботычина\n/bh tv silence', 44)
-    macros:create('Берсерк(Расовая)', '#showtooltip\n/bh c\n/cast Берсерк(Расовая)', 93)
-    macros:create('Жажда смерти', '#showtooltip\n/bh c\n/cast Жажда смерти', 94)
-    macros:create('Безрассудство', '#showtooltip\n/bh c\n/cast Безрассудство', 95)
+    macros:create('Берсерк(Расовая)', '#showtooltip\n/cast Берсерк(Расовая)', 93)
+    macros:create('Жажда смерти', '#showtooltip\n/cast Жажда смерти', 94)
+    macros:create('Безрассудство', '#showtooltip\n/cast Безрассудство', 95)
     macros:create('Возмездие',
-                  '#showtooltip Возмездие\n/bh c\n/cast [stance:2/3] Боевая стойка\n/cast [stance:1] Возмездие',
+                  '#showtooltip Возмездие\n/cast [stance:2/3] Боевая стойка\n/cast [stance:1] Возмездие',
                   96)
     macros:create('Рывок',
-                  '#showtooltip\n/bh c\n/cast [noharm]Вмешательство;[stance:2]Рывок;Перехват',
-                  15)
+                  '#showtooltip\n/cast [noharm]Вмешательство;[stance:2]Рывок;Перехват', 15)
 end
 
 function BHelper.modules.warrior.default:rotation_single()
-    vars.attack_type = '1'
+    multiple_attack = false
     return self:rotation()
 end
 
 function BHelper.modules.warrior.default:rotation_multiple()
-    vars.attack_type = '2'
+    multiple_attack = true
     return self:rotation()
 end
 
 function BHelper.modules.warrior.default:rotation()
-    if (vars.attack_type == '1') then
+    if (not multiple_attack) then
         if (player:can_cast('Удар героя')) then keybinds:show_attack('Удар героя') end
-    elseif (vars.attack_type == '2') then
+    elseif (multiple_attack) then
         if (player:can_cast('Рассекающий удар')) then
             keybinds:show_attack('Рассекающий удар')
         end
@@ -167,15 +164,12 @@ end
 function BHelper.modules.warrior.proto:init()
     vars = self.vars
 
-    self.settings.type = 'battle'
-    self.settings.only_combat_start = true
     self.settings.usable_equip = 'TANK'
 
-    if (not vars.attack_type) then vars.attack_type = '1' end
+    if (not vars.attack_type) then multiple_attack = false end
     if (not vars.battle_shout) then vars.battle_shout = false end
     if (not vars.commanding_shout) then vars.commanding_shout = false end
     if (not vars.demoralizing_shout) then vars.demoralizing_shout = false end
-    if (not vars.silence) then vars.silence = false end
 
     keybinds:bind_spell('Удар героя')
     keybinds:bind_spell('Рассекающий удар')
@@ -189,7 +183,6 @@ function BHelper.modules.warrior.proto:init()
     keybinds:bind_spell('Дразнящий удар')
     keybinds:bind_spell('Берсерк(Расовая)')
 
-    keybinds:bind_spell('Героический бросок')
     keybinds:bind_spell('Героический бросок', 'BUTTON5')
     keybinds:bind_spell('Мощный удар щитом')
     keybinds:bind_spell('Реванш')
@@ -213,42 +206,41 @@ function BHelper.modules.warrior.proto:macros()
     macros:create('Командирский крикTV',
                   '#showtooltip Командирский крик\n/bh tv commanding_shout', 43)
     macros:create('Рывок',
-                  '#showtooltip\n/bh c\n/cast [stance:2] Боевая стойка\n/cast [noharm]Вмешательство;Рывок;Перехват\n/cast [stance:1] Оборонительная стойка',
+                  '#showtooltip\n/cast [stance:2] Боевая стойка\n/cast [noharm]Вмешательство;Рывок;Перехват\n/cast [stance:1] Оборонительная стойка',
                   15)
     -- macros:create('Рывок',
-    --               '#showtooltip\n/bh c\n/cast [noharm]Вмешательство;Рывок;Перехват', 15)
+    --               '#showtooltip\n/cast [noharm]Вмешательство;Рывок;Перехват', 15)
     -- macros:create('Провокация',
-    --               '#showtooltip Провокация\n/bh c\n/cast [stance:1/3] Оборонительная стойка\n/cast [@targettarget,help] Бдительность\n/castsequence reset=target/8 Провокация, Дразнящий удар',
+    --               '#showtooltip Провокация\n/cast [stance:1/3] Оборонительная стойка\n/cast [@targettarget,help] Бдительность\n/castsequence reset=target/8 Провокация, Дразнящий удар',
     --               16)
     macros:create('Провокация',
-                  '#showtooltip\n/bh c\n/cast [stance:1/3] Оборонительная стойка\n/cast Провокация\n/cast Дразнящий удар',
+                  '#showtooltip\n/cast [stance:1/3] Оборонительная стойка\n/cast Провокация\n/cast Дразнящий удар',
                   16)
     macros:create('Возмездие',
-                  '#showtooltip Возмездие\n/bh c\n/cast [stance:2/3] Боевая стойка\n/cast [stance:1] Возмездие',
+                  '#showtooltip Возмездие\n/cast [stance:2/3] Боевая стойка\n/cast [stance:1] Возмездие',
                   24)
 
-    macros:create('Глухая оборона', '#showtooltip\n/bh c\n/cast Глухая оборона', 79)
-    macros:create('Ни шагу назад', '#showtooltip\n/bh c\n/cast Ни шагу назад', 80)
-    macros:create('Блок щитом', '#showtooltip\n/bh c\n/cast Блок щитом', 81)
+    macros:create('Глухая оборона', '#showtooltip\n/cast Глухая оборона', 79)
+    macros:create('Ни шагу назад', '#showtooltip\n/cast Ни шагу назад', 80)
+    macros:create('Блок щитом', '#showtooltip\n/cast Блок щитом', 81)
     macros:create('Отражение заклинания',
-                  '#showtooltip\n/bh c\n/cast Отражение заклинания', 82)
+                  '#showtooltip\n/cast Отражение заклинания', 82)
 end
 
 function BHelper.modules.warrior.proto:rotation_single()
-    vars.attack_type = '1'
+    multiple_attack = false
     return self:rotation()
 end
 
 function BHelper.modules.warrior.proto:rotation_multiple()
-    vars.attack_type = '2'
+    multiple_attack = true
     return self:rotation()
 end
 
 function BHelper.modules.warrior.proto:rotation()
-    if ((vars.attack_type == '1') and (player:power() >= 20) and (player:can_cast('Удар героя'))) then
+    if ((not multiple_attack) and (player:power() >= 20) and (player:can_cast('Удар героя'))) then
         keybinds:show_attack('Удар героя')
-    elseif ((vars.attack_type == '2') and (player:power() >= 30) and
-        (player:can_cast('Рассекающий удар'))) then
+    elseif ((multiple_attack) and (player:power() >= 30) and (player:can_cast('Рассекающий удар'))) then
         keybinds:show_attack('Рассекающий удар')
     end
 
@@ -300,21 +292,21 @@ function BHelper.modules.warrior.proto:rotation()
             (player:can_cast('Боевой крик'))) then return keybinds:show_spell('Боевой крик') end
     end
 
-    if (((vars.attack_type == '2') or (not player:has_stable_threat())) and (player:can_cast('Блок щитом'))) then
+    if (((multiple_attack) or (not player:has_stable_threat())) and (player:can_cast('Блок щитом'))) then
         return keybinds:show_spell('Блок щитом')
     end
 
-    if ((vars.attack_type == '1') and (not player:has_stable_threat()) and (target:is_boss()) and
+    if ((not multiple_attack) and (not player:has_stable_threat()) and (target:is_boss()) and
         (player:can_cast_on_enemy('Героический бросок'))) then
         return keybinds:show_spell('Героический бросок')
     end
 
-    if ((vars.attack_type == '1') and (target:aura('Кровопускание', true) == 0) and
+    if ((not multiple_attack) and (target:aura('Кровопускание', true) == 0) and
         (player:can_cast_on_enemy('Кровопускание'))) then
         return keybinds:show_spell('Кровопускание')
     end
 
-    if (((vars.attack_type == '2')) and (player:can_cast('Удар грома', true))) then
+    if (((multiple_attack)) and (player:can_cast('Удар грома', true))) then
         return keybinds:show_spell('Удар грома')
     end
 
@@ -342,5 +334,5 @@ function BHelper.modules.warrior.proto:rotation()
 end
 
 function BHelper.modules.warrior.proto:stop()
-    vars.attack_type = '1'
+    multiple_attack = false
 end

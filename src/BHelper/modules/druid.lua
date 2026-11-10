@@ -15,8 +15,6 @@ local vars = nil
 function BHelper.modules.druid.default:init()
     vars = self.vars
 
-    self.settings.type = 'battle'
-    self.settings.only_combat_start = true
     self.behind_of_target = true
 
     if (player:spec() == 1) then
@@ -24,8 +22,6 @@ function BHelper.modules.druid.default:init()
     else
         self.settings.usable_equip = 'TANK'
     end
-
-    if (not vars.silence) then vars.silence = false end
 
     keybinds:bind_spell('Калечение')
     keybinds:bind_spell('Оглушить')
@@ -64,6 +60,7 @@ function BHelper.modules.druid.default:init()
 end
 
 function BHelper.modules.druid.default:macros()
+    macros:create('КалечениеTV', '#showtooltip Калечение\n/bh tv silence', 43)
     macros:create('Чардж',
                   '#showtooltip\n/cast [form:1] Звериная атака - медведь\n/cast [form:3] Звериная атака - кошка',
                   15)
@@ -73,35 +70,29 @@ function BHelper.modules.druid.default:macros()
     macros:create('Reform',
                   '/bh c\n/cast [form:0/1/2/4/5/6] !Облик кошки(Смена облика)\n/cast [form:3] !Облик лютого медведя(Смена облика)\n')
     macros:create('Калечение',
-                  '#showtooltip\n/bh c\n/cast [form:1/2] Оглушить\n/cast [form:3] Калечение', 17)
-    macros:create('Возрождение', '#showtooltip Возрождение\n/bh c\n/cast Возрождение',
-                  19)
-    macros:create('Дубовая кожа',
-                  '#showtooltip Дубовая кожа\n/bh c\n/cast Дубовая кожа', 20)
-    macros:create('Смерч', '#showtooltip Смерч\n/bh c\n/cast Смерч', 21)
+                  '#showtooltip\n/cast [form:1/2] Оглушить\n/cast [form:3] Калечение', 17)
+    macros:create('Возрождение', '#showtooltip Возрождение\n/cast Возрождение', 19)
+    macros:create('Дубовая кожа', '#showtooltip Дубовая кожа\n/cast Дубовая кожа', 20)
+    macros:create('Смерч', '#showtooltip Смерч\n/cast Смерч', 21)
     macros:create('Озарение',
-                  '#showtooltip Озарение\n/bh c\n/cast [@focus,help,nodead] Озарение\n/cast [@target,help,nodead] Озарение\n/cast [@mouseover,help,nodead] Озарение',
+                  '#showtooltip Озарение\n/cast [@focus,help,nodead] Озарение\n/cast [@target,help,nodead] Озарение\n/cast [@mouseover,help,nodead] Озарение',
                   22)
     macros:create('Инстинкты выживания',
-                  '#showtooltip Инстинкты выживания\n/bh c\n/cast Инстинкты выживания',
-                  23)
+                  '#showtooltip Инстинкты выживания\n/cast Инстинкты выживания', 23)
     macros:create('Инвиз',
                   '#showtooltip Крадущийся зверь\n/bh stop\n/cast [form:0/1/2/4/5/6] !Облик кошки(Смена облика)\n/cast [form:3] Крадущийся зверь',
                   24)
     macros:create('Берсерк',
-                  '#showtooltip Берсерк\n/bh c\n/cast Берсерк\n/use Знак превосходства',
-                  69)
+                  '#showtooltip Берсерк\n/cast Берсерк\n/use Знак превосходства', 69)
     macros:create('Берсерк(Расовая)',
-                  '#showtooltip Берсерк(Расовая)\n/bh c\n/cast Берсерк(Расовая)', 70)
+                  '#showtooltip Берсерк(Расовая)\n/cast Берсерк(Расовая)', 70)
     macros:put_to_panel('Берсерк', 81)
     macros:put_to_panel('Берсерк(Расовая)', 82)
     macros:create('Неистовое восстановление',
-                  '#showtooltip Неистовое восстановление\n/bh c\n/cast Неистовое восстановление',
+                  '#showtooltip Неистовое восстановление\n/cast Неистовое восстановление',
                   71)
-    macros:create('Исступление', '#showtooltip Исступление\n/bh c\n/cast Исступление',
-                  72)
-    macros:create('Порыв', '#showtooltip Порыв\n/bh c\n/cast Порыв', 83)
-    macros:create('КалечениеTV', '#showtooltip Калечение\n/bh tv silence', 43)
+    macros:create('Исступление', '#showtooltip Исступление\n/cast Исступление', 72)
+    macros:create('Порыв', '#showtooltip Порыв\n/cast Порыв', 83)
 end
 
 function BHelper.modules.druid.default:execute()
