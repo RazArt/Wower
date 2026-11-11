@@ -19,29 +19,10 @@ function BHelper.modules.hunter.default:init()
     if (not vars.manual_mana_regeneration) then vars.manual_mana_regeneration = false end
     if (not vars.pet_control) then vars.pet_control = true end
 
-    -- keybinds:bind_spell('Дух дракондора')
-    -- keybinds:bind_spell('Дух гадюки')
-    -- keybinds:bind_spell('Глушащий выстрел')
-    -- keybinds:bind_spell('Усмиряющий выстрел')
-    -- keybinds:bind_spell('Метка охотника')
-    -- keybinds:bind_spell('Укус змеи')
-    -- keybinds:bind_spell('Укус гадюки')
-    -- keybinds:bind_spell('Убийственный выстрел')
-    -- keybinds:bind_spell('Бросок ловушки: взрывная ловушка')
-    -- keybinds:bind_spell('Град стрел')
-    -- keybinds:bind_spell('Выстрел химеры')
-    -- keybinds:bind_spell('Прицельный выстрел')
-    -- keybinds:bind_spell('Верный выстрел')
-    -- keybinds:bind_spell('Залп')
-    -- keybinds:bind_spell('Команда "Взять!"')
-    -- keybinds:bind_spell('Быстрая стрельба')
-    -- keybinds:bind_spell('Берсерк(Расовая)')
-    -- keybinds:bind_spell('Готовность')
-    -- keybinds:bind_spell('Зов дикой природы')
-    -- keybinds:bind_item('Зов берсерка')
-    -- keybinds:bind_item('Знак превосходства')
-    -- keybinds:bind_macro('Перенаправление')
-    -- keybinds:bind_macro('Mana', 'BUTTON5')
+    keybinds:bind_macro('Mana', 'BUTTON5')
+
+    keybinds:bind_item('Зов берсерка')
+    keybinds:bind_item('Знак превосходства')
 end
 
 function BHelper.modules.hunter.default:macros()

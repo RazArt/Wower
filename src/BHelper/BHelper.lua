@@ -10,6 +10,7 @@ event_frame:RegisterEvent('ACTIVE_TALENT_GROUP_CHANGED')
 event_frame:RegisterEvent('PLAYER_CONTROL_LOST')
 event_frame:RegisterEvent('PLAYER_CONTROL_GAINED')
 event_frame:RegisterEvent('PLAYER_TARGET_CHANGED')
+event_frame:RegisterEvent('UNIT_PET')
 
 function BHelper:PLAYER_LOGIN()
     BHelper.core:namespace_init()
@@ -29,8 +30,10 @@ function BHelper:PLAYER_LOGIN()
     BHelper.timers:create(BHelper.core:get_update_time(), function()
         BHelper.core:execute()
     end, 'main_execute', true)
+end
 
-    BHelper.keybinds:bind_spells()
+function BHelper:UNIT_PET(unit_id)
+    if (unit_id == 'player') then BHelper.keybinds:bind_spells() end
 end
 
 function BHelper:ACTIVE_TALENT_GROUP_CHANGED()

@@ -15,21 +15,7 @@ local vars = nil
 local multiple_attack = false
 
 function BHelper.modules.warrior:init()
-    keybinds:bind_spell('Удар героя')
-    keybinds:bind_spell('Рассекающий удар')
-    keybinds:bind_spell('Боевая стойка')
-    keybinds:bind_spell('Оборонительная стойка')
-    keybinds:bind_spell('Стойка берсерка')
-    keybinds:bind_spell('Деморализующий крик')
-    keybinds:bind_spell('Боевой крик')
-    keybinds:bind_spell('Командирский крик')
-    keybinds:bind_spell('Кровавая ярость')
-    keybinds:bind_spell('Ярость берсерка')
-    keybinds:bind_spell('Безудержное восстановление')
-    keybinds:bind_spell('Глухая оборона')
-    keybinds:bind_spell('Возмездие')
-    keybinds:bind_spell('Берсерк(Расовая)')
-    keybinds:bind_spell('Кровавое неистовство(Расовая)')
+
 end
 
 function BHelper.modules.warrior:macros()
@@ -76,15 +62,7 @@ function BHelper.modules.warrior.default:init()
     if (not vars.commanding_shout) then vars.commanding_shout = false end
     if (not vars.demoralizing_shout) then vars.demoralizing_shout = false end
 
-    keybinds:bind_spell('Зуботычина')
-    keybinds:bind_spell('Сокрушительный бросок')
-    keybinds:bind_spell('Вихрь')
-    keybinds:bind_spell('Кровожадность')
-    keybinds:bind_spell('Мощный удар')
-    keybinds:bind_spell('Казнь')
-    keybinds:bind_spell('Раскол брони')
-    keybinds:bind_spell('Безрассудство')
-    keybinds:bind_spell('Жажда смерти')
+    keybinds:bind_item('Душители Плети')
 end
 
 function BHelper.modules.warrior.default:macros()
@@ -245,19 +223,6 @@ function BHelper.modules.warrior.proto:init()
     if (not vars.battle_shout) then vars.battle_shout = false end
     if (not vars.commanding_shout) then vars.commanding_shout = false end
     if (not vars.demoralizing_shout) then vars.demoralizing_shout = false end
-
-    keybinds:bind_spell('Удар щитом')
-    keybinds:bind_spell('Дразнящий удар')
-    keybinds:bind_spell('Героический бросок', 'BUTTON5')
-    keybinds:bind_spell('Мощный удар щитом')
-    keybinds:bind_spell('Реванш')
-    keybinds:bind_spell('Удар грома')
-    keybinds:bind_spell('Сокрушение')
-    keybinds:bind_spell('Ударная волна')
-    keybinds:bind_spell('Ни шагу назад')
-    keybinds:bind_spell('Блок щитом')
-    keybinds:bind_spell('Отражение заклинания')
-    keybinds:bind_spell('Кровопускание')
 end
 
 function BHelper.modules.warrior.proto:macros()

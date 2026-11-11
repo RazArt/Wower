@@ -17,17 +17,6 @@ function BHelper.modules.rogue.default:init()
 
     if (not vars.sunder) then vars.sunder = false end
 
-    keybinds:bind_spell('Пинок')
-    keybinds:bind_spell('Ослабление доспеха')
-    keybinds:bind_spell('Мясорубка')
-    keybinds:bind_spell('Рваная рана')
-    keybinds:bind_spell('Потрошение')
-    keybinds:bind_spell('Коварный удар')
-    keybinds:bind_spell('Веер клинков')
-    keybinds:bind_spell('Шквал клинков')
-    keybinds:bind_spell('Выброс адреналина')
-    keybinds:bind_spell('Берсерк(Расовая)')
-
     keybinds:bind_item('Знак превосходства')
 end
 

@@ -8,16 +8,17 @@ function BHelper.macros:namespace_init()
     keybinds = BHelper.keybinds
 end
 
+local function delete(name)
+    DeleteMacro(GetMacroIndexByName(name:lower()))
+end
+
 function BHelper.macros:create(name, command, icon)
     name = ((name) and (type(name) == 'string')) and name:lower() or ''
     icon = (icon) and self:icon(icon) or 1
 
-    self:delete(name)
+    delete(name)
     CreateMacro(name, icon, command, (GetNumMacros() == 36))
-end
-
-function BHelper.macros:delete(name)
-    DeleteMacro(GetMacroIndexByName(name:lower()))
+    keybinds:bind_macro(name)
 end
 
 function BHelper.macros:clear()

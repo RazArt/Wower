@@ -49,31 +49,22 @@ local function bind(class, name, key)
     key = ((key) and (type(key) == 'string')) and key:upper() or false
 
     if (key) then SetBinding(key, class .. ' ' .. name) end
-
     for index, bind in pairs(binds) do
         if ((bind.class == class) and (bind.name == name)) then return true end
         if (not bind.name) then
             if (SetBinding(bind.bind_string, class .. ' ' .. name)) then
-                -- print('!!!!!!!!!!', class, name, key)
                 bind.name = name
                 bind.class = class
                 return true
-            else
-                -- print(class, name, key)
             end
             return false
         end
     end
-
     return false
 end
 
 local function show(num, r, g, b)
-    r = r or 0
-    g = g or 0
-    b = b or 0
-
-    base.frame[num].texture:SetTexture(r / 255, g / 255, b / 255)
+    base.frame[num].texture:SetTexture((r or 0) / 255, (g or 0) / 255, (b or 0) / 255)
     base.frame[num]:Show()
 
     timers:create(core:get_update_time(), function()
@@ -85,22 +76,9 @@ end
 local function show_bind(num, class, name)
     if (GetCurrentKeyBoardFocus()) then return false end
 
-    local flag = 0
-    local info = 0
-    local modifier = 0
-
-    flag = 44
     local index = get_bind_index(class, name)
     if (index == 0) then return false end
-
-    info = binds[index].key
-    modifier = binds[index].modifier
-
-    show(num, flag, info, modifier)
-end
-
-function BHelper.keybinds:bind_spell(name, key)
-    return bind('spell', name, key)
+    show(num, 44, binds[index].key, binds[index].modifier)
 end
 
 local spellbooks = {BOOKTYPE_SPELL, BOOKTYPE_PET}
@@ -109,8 +87,9 @@ function BHelper.keybinds:bind_spells()
 
     for _, spellbook in pairs(spellbooks) do
         for i = 1, 255 do
-            local name = GetSpellName(i, spellbook)
+            local name, rank = GetSpellName(i, spellbook)
             if (not name) then break end
+            if rank == 'Расовая' then name = name .. '(Расовая)' end
             spells[name] = true
         end
     end
@@ -174,14 +153,11 @@ function BHelper.keybinds:unbind_all()
 end
 
 local function init()
-    binds = {}
-
-    local keys = {
-        '7', '8', '9', '0', 'Q', 'E', 'R', 'F', 'T', 'Y', 'U', 'I', 'O', 'P', 'G', 'H', 'J', 'K', 'L', 'Z', 'X', 'C',
-        'V', 'B', 'N', 'M'
-    }
-
     local count = 1
+    local keys = {
+        '7', '8', '9', '0', 'F', 'T', 'Y', 'U', 'I', 'O', 'P', 'G', 'H', 'J', 'K', 'L', 'Z', 'X', 'C', 'V', 'B', 'N',
+        'M'
+    }
     for i = 1, #keys do
         for m = 1, 7 do
             binds[count] = {}

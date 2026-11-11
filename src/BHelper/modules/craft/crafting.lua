@@ -18,16 +18,6 @@ end
 function BHelper.modules.crafting.common:init()
     self.settings.type = 'craft'
 
-    BHelper.keybinds:bind_macro('Субстанция')
-    BHelper.keybinds:bind_macro('Распыление')
-    BHelper.keybinds:bind_macro('Брасы')
-    BHelper.keybinds:bind_macro('Рулоны')
-    BHelper.keybinds:bind_macro('Купить')
-    BHelper.keybinds:bind_macro('Аукцион')
-    BHelper.keybinds:bind_macro('Почта')
-    BHelper.keybinds:bind_macro('Нитки')
-    BHelper.keybinds:bind_macro('Start')
-
     BHelper.core.action:set('step_1')
 end
 

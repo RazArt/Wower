@@ -26,34 +26,6 @@ local timeout = {}
 function BHelper.modules.deathknight:init()
     frost = player:know_spell('Ледяной удар')
     unholy = player:know_spell('Удар плети')
-
-    keybinds:bind_spell('Заморозка разума')
-    keybinds:bind_spell('Рунический удар')
-    keybinds:bind_spell('Ледяные оковы')
-    keybinds:bind_spell('Мор')
-    keybinds:bind_spell('Вскипание крови')
-    keybinds:bind_spell('Смерть и разложение')
-    keybinds:bind_spell('Ледяное прикосновение')
-    keybinds:bind_spell('Удар чумы')
-    keybinds:bind_spell('Кровавый удар')
-    keybinds:bind_spell('Лик смерти')
-    keybinds:bind_spell('Хватка смерти')
-    keybinds:bind_spell('Темная власть')
-    keybinds:bind_spell('Удушение')
-    keybinds:bind_spell('Власть крови')
-    keybinds:bind_spell('Власть льда')
-    keybinds:bind_spell('Власть нечестивости')
-    keybinds:bind_spell('Льдистый путь')
-    keybinds:bind_spell('Зимний горн')
-    keybinds:bind_spell('Незыблемость льда')
-    keybinds:bind_spell('Антимагический панцирь')
-    keybinds:bind_spell('Усиление рунического оружия')
-    keybinds:bind_spell('Кровоотвод')
-    keybinds:bind_spell('Воскрешение мертвых')
-    keybinds:bind_spell('Войско мертвых')
-    keybinds:bind_spell('Смертельный союз')
-    keybinds:bind_spell('Берсерк(Расовая)')
-    keybinds:bind_spell('Кровавое неистовство(Расовая)')
 end
 
 function BHelper.modules.deathknight:macros()
@@ -118,11 +90,6 @@ function BHelper.modules.deathknight.default:init()
     vars = self.vars
 
     self.settings.usable_equip = 'TANK'
-
-    keybinds:bind_spell('Удар в сердце')
-    keybinds:bind_spell('Удар смерти')
-    keybinds:bind_spell('Кровь вампира')
-    keybinds:bind_spell('Захват рун')
 
     self:register_event('UNIT_SPELLCAST_SUCCEEDED')
 end
@@ -286,17 +253,6 @@ function BHelper.modules.deathknight.damage:init()
 
     if (not vars.pet_control) then vars.pet_control = true end
 
-    if (frost) then
-        keybinds:bind_spell('Ледяной удар')
-        keybinds:bind_spell('Уничтожение')
-        keybinds:bind_spell('Воющий ветер')
-        keybinds:bind_spell('Несокрушимая броня')
-    end
-    if (unholy) then
-        keybinds:bind_spell('Удар Плети')
-        keybinds:bind_spell('Костяной щит')
-        keybinds:bind_spell('Призыв горгульи')
-    end
     keybinds:bind_item('Знак превосходства')
 
     self:register_event('UNIT_SPELLCAST_SUCCEEDED')

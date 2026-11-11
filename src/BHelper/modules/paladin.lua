@@ -17,19 +17,6 @@ function BHelper.modules.paladin.default:init()
 
     if (not vars.JoW) then vars.JoW = true end
     if (not vars.JoL) then vars.JoL = false end
-
-    keybinds:bind_spell('Свет небес')
-    keybinds:bind_spell('Вспышка Света')
-    keybinds:bind_spell('Правосудие мудрости')
-    keybinds:bind_spell('Правосудие света')
-    keybinds:bind_spell('Божественная буря')
-    keybinds:bind_spell('Удар воина света')
-    keybinds:bind_spell('Молот гнева')
-    keybinds:bind_spell('Освящение')
-    keybinds:bind_spell('Экзорцизм')
-    keybinds:bind_spell('Гнев небес')
-    keybinds:bind_spell('Благословение могущества')
-    keybinds:bind_spell('Печать повиновения')
 end
 
 function BHelper.modules.paladin.default:macros()

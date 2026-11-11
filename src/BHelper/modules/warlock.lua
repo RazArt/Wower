@@ -3,21 +3,6 @@ function BHelper.modules.warlock.default:init()
 
     if (not vars.pet_control) then vars.pet_control = true end
 
-    BHelper.keybinds:bind_spell('Демоническое могущество')
-    BHelper.keybinds:bind_spell('Проклятие стихий')
-    BHelper.keybinds:bind_spell('Проклятие рока')
-    BHelper.keybinds:bind_spell('Жизнеотвод')
-    BHelper.keybinds:bind_spell('Метаморфоза')
-    BHelper.keybinds:bind_spell('Жертвенный костер')
-    BHelper.keybinds:bind_spell('Стрела Тьмы')
-    BHelper.keybinds:bind_spell('Жертвенный огонь')
-    BHelper.keybinds:bind_spell('Порча')
-    BHelper.keybinds:bind_spell('Ожог души')
-    BHelper.keybinds:bind_spell('Испепеление')
-    BHelper.keybinds:bind_spell('')
-    BHelper.keybinds:bind_spell('')
-    BHelper.keybinds:bind_spell('')
-
     BHelper.keybinds:bind_item('Освященные перчатки мрачного шабаша')
 end
 

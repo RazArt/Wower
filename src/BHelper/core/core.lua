@@ -77,7 +77,7 @@ function BHelper.core:reload()
     profile.vars = DB:profile_vars()
 
     keybinds:unbind_all()
-    keybinds:bind_macro('Target')
+    keybinds:bind_spells()
 
     macros:clear()
     core:macros()
