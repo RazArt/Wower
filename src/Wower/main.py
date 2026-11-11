@@ -2,87 +2,98 @@ import win32gui
 import win32api
 import win32con
 import keyboard
-import mouse
 from time import sleep
 
+handle = 0
+runing = False
+pixels_count = 6 + 1
 
-def get_pixels_color(hWnd):
+
+def check_handle():
+    global handle
+    if (not win32gui.IsWindow(handle)):
+        handle = win32gui.FindWindow(None, 'World of Warcraft')
+        return False
+    return True
+
+
+def get_pixels_color():
     result = []
-    if (hWnd != 0):
-        hWndDC = win32gui.GetWindowDC(hWnd)
-        for i in range(0, 6):
-            ret = win32gui.GetPixel(hWndDC, i, 0)
-            r, g, b = ret & 0xff, (ret >> 8) & 0xff, (ret >> 16) & 0xff
-            result.append((r, g, b))
-        win32gui.ReleaseDC(hWnd, hWndDC)
-        return result
+    hWndDC = win32gui.GetWindowDC(handle)
+    for i in range(0, pixels_count):
+        ret = win32gui.GetPixel(hWndDC, i, 0)
+        r, g, b = ret & 0xff, (ret >> 8) & 0xff, (ret >> 16) & 0xff
+        result.append((r, g, b))
+    win32gui.ReleaseDC(handle, hWndDC)
+    return result
 
 
-def key_send(hWnd, key_code, modifier):
-    if ((modifier == 1) or (modifier == 3)):
-        key_press(hWnd, 18)
-    if ((modifier == 2) or (modifier == 3)):
-        key_press(hWnd, 17)
-
-    key_press(hWnd, key_code)
-    key_release(hWnd, key_code)
-
-    if ((modifier == 2) or (modifier == 3)):
-        key_release(hWnd, 17)
-    if ((modifier == 1) or (modifier == 3)):
-        key_release(hWnd, 18)
+def key_send(key_code):
+    key_press(key_code)
+    key_release(key_code)
 
 
-def key_press(hWnd, key_code):
-    win32api.PostMessage(hWnd, win32con.WM_KEYDOWN, key_code, 0)
+def key_send_with_modifier(key_code, modifier):
+    if ((modifier == 1) or (modifier == 3)): key_press(18)
+    if ((modifier == 2) or (modifier == 3)): key_press(17)
+    key_press(key_code)
+    key_release(key_code)
+    if ((modifier == 2) or (modifier == 3)): key_release(17)
+    if ((modifier == 1) or (modifier == 3)): key_release(18)
 
 
-def key_release(hWnd, key_code):
-    win32api.PostMessage(hWnd, win32con.WM_KEYUP, key_code, 0)
+def key_press(key_code):
+    win32api.PostMessage(handle, win32con.WM_KEYDOWN, key_code, 0)
 
 
-def click_send(hWnd):
+def key_release(key_code):
+    win32api.PostMessage(handle, win32con.WM_KEYUP, key_code, 0)
+
+
+def click_send():
     cursor_x, cursor_y = win32api.GetCursorPos()
     lParam = win32api.MAKELONG(cursor_x, cursor_y)
-    win32gui.PostMessage(hWnd, win32con.WM_LBUTTONDOWN, win32con.MK_LBUTTON, lParam)
-    win32gui.PostMessage(hWnd, win32con.WM_LBUTTONUP, win32con.MK_LBUTTON, lParam)
+    win32gui.PostMessage(handle, win32con.WM_LBUTTONDOWN, win32con.MK_LBUTTON, lParam)
+    win32gui.PostMessage(handle, win32con.WM_LBUTTONUP, win32con.MK_LBUTTON, lParam)
 
 
-hWnd_wow = 0
-key_state = False
+def check_keys():
+    if (keyboard.is_pressed(18)): return True
+    if (keyboard.is_pressed(19)): return True
+    if ((not keyboard.is_pressed(18)) and (not keyboard.is_pressed(19))): return False
+
+
+def send_start():
+    global runing
+    runing = True
+    key_send(45)
+
+
+def send_stop():
+    global runing
+    runing = False
+    key_send(46)
+    if (pixels[2][0] == 56): key_send(35)
+
+
 while True:
     try:
-        pixel_color = get_pixels_color(hWnd_wow)
+        if (not check_handle()): continue
+        if (keyboard.is_pressed(42)): continue
+        if (keyboard.is_pressed(56)): continue
+        if (keyboard.is_pressed(29)): continue
 
-        if ((not key_state) and ((keyboard.is_pressed(18)) or keyboard.is_pressed(19))):
-            key_state = True
-            key_press(hWnd_wow, 45)
-            key_release(hWnd_wow, 45)
-        elif ((key_state) and (not keyboard.is_pressed(18)) and (not keyboard.is_pressed(19))):
-            key_state = False
-            key_press(hWnd_wow, 46)
-            key_release(hWnd_wow, 46)
-            if (pixel_color[2][0] == 56):
-                key_press(hWnd_wow, 35)
-                key_release(hWnd_wow, 35)
+        pixels = get_pixels_color()
 
-        if (pixel_color[0] == (31, 11, 12)):
-            # if ((not keyboard.is_pressed(42)) and (not keyboard.is_pressed(56))
-            #         and (not keyboard.is_pressed(29))
-            #         and ((keyboard.is_pressed(18)) or (keyboard.is_pressed(19)))):
-            if ((keyboard.is_pressed(18)) or (keyboard.is_pressed(19))):
-                if (pixel_color[1][0] == 56):
-                    click_send(hWnd_wow)
+        if ((not runing) and (check_keys())): send_start()
+        if ((runing) and (not check_keys())): send_stop()
 
-                if ((pixel_color[2][0] == 56) and (pixel_color[2][1] == 1)):
-                    key_press(hWnd_wow, 36)
-                    key_release(hWnd_wow, 36)
+        if (not check_keys()): continue
+        if (pixels[0] != (31, 11, 12)): continue
 
-                for i in range(1, 6):
-                    if (pixel_color[i][0] == 44):
-                        key_send(hWnd_wow, pixel_color[i][1], pixel_color[i][2])
-
-    except:
-        hWnd_wow = win32gui.FindWindow(None, 'World of Warcraft')
-
-    sleep(0.1)
+        if ((pixels[1][0] == 56) and (pixels[1][1] == 1)): key_send(36)
+        if (pixels[2][0] == 56): click_send()
+        for i in range(1, pixels_count):
+            if (pixels[i][0] == 44): key_send_with_modifier(pixels[i][1], pixels[i][2])
+    finally:
+        sleep(0.1)

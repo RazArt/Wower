@@ -91,6 +91,11 @@ function BHelper.target:should_evade()
     return true
 end
 
+function BHelper.target:me_on_target()
+    if (not target:is_enemy()) then return false end
+    return UnitIsUnit('targettarget', 'player')
+end
+
 function BHelper.target:check_cast(spellname)
     if (spellname) then
         return ((spellname == UnitCastingInfo('target')) or (spellname == UnitChannelInfo('target'))) and true or false

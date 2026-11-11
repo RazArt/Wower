@@ -42,7 +42,7 @@ function BHelper.modules.hunter.default:init()
     keybinds:bind_item('Знак превосходства')
 
     keybinds:bind_macro('Перенаправление')
-    keybinds:bind_macro('ManaTV', _, 'BUTTON5')
+    keybinds:bind_macro('ManaTV', 'BUTTON5')
 end
 
 function BHelper.modules.hunter.default:macros()

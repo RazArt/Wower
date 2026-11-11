@@ -86,6 +86,13 @@ function BHelper.player:power_max()
     return UnitPowerMax('player') or 0
 end
 
+function BHelper.player:form(required_form)
+    required_form = ((required_form) and (type(required_form) == 'string')) and required_form:lower() or ''
+    local form_name = select(2, GetShapeshiftFormInfo(GetShapeshiftForm()))
+    form_name = (form_name) and form_name:lower() or ''
+    return (required_form == form_name)
+end
+
 function BHelper.player:has_combo_points(count)
     return (GetComboPoints('player', 'target') >= count)
 end
@@ -235,6 +242,10 @@ end
 
 function BHelper.player:is_equipped_item(item)
     return (IsEquippedItem(item)) and true or false
+end
+
+function BHelper.player:is_equipped_item_type(type)
+    return (IsEquippedItemType(type)) and true or false
 end
 
 function BHelper.player:equip_set(equip_name)

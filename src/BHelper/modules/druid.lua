@@ -51,7 +51,6 @@ function BHelper.modules.druid.default:init()
     keybinds:bind_spell('Дубовая кожа')
     keybinds:bind_spell('Устрашающий рев')
 
-    keybinds:bind_macro('Reform')
     keybinds:bind_macro('Reform', 'BUTTON5')
 
     keybinds:bind_item('Знак превосходства')
@@ -60,7 +59,6 @@ function BHelper.modules.druid.default:init()
 end
 
 function BHelper.modules.druid.default:macros()
-    macros:create('КалечениеTV', '#showtooltip Калечение\n/bh tv silence', 43)
     macros:create('Чардж',
                   '#showtooltip\n/cast [form:1] Звериная атака - медведь\n/cast [form:3] Звериная атака - кошка',
                   15)

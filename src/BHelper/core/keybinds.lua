@@ -41,12 +41,10 @@ local function put(class, name, slot)
     ClearCursor()
 end
 
-local function bind(class, name, key, slot)
+local function bind(class, name, key)
     name = ((name) and (type(name) == 'string')) and name:lower() or ''
     key = ((key) and (type(key) == 'string')) and key:upper() or false
-    slot = ((slot) and (type(slot) == 'number')) and slot or 0
 
-    if (slot > 0) then put(class, name, slot) end
     if (key) then SetBinding(key, class .. ' ' .. name) end
 
     for index, bind in pairs(binds) do
@@ -95,16 +93,16 @@ local function show_bind(num, class, name)
     show(num, flag, info, modifier)
 end
 
-function BHelper.keybinds:bind_spell(name, key, slot)
-    return bind('spell', name, key, slot)
+function BHelper.keybinds:bind_spell(name, key)
+    return bind('spell', name, key)
 end
 
-function BHelper.keybinds:bind_macro(name, key, slot)
-    return bind('macro', name, key, slot)
+function BHelper.keybinds:bind_macro(name, key)
+    return bind('macro', name, key)
 end
 
-function BHelper.keybinds:bind_item(name, key, slot)
-    return bind('item', name, key, slot)
+function BHelper.keybinds:bind_item(name, key)
+    return bind('item', name, key)
 end
 
 function BHelper.keybinds:put_spell(name, slot)
@@ -119,12 +117,12 @@ function BHelper.keybinds:put_item(name, slot)
     return put('item', name, slot)
 end
 
-function BHelper.keybinds:show_click()
-    return show(1, 56)
+function BHelper.keybinds:show_pet(can_attack)
+    return show(1, 56, can_attack)
 end
 
-function BHelper.keybinds:show_pet(can_attack)
-    return show(2, 56, can_attack)
+function BHelper.keybinds:show_click()
+    return show(2, 56)
 end
 
 function BHelper.keybinds:show_spell(name)
@@ -175,15 +173,19 @@ local function init()
     end
 
     base = CreateFrame('Frame')
+    base.width = 1
     base:SetScale(0.71)
-    base:SetSize(6, 1)
     base:SetFrameStrata('tooltip')
     base:SetPoint('topleft', UIParent, 0, 0)
     base.texture = base:CreateTexture(nil, 'tooltip')
     base.texture:SetAllPoints(base)
     base.texture:SetTexture(31 / 255, 11 / 255, 12 / 255)
     base.frame = {}
-    for i = 1, 5 do
+
+    for i = 1, 6 do
+        base.width = base.width + 1
+        base:SetSize(base.width, 1)
+
         base.frame[i] = CreateFrame('Frame', nil, base)
         base.frame[i]:SetSize(1, 1)
         base.frame[i]:SetPoint('topleft', base, i, 0)
