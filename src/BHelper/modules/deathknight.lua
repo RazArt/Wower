@@ -12,6 +12,7 @@ local timers = BHelper.timers
 local module = BHelper.modules.deathknight
 
 local vars = nil
+
 local multiple_attack = false
 local unholy = false
 local frost = false
@@ -26,12 +27,7 @@ function BHelper.modules.deathknight:init()
     frost = player:know_spell('Ледяной удар')
     unholy = player:know_spell('Удар плети')
 
-    keybinds:bind_spell('Власть крови')
-    keybinds:bind_spell('Власть льда')
-    keybinds:bind_spell('Власть нечестивости')
-
     keybinds:bind_spell('Заморозка разума')
-
     keybinds:bind_spell('Рунический удар')
     keybinds:bind_spell('Ледяные оковы')
     keybinds:bind_spell('Мор')
@@ -41,11 +37,12 @@ function BHelper.modules.deathknight:init()
     keybinds:bind_spell('Удар чумы')
     keybinds:bind_spell('Кровавый удар')
     keybinds:bind_spell('Лик смерти')
-
     keybinds:bind_spell('Хватка смерти')
     keybinds:bind_spell('Темная власть')
     keybinds:bind_spell('Удушение')
-
+    keybinds:bind_spell('Власть крови')
+    keybinds:bind_spell('Власть льда')
+    keybinds:bind_spell('Власть нечестивости')
     keybinds:bind_spell('Льдистый путь')
     keybinds:bind_spell('Зимний горн')
     keybinds:bind_spell('Незыблемость льда')
@@ -55,24 +52,25 @@ function BHelper.modules.deathknight:init()
     keybinds:bind_spell('Воскрешение мертвых')
     keybinds:bind_spell('Войско мертвых')
     keybinds:bind_spell('Смертельный союз')
-
     keybinds:bind_spell('Берсерк(Расовая)')
     keybinds:bind_spell('Кровавое неистовство(Расовая)')
 end
 
 function BHelper.modules.deathknight:macros()
     macros:create('Кровоотвод', '#showtooltip\n/cancelaura Кровоотвод\n/cast Кровоотвод')
+    macros:create('Антимагический панцирь',
+                  '#showtooltip\n/cancelaura Антимагический панцирь\n/cast Антимагический панцирь')
     macros:create('Смертельный союз',
                   '#showtooltip Смертельный союз\n/castsequence reset=120 Воскрешение мертвых, Смертельный союз')
 end
 
 function BHelper.modules.deathknight:execute()
-    disease_exists = ((target:aura('Озноб', true) > 0) and (target:aura('Кровавая чума', true) > 0))
     runes.all_cooldown = true
     for i = 1, 4 do
         runes.count[i] = 0
         runes.ready_count[i] = 0
     end
+
     for i = 1, 6 do
         local type = GetRuneType(i)
         local start, duration, ready = GetRuneCooldown(i)
@@ -84,6 +82,8 @@ function BHelper.modules.deathknight:execute()
         runes.count[type] = runes.count[type] + 1
         if (ready) then runes.ready_count[type] = runes.ready_count[type] + 1 end
     end
+
+    diseases = ((target:aura('Озноб', true) > 0) and (target:aura('Кровавая чума', true) > 0))
 
     if (player:can_cast('Рунический удар')) then keybinds:show_attack('Рунический удар') end
 
@@ -129,35 +129,33 @@ end
 
 function BHelper.modules.deathknight.default:macros()
     macros:create('Истерия',
-                  '#showtooltip Истерия\n/cast [@focus,help,nodead] Истерия\n/cast [@target,help,nodead] Истерия\n/cast [@mouseover,help,nodead] Истерия')
+                  '#showtooltip Истерия\n/cast [@target,help,nodead] Истерия\n/cast [@focus,help,nodead] Истерия')
 end
 
 function BHelper.modules.deathknight.default:put()
-    keybinds:put_spell('Мор', 1)
-    keybinds:put_spell('Смерть и разложение', 2)
-    keybinds:put_spell('Удар чумы', 3)
-    keybinds:put_spell('Ледяное прикосновение', 4)
-    keybinds:put_spell('Кровавый удар', 5)
-    if (player:know_spell('Удар в сердце')) then keybinds:put_spell('Удар в сердце', 5) end
-    keybinds:put_spell('Удар смерти', 6)
-    keybinds:put_spell('Незыблемость льда', 7)
-    keybinds:put_spell('Антимагический панцирь', 8)
-    keybinds:put_spell('Кровь вампира', 9)
-    keybinds:put_spell('Кровоотвод', 10)
-    keybinds:put_spell('Захват рун', 11)
-
-    keybinds:put_spell('Хватка смерти', 15)
-    keybinds:put_spell('Темная власть', 16)
-    keybinds:put_spell('Заморозка разума', 17)
-    keybinds:put_spell('Удушение', 18)
-    keybinds:put_spell('Ледяные оковы', 19)
-    keybinds:put_spell('Войско мертвых', 20)
-    keybinds:put_spell('Усиление рунического оружия', 21)
-    keybinds:put_macro('Истерия', 22)
-    keybinds:put_macro('Смертельный союз', 24)
-
-    keybinds:put_spell('Льдистый путь', 35)
-    keybinds:put_spell('Зимний горн', 36)
+    keybinds:place_spell('Мор', 1)
+    keybinds:place_spell('Смерть и разложение', 2)
+    keybinds:place_spell('Удар чумы', 3)
+    keybinds:place_spell('Ледяное прикосновение', 4)
+    keybinds:place_spell('Кровавый удар', 5)
+    if (player:know_spell('Удар в сердце')) then keybinds:place_spell('Удар в сердце', 5) end
+    keybinds:place_spell('Удар смерти', 6)
+    keybinds:place_spell('Незыблемость льда', 7)
+    keybinds:place_macro('Антимагический панцирь', 8)
+    keybinds:place_spell('Кровь вампира', 9)
+    keybinds:place_macro('Кровоотвод', 10)
+    keybinds:place_spell('Захват рун', 11)
+    keybinds:place_spell('Хватка смерти', 15)
+    keybinds:place_spell('Темная власть', 16)
+    keybinds:place_spell('Заморозка разума', 17)
+    keybinds:place_spell('Удушение', 18)
+    keybinds:place_spell('Ледяные оковы', 19)
+    keybinds:place_spell('Войско мертвых', 20)
+    keybinds:place_spell('Усиление рунического оружия', 21)
+    keybinds:place_macro('Истерия', 22)
+    keybinds:place_macro('Смертельный союз', 24)
+    keybinds:place_spell('Льдистый путь', 35)
+    keybinds:place_spell('Зимний горн', 36)
 end
 
 function BHelper.modules.deathknight.default:rotation_single()
@@ -175,13 +173,14 @@ function BHelper.modules.deathknight.default:rotation()
         (player:can_cast('Власть льда'))) then return keybinds:show_spell('Власть льда') end
 
     if ((not player:has_stable_threat()) or (self.opener)) then
-        if ((target:is_boss()) and (player:spell_cooldown('Ледяное прикосновение') > 3) and
-            (player:can_cast('Усиление рунического оружия'))) then
-            return keybinds:show_spell('Усиление рунического оружия')
+        if ((target:is_boss()) and (player:spell_cooldown('Ледяное прикосновение') > 3)) then
+            if (player:can_cast('Усиление рунического оружия')) then
+                return keybinds:show_spell('Усиление рунического оружия')
+            end
+            if (player:can_cast('Кровоотвод')) then
+                return keybinds:show_spell('Кровоотвод')
+            end
         end
-
-        if ((target:is_boss()) and (player:spell_cooldown('Ледяное прикосновение') > 3) and
-            (player:can_cast('Кровоотвод'))) then return keybinds:show_spell('Кровоотвод') end
 
         if (player:can_cast_on_enemy('Ледяное прикосновение')) then
             return keybinds:show_spell('Ледяное прикосновение')
@@ -198,7 +197,7 @@ function BHelper.modules.deathknight.default:rotation()
     end
 
     if (multiple_attack) then
-        if (disease_exists) then
+        if (diseases) then
             if ((player:health_on_percent() < 60) and (player:can_cast_on_enemy('Удар смерти'))) then
                 return keybinds:show_spell('Удар смерти')
             end
@@ -227,7 +226,7 @@ function BHelper.modules.deathknight.default:rotation()
             end
         end
 
-        if ((runes.ready_count[4] < 3) and (player:can_cast_on_enemy('Удар смерти'))) then
+        if ((runes.ready_count[4] < 4) and (player:can_cast_on_enemy('Удар смерти'))) then
             return keybinds:show_spell('Удар смерти')
         end
     else
@@ -293,64 +292,55 @@ function BHelper.modules.deathknight.damage:init()
         keybinds:bind_spell('Воющий ветер')
         keybinds:bind_spell('Несокрушимая броня')
     end
-
     if (unholy) then
         keybinds:bind_spell('Удар Плети')
         keybinds:bind_spell('Костяной щит')
         keybinds:bind_spell('Призыв горгульи')
     end
-
     keybinds:bind_item('Знак превосходства')
 
     self:register_event('UNIT_SPELLCAST_SUCCEEDED')
 end
 
 function BHelper.modules.deathknight.damage:put()
-    keybinds:put_spell('Мор', 1)
-    keybinds:put_spell('Смерть и разложение', 2)
-
+    keybinds:place_spell('Мор', 1)
+    keybinds:place_spell('Смерть и разложение', 2)
     if (frost) then
-        keybinds:put_spell('Ледяной удар', 3)
-        keybinds:put_spell('Уничтожение', 4)
-        keybinds:put_spell('Воющий ветер', 5)
-        keybinds:put_spell('Несокрушимая броня', 8)
-        keybinds:put_spell('Воскрешение мертвых', 9)
+        keybinds:place_spell('Ледяной удар', 3)
+        keybinds:place_spell('Уничтожение', 4)
+        keybinds:place_spell('Воющий ветер', 5)
+        keybinds:place_spell('Несокрушимая броня', 8)
+        keybinds:place_spell('Воскрешение мертвых', 9)
     end
     if (unholy) then
-        keybinds:put_spell('Удар Плети', 4)
-        keybinds:put_spell('Лик смерти', 5)
-        keybinds:put_spell('Костяной щит', 8)
-        keybinds:put_spell('Призыв горгульи', 9)
+        keybinds:place_spell('Удар Плети', 4)
+        keybinds:place_spell('Лик смерти', 5)
+        keybinds:place_spell('Костяной щит', 8)
+        keybinds:place_spell('Призыв горгульи', 9)
     end
-
-    keybinds:put_spell('Вскипание крови', 6)
-
+    keybinds:place_spell('Вскипание крови', 6)
     if (player:know_spell('Берсерк(Расовая)')) then
-        keybinds:put_spell('Берсерк(Расовая)', 7)
+        keybinds:place_spell('Берсерк(Расовая)', 7)
     end
     if (player:know_spell('Кровавое неистовство(Расовая)')) then
-        keybinds:put_spell('Кровавое неистовство(Расовая)', 7)
+        keybinds:place_spell('Кровавое неистовство(Расовая)', 7)
     end
-
-    keybinds:put_spell('Кровоотвод', 10)
-    keybinds:put_spell('Незыблемость льда', 11)
-    keybinds:put_spell('Антимагический панцирь', 12)
-
-    keybinds:put_spell('Хватка смерти', 15)
-    keybinds:put_spell('Темная власть', 16)
-    keybinds:put_spell('Заморозка разума', 17)
-    keybinds:put_spell('Удушение', 18)
-    keybinds:put_spell('Ледяные оковы', 21)
-    keybinds:put_spell('Войско мертвых', 22)
-    keybinds:put_spell('Усиление рунического оружия', 23)
-    keybinds:put_macro('Смертельный союз', 24)
-
-    keybinds:put_spell('Удар чумы', 31)
-    keybinds:put_spell('Ледяное прикосновение', 32)
-    keybinds:put_spell('Кровавый удар', 33)
-    keybinds:put_spell('Льдистый путь', 35)
-    keybinds:put_spell('Зимний горн', 36)
-
+    keybinds:place_spell('Кровоотвод', 10)
+    keybinds:place_spell('Незыблемость льда', 11)
+    keybinds:place_macro('Антимагический панцирь', 12)
+    keybinds:place_spell('Хватка смерти', 15)
+    keybinds:place_spell('Темная власть', 16)
+    keybinds:place_spell('Заморозка разума', 17)
+    keybinds:place_spell('Удушение', 18)
+    keybinds:place_spell('Ледяные оковы', 21)
+    keybinds:place_spell('Войско мертвых', 22)
+    keybinds:place_spell('Усиление рунического оружия', 23)
+    keybinds:place_macro('Смертельный союз', 24)
+    keybinds:place_spell('Удар чумы', 31)
+    keybinds:place_spell('Ледяное прикосновение', 32)
+    keybinds:place_spell('Кровавый удар', 33)
+    keybinds:place_spell('Льдистый путь', 35)
+    keybinds:place_spell('Зимний горн', 36)
     if (unholy) then put_macro('PetControl', 41) end
 end
 
@@ -429,7 +419,7 @@ function BHelper.modules.deathknight.damage:rotation()
         return keybinds:show_spell('Удар чумы')
     end
 
-    if ((multiple_attack) and (disease_exists)) then
+    if ((multiple_attack) and (diseases)) then
         if ((not timeout.pestilence) and (player:can_cast_on_enemy('Мор'))) then
             return keybinds:show_spell('Мор')
         end

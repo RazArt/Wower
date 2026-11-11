@@ -4,9 +4,9 @@ local event_frame = CreateFrame('Frame')
 event_frame:SetScript('OnEvent', function(_, event, ...)
     BHelper[event](BHelper, ...)
 end)
+
 event_frame:RegisterEvent('PLAYER_LOGIN')
 event_frame:RegisterEvent('ACTIVE_TALENT_GROUP_CHANGED')
--- event_frame:RegisterEvent('GLYPH_UPDATED')
 event_frame:RegisterEvent('PLAYER_CONTROL_LOST')
 event_frame:RegisterEvent('PLAYER_CONTROL_GAINED')
 event_frame:RegisterEvent('PLAYER_TARGET_CHANGED')
@@ -30,11 +30,7 @@ function BHelper:PLAYER_LOGIN()
         BHelper.core:execute()
     end, 'main_execute', true)
 
-    -- BHelper.icons:add('icon1', 25, 25, 'Interface\\AddOns\\BHelper\\textures\\warning.tga')
-    -- BHelper.icons:add('icon2', 50, 50, 'Interface\\AddOns\\BHelper\\textures\\warning.tga')
-    -- BHelper.icons:add('icon3', 25, 25, 'Interface\\AddOns\\BHelper\\textures\\warning.tga')
-    -- BHelper.icons:add('icon2', 50, 50, 'Interface\\AddOns\\BHelper\\textures\\warning.tga')
-    -- BHelper.icons:add('icon3', 25, 25, 'Interface\\AddOns\\BHelper\\textures\\warning.tga')
+    BHelper.keybinds:bind_spells()
 end
 
 function BHelper:ACTIVE_TALENT_GROUP_CHANGED()
@@ -42,12 +38,6 @@ function BHelper:ACTIVE_TALENT_GROUP_CHANGED()
         self.core:reload()
     end, 'reload')
 end
-
--- function BHelper:GLYPH_UPDATED()
---     self.timers:create(5, function()
---         self.core:reload()
---     end, 'reload')
--- end
 
 function BHelper:PLAYER_CONTROL_LOST()
     BHelper.core._cooldown = true
@@ -100,9 +90,8 @@ SlashCmdList['BHELPER'] = function(message)
     BHelper:commands(message)
 end
 
-function BHelper:init()
-    self.vars = {}
-    self.vars._player = {}
-
-end
-BHelper:init()
+-- function BHelper:init()
+--     self.vars = {}
+--     self.vars._player = {}
+-- end
+-- BHelper:init()

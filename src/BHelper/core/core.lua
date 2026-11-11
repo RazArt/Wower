@@ -41,22 +41,18 @@ function BHelper.core:namespace_init()
 end
 
 function BHelper.core:start()
-    if ((not player:on_combat()) and (not target:on_combat())) then return false end
-
     core.profile:get().burst_cooldown = true
     timers:create(2, function()
         core.profile:get().burst_cooldown = false
     end, 'burst_cooldown')
 
     execution = true
-
     if (core.profile:get().start) then core.profile:get():start() end
 end
 
 function BHelper.core:stop()
     execution = false
     cooldown = false
-    core.profile:get().burst_cooldown = false
 
     if (core.profile:get().stop) then core.profile:get():stop() end
 end
@@ -247,11 +243,11 @@ function BHelper.core:macros()
     if ((player:class() == 'hunter') or (player:class() == 'warlock') or (player:class() == 'deathknight')) then
         macros:create('PetAttack', '/petattack [@target]', 'Ability_Vehicle_PlayerLoaded')
         keybinds:bind_macro('PetAttack', 'HOME')
-        keybinds:put_macro('PetAttack', 19)
+        keybinds:place_macro('PetAttack', 19)
 
         macros:create('PetFollow', '/petfollow', 'Ability_Vehicle_LoadSelfCatapult')
         keybinds:bind_macro('PetFollow', 'END')
-        keybinds:put_macro('PetFollow', 20)
+        keybinds:place_macro('PetFollow', 20)
 
         macros:create('PetControl', '/bh tv pet_control', 'Spell_Magic_PolymorphPig')
     end
@@ -259,66 +255,68 @@ function BHelper.core:macros()
     macros:create('Target', '/targetenemy\n/startattack')
 
     macros:create('Silence', '/bh tv silence', 'Spell_Shadow_SoothingKiss')
-    keybinds:put_macro('Silence', 40)
+    keybinds:place_macro('Silence', 40)
 
     macros:create('Reload', '/reload', 'Spell_Shadow_SoulLeech_2')
-    keybinds:put_macro('Reload', 49)
+    keybinds:place_macro('Reload', 49)
 
     macros:create('Roll', '/roll', 'Spell_Shadow_SoulLeech')
-    keybinds:put_macro('Roll', 52)
+    keybinds:place_macro('Roll', 52)
 
     macros:create('Focus', '/focus', 'Ability_Spy')
-    keybinds:put_macro('Focus', 53)
+    keybinds:place_macro('Focus', 53)
 
     macros:create('Макросы', '/macro', 'Spell_Arcane_Rune')
-    keybinds:put_macro('Макросы', 55)
+    keybinds:place_macro('Макросы', 55)
 
     if (GetRealmName() == 'WoW Circle 3.3.5a x1') then
         macros:create('Домой', '/s .vip home', 'Spell_Arcane_PortalDalaran')
-        keybinds:put_macro('Домой', 56)
+        keybinds:place_macro('Домой', 56)
 
         macros:create('ГХ', '/s .gh tele', 'Spell_Arcane_TeleportShattrath')
-        keybinds:put_macro('ГХ', 57)
+        keybinds:place_macro('ГХ', 57)
 
         macros:create('Тренер', '/s .vip class', 'Spell_Arcane_FocusedPower')
-        keybinds:put_macro('Тренер', 58)
+        keybinds:place_macro('Тренер', 58)
 
         macros:create('Почта', '/s .vip mail', 'Ability_Hunter_MarkedForDeath')
-        keybinds:put_macro('Почта', 59)
+        keybinds:place_macro('Почта', 59)
 
         macros:create('Банк', '/s .vip bank', 'Spell_Shadow_GhostKey')
-        keybinds:put_macro('Банк', 60)
+        keybinds:place_macro('Банк', 60)
     end
 
     if (GetRealmName() == 'Isengard Tirion x2') then
         macros:create('Воскрешение', '/s .i massrevive', 'spell_yorsahj_bloodboil_blue')
-        keybinds:put_macro('Воскрешение', 56)
+        keybinds:place_macro('Воскрешение', 56)
 
         macros:create('Магазин', '/s .i v', 'spell_yorsahj_bloodboil_blue')
-        keybinds:put_macro('Магазин', 57)
+        keybinds:place_macro('Магазин', 57)
 
         macros:create('Почта', '/s .i m', 'spell_yorsahj_bloodboil_green')
-        keybinds:put_macro('Почта', 58)
+        keybinds:place_macro('Почта', 58)
 
         macros:create('Банк', '/s .i b', 'spell_yorsahj_bloodboil_orange')
-        keybinds:put_macro('Банк', 59)
+        keybinds:place_macro('Банк', 59)
 
         macros:create('Аук', '/s .i au', 'spell_yorsahj_bloodboil_purple')
-        keybinds:put_macro('Аук', 60)
+        keybinds:place_macro('Аук', 60)
 
         macros:create('Тренер', '/s .i t', 'Spell_Arcane_FocusedPower')
     end
 
     macros:create('S', '/bh sa rotation_single', 'Spell_Fire_FelPyroblast')
-    keybinds:put_macro('S', 13)
+    keybinds:place_macro('S', 13)
 
     macros:create('M', '/bh sa rotation_multiple', 'Spell_Fire_FelRainOfFire')
-    keybinds:put_macro('M', 14)
+    keybinds:place_macro('M', 14)
 
     macros:create('LADY', '/cleartarget\n/equipset [noequipped:Оружие] pve; LADY', 'Spell_Magic_PolymorphRabbit')
-    keybinds:put_macro('LADY', 26)
+    keybinds:place_macro('LADY', 26)
 
     macros:create('Баджи',
                   '/script local function buy (n,q) for i=1,100 do if n==GetMerchantItemInfo(i) then BuyMerchantItem(i,q) end end end buy (\'Эмблема героизма\',80)',
                   'Spell_Holy_EmpowerChampion')
+
+    keybinds:place_item('Камень возвращения', 48)
 end

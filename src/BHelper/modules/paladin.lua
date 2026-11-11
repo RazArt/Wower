@@ -33,7 +33,7 @@ function BHelper.modules.paladin.default:init()
 end
 
 function BHelper.modules.paladin.default:macros()
-    macros:create('JoW', '#showtooltip Правосудие мудрости\n/bh tv JoL\n/bh tv JoW', 40)
+    macros:create('JoW', '#showtooltip Правосудие мудрости\n/bh tv JoL\n/bh tv JoW')
 end
 
 function BHelper.modules.paladin.default:execute()

@@ -23,9 +23,12 @@ end
 
 local function get_bind_string(key, modifier)
     if (modifier == 1) then return 'ALT-' .. key end
-    if (modifier == 2) then return 'CTRL-' .. key end
-    if (modifier == 3) then return 'ALT-CTRL-' .. key end
-    return ''
+    if (modifier == 2) then return 'ALT-CTRL-' .. key end
+    if (modifier == 3) then return 'ALT-SHIFT-' .. key end
+    if (modifier == 4) then return 'CTRL-' .. key end
+    if (modifier == 5) then return 'CTRL-SHIFT-' .. key end
+    if (modifier == 6) then return 'SHIFT-' .. key end
+    if (modifier == 7) then return 'ALT-CTRL-SHIFT-' .. key end
 end
 
 local function put(class, name, slot)
@@ -51,9 +54,12 @@ local function bind(class, name, key)
         if ((bind.class == class) and (bind.name == name)) then return true end
         if (not bind.name) then
             if (SetBinding(bind.bind_string, class .. ' ' .. name)) then
+                -- print('!!!!!!!!!!', class, name, key)
                 bind.name = name
                 bind.class = class
                 return true
+            else
+                -- print(class, name, key)
             end
             return false
         end
@@ -97,6 +103,20 @@ function BHelper.keybinds:bind_spell(name, key)
     return bind('spell', name, key)
 end
 
+local spellbooks = {BOOKTYPE_SPELL, BOOKTYPE_PET}
+function BHelper.keybinds:bind_spells()
+    local spells = {}
+
+    for _, spellbook in pairs(spellbooks) do
+        for i = 1, 255 do
+            local name = GetSpellName(i, spellbook)
+            if (not name) then break end
+            spells[name] = true
+        end
+    end
+    for name, _ in pairs(spells) do bind('spell', name) end
+end
+
 function BHelper.keybinds:bind_macro(name, key)
     return bind('macro', name, key)
 end
@@ -105,15 +125,15 @@ function BHelper.keybinds:bind_item(name, key)
     return bind('item', name, key)
 end
 
-function BHelper.keybinds:put_spell(name, slot)
+function BHelper.keybinds:place_spell(name, slot)
     return put('spell', name, slot)
 end
 
-function BHelper.keybinds:put_macro(name, slot)
+function BHelper.keybinds:place_macro(name, slot)
     return put('macro', name, slot)
 end
 
-function BHelper.keybinds:put_item(name, slot)
+function BHelper.keybinds:place_item(name, slot)
     return put('item', name, slot)
 end
 
@@ -157,19 +177,19 @@ local function init()
     binds = {}
 
     local keys = {
-        {'T', 1}, {'Y', 1}, {'U', 1}, {'I', 1}, {'O', 1}, {'P', 1}, {'H', 1}, {'G', 1}, {'J', 1}, {'K', 1}, {'L', 1},
-        {'Z', 1}, {'X', 1}, {'C', 1}, {'V', 1}, {'B', 1}, {'N', 1}, {'M', 1}, {'T', 2}, {'Y', 2}, {'U', 2}, {'I', 2},
-        {'O', 2}, {'P', 2}, {'H', 2}, {'G', 2}, {'J', 2}, {'K', 2}, {'L', 2}, {'Z', 2}, {'X', 2}, {'C', 2}, {'V', 2},
-        {'B', 2}, {'N', 2}, {'M', 2}, {'1', 3}, {'2', 3}, {'3', 3}, {'4', 3}, {'5', 3}, {'6', 3}, {'7', 3}, {'8', 3},
-        {'9', 3}, {'0', 3}, {'T', 3}, {'Y', 3}, {'U', 3}, {'I', 3}, {'O', 3}, {'P', 3}, {'H', 3}, {'G', 3}, {'J', 3},
-        {'K', 3}, {'L', 3}, {'Z', 3}, {'X', 3}, {'C', 3}, {'V', 3}, {'B', 3}, {'N', 3}, {'M', 3}
+        '7', '8', '9', '0', 'Q', 'E', 'R', 'F', 'T', 'Y', 'U', 'I', 'O', 'P', 'G', 'H', 'J', 'K', 'L', 'Z', 'X', 'C',
+        'V', 'B', 'N', 'M'
     }
 
+    local count = 1
     for i = 1, #keys do
-        binds[i] = {}
-        binds[i].key = string.byte(keys[i][1], 1)
-        binds[i].modifier = keys[i][2]
-        binds[i].bind_string = get_bind_string(keys[i][1], keys[i][2])
+        for m = 1, 7 do
+            binds[count] = {}
+            binds[count].key = string.byte(keys[i], 1)
+            binds[count].modifier = m
+            binds[count].bind_string = get_bind_string(keys[i], m)
+            count = count + 1
+        end
     end
 
     base = CreateFrame('Frame')

@@ -88,9 +88,14 @@ end
 
 function BHelper.player:form(required_form)
     required_form = ((required_form) and (type(required_form) == 'string')) and required_form:lower() or ''
-    local form_name = select(2, GetShapeshiftFormInfo(GetShapeshiftForm()))
-    form_name = (form_name) and form_name:lower() or ''
-    return (required_form == form_name)
+
+    local index = GetShapeshiftForm()
+    if (index == 0) then return false end
+
+    local player_form = select(2, GetShapeshiftFormInfo(index))
+    player_form = (player_form) and player_form:lower() or ''
+
+    return (required_form == player_form)
 end
 
 function BHelper.player:has_combo_points(count)
