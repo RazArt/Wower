@@ -2,17 +2,14 @@ BHelper.keybinds = {}
 
 local core = {}
 local keybinds = {}
-local player = {}
 local timers = {}
 
 local binds = {}
-local binds_frame = CreateFrame('Frame')
-local base = {}
+local base_frame = CreateFrame('Frame')
 
 function BHelper.keybinds:namespace_init()
     core = BHelper.core
     keybinds = BHelper.keybinds
-    player = BHelper.player
     timers = BHelper.timers
 end
 
@@ -28,20 +25,25 @@ local function get_bind_string(key, modifier)
     if (modifier == 4) then return 'CTRL-' .. key end
     if (modifier == 5) then return 'CTRL-SHIFT-' .. key end
     if (modifier == 6) then return 'SHIFT-' .. key end
-    if (modifier == 7) then return 'ALT-CTRL-SHIFT-' .. key end
 end
 
 local function bind(group, name, key)
-    if (player:on_combat()) then return false end
+    if (core:combat()) then
+        timers:create(1, function()
+            bind(group, name, key)
+        end, 'bind')
+        return false
+    end
 
     name = ((name) and (type(name) == 'string')) and name:lower() or ''
     key = ((key) and (type(key) == 'string')) and key:upper() or false
+    command = group .. ' ' .. name
 
-    if (key) then return SetOverrideBinding(binds_frame, true, key, group .. ' ' .. name) end
+    if (key) then return SetOverrideBinding(base_frame, true, key, command) end
     for i = 1, #binds do
         if ((binds[i].group == group) and (binds[i].name == name)) then return true end
         if (not binds[i].name) then
-            SetOverrideBinding(binds_frame, true, binds[i].bind_string, group .. ' ' .. name)
+            SetOverrideBinding(base_frame, true, binds[i].bind_string, command)
             binds[i].group = group
             binds[i].name = name
             -- print(i, binds[i].bind_string, group .. ' ' .. name)
@@ -53,7 +55,12 @@ local function bind(group, name, key)
 end
 
 local function place(group, name, slot)
-    if (player:on_combat()) then return false end
+    if (core:combat()) then
+        timers:create(1, function()
+            place(group, name, slot)
+        end, 'place')
+        return false
+    end
 
     name = ((name) and (type(name) == 'string')) and name:lower() or ''
     slot = ((slot) and (type(slot) == 'number')) and slot or 0
@@ -68,11 +75,11 @@ local function place(group, name, slot)
 end
 
 local function show(num, r, g, b)
-    base.frame[num].texture:SetTexture((r or 0) / 255, (g or 0) / 255, (b or 0) / 255)
-    base.frame[num]:Show()
+    base_frame.frame[num].texture:SetTexture((r or 0) / 255, (g or 0) / 255, (b or 0) / 255)
+    base_frame.frame[num]:Show()
 
     timers:create(core:get_update_time(), function()
-        base.frame[num]:Hide()
+        base_frame.frame[num]:Hide()
     end, 'keybinds_hide_' .. num)
     return true
 end
@@ -82,15 +89,18 @@ local function show_bind(num, group, name)
 
     name = ((name) and (type(name) == 'string')) and name:lower() or ''
     local index = get_bind_index(group, name)
+
     if (index == 0) then return false end
     show(num, 44, binds[index].key, binds[index].modifier)
 end
 
 function BHelper.keybinds:rebind()
+    ClearOverrideBindings(base_frame)
     for i = 1, #binds do
         binds[i].name = nil
         binds[i].group = nil
     end
+
     keybinds:bind_spells()
     keybinds:bind_macros()
     keybinds:bind_items()
@@ -232,7 +242,7 @@ local function init()
         ['\''] = 222
     }
     for key, code in pairs(keys) do
-        for m = 1, 7 do
+        for m = 1, 6 do
             binds[count] = {}
             binds[count].key = code
             binds[count].modifier = m
@@ -241,26 +251,25 @@ local function init()
         end
     end
 
-    base = CreateFrame('Frame')
-    base.width = 1
-    base:SetScale(0.71)
-    base:SetFrameStrata('tooltip')
-    base:SetPoint('topleft', UIParent, 0, 0)
-    base.texture = base:CreateTexture(nil, 'tooltip')
-    base.texture:SetAllPoints(base)
-    base.texture:SetTexture(31 / 255, 11 / 255, 12 / 255)
-    base.frame = {}
+    base_frame.width = 1
+    base_frame:SetScale(0.71)
+    base_frame:SetFrameStrata('tooltip')
+    base_frame:SetPoint('topleft', UIParent, 0, 0)
+    base_frame.texture = base_frame:CreateTexture(nil, 'tooltip')
+    base_frame.texture:SetAllPoints(base_frame)
+    base_frame.texture:SetTexture(31 / 255, 11 / 255, 12 / 255)
+    base_frame.frame = {}
 
     for i = 1, 6 do
-        base.width = base.width + 1
-        base:SetSize(base.width, 1)
+        base_frame.width = base_frame.width + 1
+        base_frame:SetSize(base_frame.width, 1)
 
-        base.frame[i] = CreateFrame('Frame', nil, base)
-        base.frame[i]:SetSize(1, 1)
-        base.frame[i]:SetPoint('topleft', base, i, 0)
-        base.frame[i].texture = base.frame[i]:CreateTexture(nil, 'tooltip')
-        base.frame[i].texture:SetAllPoints(base.frame[i])
-        base.frame[i]:Hide()
+        base_frame.frame[i] = CreateFrame('Frame', nil, base_frame)
+        base_frame.frame[i]:SetSize(1, 1)
+        base_frame.frame[i]:SetPoint('topleft', base_frame, i, 0)
+        base_frame.frame[i].texture = base_frame.frame[i]:CreateTexture(nil, 'tooltip')
+        base_frame.frame[i].texture:SetAllPoints(base_frame.frame[i])
+        base_frame.frame[i]:Hide()
     end
 end
 init()

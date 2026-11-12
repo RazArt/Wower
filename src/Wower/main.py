@@ -32,40 +32,26 @@ def get_pixels_color():
     return result
 
 
-def modifier_resend():
-    key_send(16)
-    key_send(17)
-    key_send(18)
-
-
 def key_send_with_modifier(key_code, modifier):
     if (modifier == 1): key_press(18)
     if (modifier == 2): key_press(18)
     if (modifier == 3): key_press(18)
-    if (modifier == 7): key_press(18)
     if (modifier == 2): key_press(17)
     if (modifier == 4): key_press(17)
     if (modifier == 5): key_press(17)
-    if (modifier == 7): key_press(17)
     if (modifier == 3): key_press(16)
     if (modifier == 5): key_press(16)
     if (modifier == 6): key_press(16)
-    if (modifier == 7): key_press(16)
-
     key_send(key_code)
-
     if (modifier == 3): key_release(16)
     if (modifier == 5): key_release(16)
     if (modifier == 6): key_release(16)
-    if (modifier == 7): key_release(16)
     if (modifier == 2): key_release(17)
     if (modifier == 4): key_release(17)
     if (modifier == 5): key_release(17)
-    if (modifier == 7): key_release(17)
     if (modifier == 1): key_release(18)
     if (modifier == 2): key_release(18)
     if (modifier == 3): key_release(18)
-    if (modifier == 7): key_release(18)
 
 
 def key_send(key_code):
@@ -114,7 +100,10 @@ while True:
         if (keyboard.is_pressed(56)): continue
         if (keyboard.is_pressed(29)): continue
 
-        modifier_resend()
+        key_send(16)
+        key_send(17)
+        key_send(18)
+
         pixels = get_pixels_color()
 
         if ((not runing) and (check_keys())): send_start()

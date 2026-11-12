@@ -58,13 +58,12 @@ function BHelper.core:stop()
 end
 
 function BHelper.core:reload()
-    if (player:on_combat()) then
+    if (core:combat()) then
         timers:create(1, function()
             core:reload()
-        end, 'reload', true)
+        end, 'reload')
         return false
     end
-    timers:delete('reload')
 
     DB:recache()
 
@@ -164,6 +163,10 @@ end
 
 function BHelper.core:cooldown()
     return cooldown
+end
+
+function BHelper.core:combat()
+    return (UnitAffectingCombat('player')) and true or false
 end
 
 function BHelper.core:get_update_time()

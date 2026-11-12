@@ -6,12 +6,13 @@ local function update(elapsed)
     for i = #timers, 1, -1 do
         timers[i][1] = timers[i][1] + elapsed
         if timers[i][1] >= timers[i][2] then
-            timers[i][3]()
+            local func = timers[i][3]
             if (not timers[i][4]) then
                 table.remove(timers, i)
             else
                 timers[i][1] = 0
             end
+            func()
         end
     end
 end

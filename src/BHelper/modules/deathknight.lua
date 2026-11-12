@@ -145,7 +145,7 @@ function BHelper.modules.deathknight.default:rotation()
     if ((player:aura('Власть крови') == 0) and (player:aura('Власть льда') == 0) and
         (player:can_cast('Власть льда'))) then return keybinds:show_spell('Власть льда') end
 
-    if ((not player:has_stable_threat()) or (self.opener)) then
+    if ((not multiple_attack) and ((not player:has_stable_threat()) or (self.opener))) then
         if ((target:is_boss()) and (player:spell_cooldown('Ледяное прикосновение') > 3)) then
             if (player:can_cast('Усиление рунического оружия')) then
                 return keybinds:show_spell('Усиление рунического оружия')
@@ -244,11 +244,14 @@ function BHelper.modules.deathknight.default:UNIT_SPELLCAST_SUCCEEDED(unit_id, s
 end
 
 function BHelper.modules.deathknight.default:start()
-    self.opener = true
-    self.opener = false
+    if (target:is_boss()) then self.opener = true end
     timers:create(20, function()
         self.opener = false
     end, 'opener')
+end
+
+function BHelper.modules.deathknight.default:stop()
+    self.opener = false
 end
 
 function BHelper.modules.deathknight.damage:init()
