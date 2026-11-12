@@ -61,8 +61,6 @@ function BHelper.modules.warrior.default:init()
     if (not vars.battle_shout) then vars.battle_shout = false end
     if (not vars.commanding_shout) then vars.commanding_shout = false end
     if (not vars.demoralizing_shout) then vars.demoralizing_shout = false end
-
-    keybinds:bind_item('Душители Плети')
 end
 
 function BHelper.modules.warrior.default:macros()
@@ -116,7 +114,7 @@ function BHelper.modules.warrior.default:rotation()
             (player:can_cast('Оборонительная стойка'))) then
             return keybinds:show_help('Оборонительная стойка')
         end
-        if (not player:is_equipped_item_type('Щиты')) then player:equip_set('TANK') end
+        if (not player:is_equipped_type('Щиты')) then player:equip_set('TANK') end
         return keybinds:show_spell('Глухая оборона')
     end
 
@@ -127,7 +125,13 @@ function BHelper.modules.warrior.default:rotation()
         return keybinds:show_spell('Возмездие')
     end
 
-    if (player:is_equipped_item_type('Щиты')) then player:equip_set('DPS') end
+    if (player:is_equipped_type('Щиты')) then player:equip_set('DPS') end
+
+    if ((target:aura('Сокрушительный бросок') == 0) and
+        (player:spell_casttime('Сокрушительный бросок') == 0) and
+        (player:can_cast_on_enemy('Сокрушительный бросок'))) then
+        return keybinds:show_spell('Сокрушительный бросок')
+    end
 
     if ((not player:form('Стойка берсерка')) and (player:can_cast('Стойка берсерка'))) then
         return keybinds:show_spell('Стойка берсерка')
@@ -142,27 +146,6 @@ function BHelper.modules.warrior.default:rotation()
         return keybinds:show_spell('Деморализующий крик')
     end
 
-    if ((player:aura('Боевой крик') == 0) and
-        (player:aura('Благословение могущества') == 0) and
-        (player:aura('Великое благословение могущества') == 0) and (vars.battle_shout) and
-        (player:can_cast('Боевой крик'))) then return keybinds:show_spell('Боевой крик') end
-
-    if ((player:aura('Командирский крик') == 0) and (vars.commanding_shout) and
-        (player:can_cast('Командирский крик'))) then
-        return keybinds:show_spell('Командирский крик')
-    end
-
-    if ((target:aura('Сокрушительный бросок') == 0) and
-        (player:spell_casttime('Сокрушительный бросок') == 0) and
-        (player:can_cast_on_enemy('Сокрушительный бросок'))) then
-        return keybinds:show_spell('Сокрушительный бросок')
-    end
-
-    if ((target:aura('Раскол брони') > 0) and (target:aura('Раскол брони') <= 2) and
-        (player:can_cast_on_enemy('Раскол брони'))) then
-        return keybinds:show_spell('Раскол брони')
-    end
-
     if (player:power() <= 30) then
         if (player:can_cast('Ярость берсерка')) then
             return keybinds:show_spell('Ярость берсерка')
@@ -173,6 +156,12 @@ function BHelper.modules.warrior.default:rotation()
     end
 
     if ((player:is_burst()) and (not self.burst_cooldown)) then
+        local item = player:item_name(INVSLOT_TRINKET1)
+        if ((player:is_equipped_item(item)) and (player:can_use_item(item))) then keybinds:show_item(item) end
+
+        local item = player:item_name(INVSLOT_TRINKET2)
+        if ((player:is_equipped_item(item)) and (player:can_use_item(item))) then keybinds:show_item(item) end
+
         if ((player:can_cast('Безрассудство'))) then
             return keybinds:show_spell('Безрассудство')
         end
@@ -190,8 +179,8 @@ function BHelper.modules.warrior.default:rotation()
         end
     end
 
-    -- if ((player:is_equipped_item('Душители Плети')) and
-    --     (player:can_use_item('Душители Плети'))) then keybinds:show_item('Душители Плети') end
+    local item = player:item_name(INVSLOT_HAND)
+    if ((player:is_equipped_item(item)) and (player:can_use_item(item))) then keybinds:show_item(item) end
 
     if (player:can_cast_on_enemy('Кровожадность')) then
         return keybinds:show_spell('Кровожадность')
@@ -203,6 +192,21 @@ function BHelper.modules.warrior.default:rotation()
 
     if ((target:name() ~= 'Принц Келесет') and (player:can_cast('Вихрь', true))) then
         return keybinds:show_spell('Вихрь')
+    end
+
+    if ((player:aura('Боевой крик') == 0) and
+        (player:aura('Благословение могущества') == 0) and
+        (player:aura('Великое благословение могущества') == 0) and (vars.battle_shout) and
+        (player:can_cast('Боевой крик'))) then return keybinds:show_spell('Боевой крик') end
+
+    if ((player:aura('Командирский крик') == 0) and (vars.commanding_shout) and
+        (player:can_cast('Командирский крик'))) then
+        return keybinds:show_spell('Командирский крик')
+    end
+
+    if ((target:aura('Раскол брони') > 0) and (target:aura('Раскол брони') <= 2) and
+        (player:can_cast_on_enemy('Раскол брони'))) then
+        return keybinds:show_spell('Раскол брони')
     end
 
     if ((not player:can_cast_on_enemy('Кровожадность', 1)) and (player:can_cast_on_enemy('Казнь'))) then
@@ -267,7 +271,7 @@ function BHelper.modules.warrior.proto:rotation_multiple()
 end
 
 function BHelper.modules.warrior.proto:rotation()
-    if (not player:is_equipped_item_type('Щиты')) then player:equip_set('TANK') end
+    if (not player:is_equipped_type('Щиты')) then player:equip_set('TANK') end
 
     if ((not player:form('Оборонительная стойка')) and
         (player:can_cast('Оборонительная стойка'))) then

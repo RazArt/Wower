@@ -16,8 +16,6 @@ function BHelper.modules.rogue.default:init()
     vars = self.vars
 
     if (not vars.sunder) then vars.sunder = false end
-
-    keybinds:bind_item('Знак превосходства')
 end
 
 function BHelper.modules.rogue.default:macros()
@@ -36,10 +34,11 @@ function BHelper.modules.rogue.default:rotation_single()
     if (target:check_cast() and player:can_cast_on_enemy('Пинок')) then return keybinds:show_spell('Пинок') end
 
     if (player:is_burst() and (not self.burst_cooldown)) then
-        if ((player:is_equipped_item('Знак превосходства')) and
-            (player:can_use_item('Знак превосходства'))) then
-            return keybinds:show_item('Знак превосходства')
-        end
+        local item = player:item_name(INVSLOT_TRINKET1)
+        if ((player:is_equipped_item(item)) and (player:can_use_item(item))) then keybinds:show_item(item) end
+
+        local item = player:item_name(INVSLOT_TRINKET2)
+        if ((player:is_equipped_item(item)) and (player:can_use_item(item))) then keybinds:show_item(item) end
 
         if (player:can_cast('Шквал клинков')) then
             return keybinds:show_spell('Шквал клинков')

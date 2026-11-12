@@ -145,7 +145,6 @@ function BHelper.player:can_cast(spellname, melee_only, check_time)
     if ((melee_only) and (not player:check_melee_range())) then return false end
     if (player:check_cast()) then return false end
     if (player:check_spell_cooldown(spellname, check_time)) then return false end
-    if (not player:has_control()) then return false end
     if ((player:moving()) and (player:spell_casttime(spellname) > 0)) then return false end
     return true
 end
@@ -187,18 +186,16 @@ function BHelper.player:check_spell_range(spellname, unit_id)
 end
 
 local melee_spells = {}
-
 melee_spells['deathknight'] = 'Удар чумы'
 melee_spells['druid'] = 'Цапнуть'
 melee_spells['hunter'] = ''
 melee_spells['mage'] = ''
 melee_spells['paladin'] = ''
 melee_spells['priest'] = ''
-melee_spells['rogue'] = ''
+melee_spells['rogue'] = 'Коварный удар'
 melee_spells['shaman'] = ''
 melee_spells['warlock'] = ''
 melee_spells['warrior'] = 'Раскол брони'
-
 function BHelper.player:check_melee_range()
     return player:check_spell_range(melee_spells[player:class()])
 end
@@ -230,13 +227,39 @@ end
 function BHelper.player:can_use_item(item)
     if (player:item_count(item) == 0) then return false end
     if (player:check_item_cooldown(item)) then return false end
-    if (player:is_mounted()) then return false end
-    if (not player:has_control()) then return false end
+    if (not GetItemSpell(item)) then return false end
     return true
 end
 
 function BHelper.player:item_count(item)
     return GetItemCount(item)
+end
+
+function BHelper.player:item_name(slot)
+    -- INVSLOT_AMMO
+    -- INVSLOT_HEAD
+    -- INVSLOT_NECK
+    -- INVSLOT_SHOULDER
+    -- INVSLOT_BODY
+    -- INVSLOT_CHEST
+    -- INVSLOT_WAIST
+    -- INVSLOT_LEGS
+    -- INVSLOT_FEET
+    -- INVSLOT_WRIST
+    -- INVSLOT_HAND
+    -- INVSLOT_FINGER1
+    -- INVSLOT_FINGER2
+    -- INVSLOT_TRINKET1
+    -- INVSLOT_TRINKET2
+    -- INVSLOT_BACK
+    -- INVSLOT_MAINHAND
+    -- INVSLOT_OFFHAND
+    -- INVSLOT_RANGED
+    -- INVSLOT_TABARD
+
+    local item = GetInventoryItemID('player', slot)
+    if (not item) then return '' end
+    return GetItemInfo(item)
 end
 
 function BHelper.player:check_item_cooldown(item)
@@ -249,7 +272,7 @@ function BHelper.player:is_equipped_item(item)
     return (IsEquippedItem(item)) and true or false
 end
 
-function BHelper.player:is_equipped_item_type(type)
+function BHelper.player:is_equipped_type(type)
     return (IsEquippedItemType(type)) and true or false
 end
 

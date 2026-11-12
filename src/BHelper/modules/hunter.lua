@@ -12,6 +12,10 @@ local module = BHelper.modules.hunter
 
 local vars = nil
 
+local function mana_regeneration()
+    return ((vars.mana_regeneration) or (vars.manual_mana_regeneration)) and true or false
+end
+
 function BHelper.modules.hunter.default:init()
     vars = self.vars
 
@@ -20,9 +24,6 @@ function BHelper.modules.hunter.default:init()
     if (not vars.pet_control) then vars.pet_control = true end
 
     keybinds:bind_macro('Mana', 'BUTTON5')
-
-    keybinds:bind_item('Зов берсерка')
-    keybinds:bind_item('Знак превосходства')
 end
 
 function BHelper.modules.hunter.default:macros()
@@ -83,12 +84,12 @@ function BHelper.modules.hunter.default:execute()
     if ((player:mana() < 500)) then vars.mana_regeneration = true end
     if ((player:mana() > 3000)) then vars.mana_regeneration = false end
 
-    if ((not self:mana_regeneration()) and (player:aura('Дух дракондора') == 0) and
+    if ((not mana_regeneration()) and (player:aura('Дух дракондора') == 0) and
         (player:aura('Дух дикой природы') == 0) and (player:can_cast('Дух дракондора'))) then
         return keybinds:show_spell('Дух дракондора')
     end
 
-    if ((self:mana_regeneration()) and (player:aura('Дух гадюки') == 0) and
+    if ((mana_regeneration()) and (player:aura('Дух гадюки') == 0) and
         (player:aura('Дух дикой природы') == 0) and (player:can_cast('Дух гадюки'))) then
         return keybinds:show_spell('Дух гадюки')
     end
@@ -107,21 +108,18 @@ function BHelper.modules.hunter.default:execute()
 end
 
 function BHelper.modules.hunter.default:rotation_single()
-    if (self:mana_regeneration()) then return self:rotation_mana() end
+    if (mana_regeneration()) then return self:rotation_mana() end
 
     if ((player:can_cast_on_enemy('Убийственный выстрел'))) then
         return keybinds:show_spell('Убийственный выстрел')
     end
 
     if ((player:is_burst()) and (not self.burst_cooldown)) then
-        if ((player:is_equipped_item('Зов берсерка')) and (player:can_use_item('Зов берсерка'))) then
-            return keybinds:show_item('Зов берсерка')
-        end
+        local item = player:item_name(INVSLOT_TRINKET1)
+        if ((player:is_equipped_item(item)) and (player:can_use_item(item))) then keybinds:show_item(item) end
 
-        if ((player:is_equipped_item('Знак превосходства')) and
-            (player:can_use_item('Знак превосходства'))) then
-            return keybinds:show_item('Знак превосходства')
-        end
+        local item = player:item_name(INVSLOT_TRINKET2)
+        if ((player:is_equipped_item(item)) and (player:can_use_item(item))) then keybinds:show_item(item) end
 
         if ((player:aura('Зов дикой природы') == 0) and
             (player:can_cast('Зов дикой природы'))) then
@@ -177,7 +175,7 @@ function BHelper.modules.hunter.default:rotation_single()
 end
 
 function BHelper.modules.hunter.default:rotation_multiple()
-    if (self:mana_regeneration()) then return self:rotation_mana() end
+    if (mana_regeneration()) then return self:rotation_mana() end
 
     if (player:aura('Перенаправление') == 0) then
         if (player:can_cast_on_enemy('Залп')) then return keybinds:show_spell('Залп') end
@@ -208,8 +206,4 @@ end
 
 function BHelper.modules.hunter.default:stop()
     vars.manual_mana_regeneration = false
-end
-
-function BHelper.modules.hunter.default:mana_regeneration()
-    return ((vars.mana_regeneration) or (vars.manual_mana_regeneration)) and true or false
 end

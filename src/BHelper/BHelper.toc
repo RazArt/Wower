@@ -19,17 +19,17 @@ core\pet.lua
 core\target.lua
 core\icons.lua
 
+modules\deathknight.lua
 modules\druid.lua
 modules\hunter.lua
-modules\rogue.lua
-modules\druid.lua
-modules\warrior.lua
+modules\mage.lua
 modules\paladin.lua
 modules\priest.lua
-modules\deathknight.lua
+modules\rogue.lua
 modules\shaman.lua
-modules\mage.lua
 modules\warlock.lua
-modules\auction.lua
-modules\crafting.lua
-modules\mailbox.lua
+modules\warrior.lua
+
+modules\craft\auction.lua
+modules\craft\crafting.lua
+modules\craft\mailbox.lua

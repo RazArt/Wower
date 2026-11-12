@@ -22,8 +22,6 @@ function BHelper.modules.druid.default:init()
 
     keybinds:bind_macro('Reform', 'BUTTON5')
 
-    keybinds:bind_item('Знак превосходства')
-
     self:register_event('UI_ERROR_MESSAGE')
 end
 
@@ -121,6 +119,12 @@ function BHelper.modules.druid.default:execute()
     end
 
     if (player:is_burst() and (not self.burst_cooldown)) then
+        local item = player:item_name(INVSLOT_TRINKET1)
+        if ((player:is_equipped_item(item)) and (player:can_use_item(item))) then keybinds:show_item(item) end
+
+        local item = player:item_name(INVSLOT_TRINKET2)
+        if ((player:is_equipped_item(item)) and (player:can_use_item(item))) then keybinds:show_item(item) end
+
         if ((player:form('Облик лютого медведя')) and (player:can_cast('Берсерк'))) then
             return keybinds:show_spell('Берсерк')
         end
@@ -128,11 +132,6 @@ function BHelper.modules.druid.default:execute()
         if ((player:form('Облик кошки')) and (player:aura('Тигриное неистовство') == 0) and
             (player:power() <= 80) and (player:can_cast('Берсерк'))) then
             return keybinds:show_spell('Берсерк')
-        end
-
-        if ((player:aura(50334) > 0) and (player:is_equipped_item('Знак превосходства')) and
-            (player:can_use_item('Знак превосходства'))) then
-            return keybinds:show_item('Знак превосходства')
         end
 
         if (player:can_cast('Берсерк(Расовая)')) then

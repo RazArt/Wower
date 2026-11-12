@@ -2,22 +2,22 @@ BHelper.keybinds = {}
 
 local core = {}
 local keybinds = {}
+local player = {}
 local timers = {}
 
 local binds = {}
+local binds_frame = CreateFrame('Frame')
 local base = {}
 
 function BHelper.keybinds:namespace_init()
     core = BHelper.core
     keybinds = BHelper.keybinds
+    player = BHelper.player
     timers = BHelper.timers
 end
 
-local function get_bind_index(class, name)
-    class = class:lower()
-    name = name:lower()
-
-    for num, bind in pairs(binds) do if ((bind.class == class) and (bind.name == name)) then return num end end
+local function get_bind_index(group, name)
+    for i = 1, #binds do if ((binds[i].group == group) and (binds[i].name == name)) then return i end end
     return 0
 end
 
@@ -31,36 +31,40 @@ local function get_bind_string(key, modifier)
     if (modifier == 7) then return 'ALT-CTRL-SHIFT-' .. key end
 end
 
-local function put(class, name, slot)
+local function bind(group, name, key)
+    if (player:on_combat()) then return false end
+
+    name = ((name) and (type(name) == 'string')) and name:lower() or ''
+    key = ((key) and (type(key) == 'string')) and key:upper() or false
+
+    if (key) then return SetOverrideBinding(binds_frame, true, key, group .. ' ' .. name) end
+    for i = 1, #binds do
+        if ((binds[i].group == group) and (binds[i].name == name)) then return true end
+        if (not binds[i].name) then
+            SetOverrideBinding(binds_frame, true, binds[i].bind_string, group .. ' ' .. name)
+            binds[i].group = group
+            binds[i].name = name
+            -- print(i, binds[i].bind_string, group .. ' ' .. name)
+            return true
+        end
+    end
+    keybinds:rebind()
+    return false
+end
+
+local function place(group, name, slot)
+    if (player:on_combat()) then return false end
+
     name = ((name) and (type(name) == 'string')) and name:lower() or ''
     slot = ((slot) and (type(slot) == 'number')) and slot or 0
 
     if (slot == 0) then return end
 
-    if (class == 'macro') then PickupMacro(name) end
-    if (class == 'spell') then PickupSpell(name) end
-    if (class == 'item') then PickupItem(name) end
+    if (group == 'macro') then PickupMacro(name) end
+    if (group == 'spell') then PickupSpell(name) end
+    if (group == 'item') then PickupItem(name) end
     PlaceAction(slot)
     ClearCursor()
-end
-
-local function bind(class, name, key)
-    name = ((name) and (type(name) == 'string')) and name:lower() or ''
-    key = ((key) and (type(key) == 'string')) and key:upper() or false
-
-    if (key) then SetBinding(key, class .. ' ' .. name) end
-    for index, bind in pairs(binds) do
-        if ((bind.class == class) and (bind.name == name)) then return true end
-        if (not bind.name) then
-            if (SetBinding(bind.bind_string, class .. ' ' .. name)) then
-                bind.name = name
-                bind.class = class
-                return true
-            end
-            return false
-        end
-    end
-    return false
 end
 
 local function show(num, r, g, b)
@@ -73,31 +77,68 @@ local function show(num, r, g, b)
     return true
 end
 
-local function show_bind(num, class, name)
+local function show_bind(num, group, name)
     if (GetCurrentKeyBoardFocus()) then return false end
 
-    local index = get_bind_index(class, name)
+    name = ((name) and (type(name) == 'string')) and name:lower() or ''
+    local index = get_bind_index(group, name)
     if (index == 0) then return false end
     show(num, 44, binds[index].key, binds[index].modifier)
 end
 
-local spellbooks = {BOOKTYPE_SPELL, BOOKTYPE_PET}
-function BHelper.keybinds:bind_spells()
-    local spells = {}
+function BHelper.keybinds:rebind()
+    for i = 1, #binds do
+        binds[i].name = nil
+        binds[i].group = nil
+    end
+    keybinds:bind_spells()
+    keybinds:bind_macros()
+    keybinds:bind_items()
+end
 
-    for _, spellbook in pairs(spellbooks) do
+function BHelper.keybinds:bind_spells()
+    for _, spellbook in pairs({BOOKTYPE_SPELL, BOOKTYPE_PET}) do
         for i = 1, 255 do
             local name, rank = GetSpellName(i, spellbook)
             if (not name) then break end
             if rank == 'Расовая' then name = name .. '(Расовая)' end
-            spells[name] = true
+            bind('spell', name)
         end
     end
-    for name, _ in pairs(spells) do bind('spell', name) end
+end
+
+function BHelper.keybinds:bind_spell(name, key)
+    return bind('spell', name, key)
+end
+
+function BHelper.keybinds:bind_macros()
+    for i = 54, 1, -1 do
+        local name = GetMacroInfo(i)
+        if (name) then bind('macro', name) end
+    end
 end
 
 function BHelper.keybinds:bind_macro(name, key)
     return bind('macro', name, key)
+end
+
+function BHelper.keybinds:bind_items()
+    for i = 1, 20 do
+        local item = GetInventoryItemLink('player', i)
+        if ((item) and (GetItemSpell(item))) then
+            local name = GetItemInfo(item)
+            bind('item', name)
+        end
+    end
+    for bag = 0, 4 do
+        for i = 1, GetContainerNumSlots(bag) do
+            local item = GetContainerItemLink(bag, i)
+            if ((item) and (GetItemSpell(item))) then
+                local name = GetItemInfo(item)
+                bind('item', name)
+            end
+        end
+    end
 end
 
 function BHelper.keybinds:bind_item(name, key)
@@ -105,15 +146,15 @@ function BHelper.keybinds:bind_item(name, key)
 end
 
 function BHelper.keybinds:place_spell(name, slot)
-    return put('spell', name, slot)
+    return place('spell', name, slot)
 end
 
 function BHelper.keybinds:place_macro(name, slot)
-    return put('macro', name, slot)
+    return place('macro', name, slot)
 end
 
 function BHelper.keybinds:place_item(name, slot)
-    return put('item', name, slot)
+    return place('item', name, slot)
 end
 
 function BHelper.keybinds:show_pet(can_attack)
@@ -144,26 +185,58 @@ function BHelper.keybinds:show_help(name)
     return show_bind(5, 'spell', name)
 end
 
-function BHelper.keybinds:unbind_all()
-    for i = 1, #binds do
-        binds[i].name = nil
-        binds[i].class = nil
-        SetBinding(binds[i].bind_string)
-    end
-end
-
 local function init()
     local count = 1
     local keys = {
-        '7', '8', '9', '0', 'F', 'T', 'Y', 'U', 'I', 'O', 'P', 'G', 'H', 'J', 'K', 'L', 'Z', 'X', 'C', 'V', 'B', 'N',
-        'M'
+        ['B'] = 66,
+        ['C'] = 67,
+        ['F'] = 70,
+        ['G'] = 71,
+        ['H'] = 72,
+        ['I'] = 73,
+        ['J'] = 74,
+        ['K'] = 75,
+        ['L'] = 76,
+        ['M'] = 77,
+        ['N'] = 78,
+        ['O'] = 79,
+        ['P'] = 80,
+        ['T'] = 84,
+        ['U'] = 85,
+        ['V'] = 86,
+        ['X'] = 88,
+        ['Y'] = 89,
+        ['Z'] = 90,
+        ['F1'] = 112,
+        ['F2'] = 113,
+        ['F3'] = 114,
+        ['F4'] = 115,
+        ['F5'] = 116,
+        ['F6'] = 117,
+        ['F7'] = 118,
+        ['F8'] = 119,
+        ['F9'] = 120,
+        ['F10'] = 121,
+        ['F11'] = 122,
+        ['F12'] = 123,
+        [';'] = 186,
+        ['='] = 187,
+        [','] = 188,
+        ['-'] = 189,
+        ['.'] = 190,
+        ['/'] = 191,
+        ['`'] = 192,
+        ['['] = 219,
+        ['\\'] = 220,
+        [']'] = 221,
+        ['\''] = 222
     }
-    for i = 1, #keys do
+    for key, code in pairs(keys) do
         for m = 1, 7 do
             binds[count] = {}
-            binds[count].key = string.byte(keys[i], 1)
+            binds[count].key = code
             binds[count].modifier = m
-            binds[count].bind_string = get_bind_string(keys[i], m)
+            binds[count].bind_string = get_bind_string(key, m)
             count = count + 1
         end
     end

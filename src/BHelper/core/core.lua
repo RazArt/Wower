@@ -58,7 +58,16 @@ function BHelper.core:stop()
 end
 
 function BHelper.core:reload()
+    if (player:on_combat()) then
+        timers:create(1, function()
+            core:reload()
+        end, 'reload', true)
+        return false
+    end
+    timers:delete('reload')
+
     DB:recache()
+
     module = nil
     profile = nil
     action = nil
@@ -76,9 +85,7 @@ function BHelper.core:reload()
     profile.settings = DB:profile_settings()
     profile.vars = DB:profile_vars()
 
-    keybinds:unbind_all()
-    keybinds:bind_spells()
-
+    keybinds:rebind()
     macros:clear()
     core:macros()
 
@@ -92,11 +99,13 @@ function BHelper.core:reload()
 
     if (not profile.settings.type) then profile.settings.type = 'battle' end
     if ((profile.settings.type == 'battle') and (not profile.vars.silence)) then profile.vars.silence = false end
-
     if (profile.settings.usable_equip) then player:equip_set(profile.settings.usable_equip) end
 end
 
 function BHelper.core:execute()
+    if (player:is_mounted()) then return false end
+    if (not player:has_control()) then return false end
+
     if (BHelper.pet:has_control()) then keybinds:show_pet((pet:can_target_attack()) and 1 or 0) end
 
     if ((core:execution()) and (not core:cooldown())) then

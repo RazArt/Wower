@@ -1,33 +1,22 @@
 BHelper.macros = {}
 
-local keybinds = {}
-
 local icons = {}
 
-function BHelper.macros:namespace_init()
-    keybinds = BHelper.keybinds
-end
-
-local function delete(name)
-    DeleteMacro(GetMacroIndexByName(name:lower()))
+local function icon_index(name)
+    name = ((name) and (type(name) == 'string')) and ('Interface\\Icons\\' .. name) or ''
+    for i = 1, #icons do if (icons[i] == name) then return i end end
 end
 
 function BHelper.macros:create(name, command, icon)
     name = ((name) and (type(name) == 'string')) and name:lower() or ''
-    icon = (icon) and self:icon(icon) or 1
+    icon = (icon) and icon_index(icon) or 1
 
-    delete(name)
+    DeleteMacro(GetMacroIndexByName(name))
     CreateMacro(name, icon, command, (GetNumMacros() == 36))
-    keybinds:bind_macro(name)
 end
 
 function BHelper.macros:clear()
     for i = 54, 1, -1 do DeleteMacro(i) end
-end
-
-function BHelper.macros:icon(name)
-    name = ((name) and (type(name) == 'string')) and ('Interface\\Icons\\' .. name) or ''
-    for index, icon in pairs(icons) do if (icon == name) then return index end end
 end
 
 local function init()

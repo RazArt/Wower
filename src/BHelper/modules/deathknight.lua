@@ -13,30 +13,20 @@ local module = BHelper.modules.deathknight
 
 local vars = nil
 
+local cooldown = {}
 local multiple_attack = false
 local unholy = false
 local frost = false
 local runes = {}
+for i = 1, 6 do runes[i] = {} end
 runes.count = {}
 runes.ready_count = {}
 runes.all_cooldown = false
-for i = 1, 6 do runes[i] = {} end
-local timeout = {}
 
-function BHelper.modules.deathknight:init()
+local function udpate()
     frost = player:know_spell('Ледяной удар')
     unholy = player:know_spell('Удар плети')
-end
 
-function BHelper.modules.deathknight:macros()
-    macros:create('Кровоотвод', '#showtooltip\n/cancelaura Кровоотвод\n/cast Кровоотвод')
-    macros:create('Антимагический панцирь',
-                  '#showtooltip\n/cancelaura Антимагический панцирь\n/cast Антимагический панцирь')
-    macros:create('Смертельный союз',
-                  '#showtooltip Смертельный союз\n/castsequence reset=120 Воскрешение мертвых, Смертельный союз')
-end
-
-function BHelper.modules.deathknight:execute()
     runes.all_cooldown = true
     for i = 1, 4 do
         runes.count[i] = 0
@@ -56,6 +46,22 @@ function BHelper.modules.deathknight:execute()
     end
 
     diseases = ((target:aura('Озноб', true) > 0) and (target:aura('Кровавая чума', true) > 0))
+end
+
+function BHelper.modules.deathknight:init()
+    udpate()
+end
+
+function BHelper.modules.deathknight:macros()
+    macros:create('Кровоотвод', '#showtooltip\n/cancelaura Кровоотвод\n/cast Кровоотвод')
+    macros:create('Антимагический панцирь',
+                  '#showtooltip\n/cancelaura Антимагический панцирь\n/cast Антимагический панцирь')
+    macros:create('Смертельный союз',
+                  '#showtooltip Смертельный союз\n/castsequence reset=120 Воскрешение мертвых, Смертельный союз')
+end
+
+function BHelper.modules.deathknight:execute()
+    udpate()
 
     if (player:can_cast('Рунический удар')) then keybinds:show_attack('Рунический удар') end
 
@@ -169,7 +175,7 @@ function BHelper.modules.deathknight.default:rotation()
                 return keybinds:show_spell('Удар смерти')
             end
 
-            if ((not timeout.pestilence) and (player:can_cast_on_enemy('Мор'))) then
+            if ((not cooldown.pestilence) and (player:can_cast_on_enemy('Мор'))) then
                 return keybinds:show_spell('Мор')
             end
 
@@ -232,9 +238,9 @@ end
 function BHelper.modules.deathknight.default:UNIT_SPELLCAST_SUCCEEDED(unit_id, spellName)
     if (unit_id ~= 'player') then return end
 
-    if (spellName == 'Ледяное прикосновение') then timeout.pestilence = false end
-    if (spellName == 'Удар чумы') then timeout.pestilence = false end
-    if (spellName == 'Мор') then timeout.pestilence = true end
+    if (spellName == 'Ледяное прикосновение') then cooldown.pestilence = false end
+    if (spellName == 'Удар чумы') then cooldown.pestilence = false end
+    if (spellName == 'Мор') then cooldown.pestilence = true end
 end
 
 function BHelper.modules.deathknight.default:start()
@@ -252,8 +258,6 @@ function BHelper.modules.deathknight.damage:init()
     if (unholy) then self.settings.usable_equip = 'DPS Unh' end
 
     if (not vars.pet_control) then vars.pet_control = true end
-
-    keybinds:bind_item('Знак превосходства')
 
     self:register_event('UNIT_SPELLCAST_SUCCEEDED')
 end
@@ -315,10 +319,11 @@ function BHelper.modules.deathknight.damage:rotation()
         (player:can_cast('Власть крови'))) then return keybinds:show_spell('Власть крови') end
 
     if ((player:is_burst()) and (not self.burst_cooldown)) then
-        if ((player:is_equipped_item('Знак превосходства')) and
-            (player:can_use_item('Знак превосходства'))) then
-            return keybinds:show_item('Знак превосходства')
-        end
+        local item = player:item_name(INVSLOT_TRINKET1)
+        if ((player:is_equipped_item(item)) and (player:can_use_item(item))) then keybinds:show_item(item) end
+
+        local item = player:item_name(INVSLOT_TRINKET2)
+        if ((player:is_equipped_item(item)) and (player:can_use_item(item))) then keybinds:show_item(item) end
 
         if ((runes.all_cooldown) and (player:can_cast('Усиление рунического оружия'))) then
             return keybinds:show_spell('Усиление рунического оружия')
@@ -376,7 +381,7 @@ function BHelper.modules.deathknight.damage:rotation()
     end
 
     if ((multiple_attack) and (diseases)) then
-        if ((not timeout.pestilence) and (player:can_cast_on_enemy('Мор'))) then
+        if ((not cooldown.pestilence) and (player:can_cast_on_enemy('Мор'))) then
             return keybinds:show_spell('Мор')
         end
 
@@ -408,9 +413,9 @@ end
 function BHelper.modules.deathknight.damage:UNIT_SPELLCAST_SUCCEEDED(unit_id, spellName)
     if (unit_id ~= 'player') then return end
 
-    if (spellName == 'Ледяное прикосновение') then timeout.pestilence = false end
-    if (spellName == 'Удар чумы') then timeout.pestilence = false end
-    if (spellName == 'Мор') then timeout.pestilence = true end
+    if (spellName == 'Ледяное прикосновение') then cooldown.pestilence = false end
+    if (spellName == 'Удар чумы') then cooldown.pestilence = false end
+    if (spellName == 'Мор') then cooldown.pestilence = true end
 end
 
 -- can_use_blood_rune = false

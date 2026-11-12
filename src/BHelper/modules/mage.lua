@@ -11,14 +11,11 @@ local timers = BHelper.timers
 local module = BHelper.modules.mage
 
 local vars = nil
-local timeout = {}
+
+local cooldown = {}
 
 function BHelper.modules.mage.default:init()
     vars = self.vars
-
-    keybinds:bind_item('Сапфир маны')
-    keybinds:bind_item('Перчатки ложных знаков')
-    keybinds:bind_item('Освященные перчатки волшебника крови')
 
     self:register_event('UNIT_SPELLCAST_SUCCEEDED')
     self:register_event('PLAYER_REGEN_ENABLED')
@@ -113,7 +110,7 @@ function BHelper.modules.mage.default:rotation_single()
     end
 
     if ((target:aura('Улучшенный ожог') < 3) and (target:aura('Власть над Тенями') == 0) and
-        (not timeout.scorch) and (player:can_cast_on_enemy('Ожог'))) then return keybinds:show_spell('Ожог') end
+        (not cooldown.scorch) and (player:can_cast_on_enemy('Ожог'))) then return keybinds:show_spell('Ожог') end
 
     if ((player:is_burst()) and (not self.burst_cooldown)) then
         if (player:can_cast('Зеркальное изображение')) then
@@ -129,15 +126,8 @@ function BHelper.modules.mage.default:rotation_single()
         end
     end
 
-    if ((player:is_equipped_item('Перчатки ложных знаков')) and
-        (player:can_use_item('Перчатки ложных знаков'))) then
-        return keybinds:show_item('Перчатки ложных знаков')
-    end
-
-    if ((player:is_equipped_item('Освященные перчатки волшебника крови')) and
-        (player:can_use_item('Освященные перчатки волшебника крови'))) then
-        return keybinds:show_item('Освященные перчатки волшебника крови')
-    end
+    local item_hand = player:item_name(INVSLOT_HAND)
+    if ((player:is_equipped_item(item_hand)) and (player:can_use_item(item_hand))) then keybinds:show_item(item_hand) end
 
     if (player:can_cast_on_enemy('Огненный шар')) then
         return keybinds:show_spell('Огненный шар')
@@ -158,9 +148,9 @@ function BHelper.modules.mage.default:UNIT_SPELLCAST_SUCCEEDED(unit_id, spellNam
     if (unit_id ~= 'player') then return end
 
     if (spellName == 'Ожог') then
-        timeout.scorch = true
+        cooldown.scorch = true
         timers:create(1, function()
-            timeout.scorch = false
+            cooldown.scorch = false
         end, 'scorch')
     end
 end

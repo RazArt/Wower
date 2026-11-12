@@ -1,4 +1,4 @@
-function BHelper.modules.mailbox.common:init()
+function BHelper.modules.mailbox.default:init()
     vars = self.vars
     self.vars.open = false
 
@@ -8,7 +8,7 @@ function BHelper.modules.mailbox.common:init()
     BHelper.core.action:set('step_1')
 end
 
-function BHelper.modules.mailbox.common:step_1()
+function BHelper.modules.mailbox.default:step_1()
     if (self.vars.open == false) then
         BHelper.keybinds:show_spell(12, false, false, true)
     else
@@ -16,18 +16,18 @@ function BHelper.modules.mailbox.common:step_1()
     end
 end
 
-function BHelper.modules.mailbox.common:open_click()
+function BHelper.modules.mailbox.default:open_click()
     if (self.vars.open == true) then return end
     self.vars.open = true
     SendChatMessage('.i m', 'SAY')
     BHelper.core:add_cooldown(15)
 end
 
-function BHelper.modules.mailbox.common:MAIL_INBOX_UPDATE()
+function BHelper.modules.mailbox.default:MAIL_INBOX_UPDATE()
     BHelper.core:add_cooldown(0.5)
 end
 
-function BHelper.modules.mailbox.common:step_2()
+function BHelper.modules.mailbox.default:step_2()
     if (not self.vars.open) then BHelper.core.action:set('step_1') end
 
     if (select(2, GetInboxNumItems()) > 0) then
@@ -65,6 +65,6 @@ function BHelper.modules.mailbox.common:step_2()
     end
 end
 
-function BHelper.modules.mailbox.common:MAIL_CLOSED()
+function BHelper.modules.mailbox.default:MAIL_CLOSED()
     self.vars.open = false
 end

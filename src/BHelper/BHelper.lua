@@ -10,12 +10,14 @@ event_frame:RegisterEvent('ACTIVE_TALENT_GROUP_CHANGED')
 event_frame:RegisterEvent('PLAYER_CONTROL_LOST')
 event_frame:RegisterEvent('PLAYER_CONTROL_GAINED')
 event_frame:RegisterEvent('PLAYER_TARGET_CHANGED')
-event_frame:RegisterEvent('UNIT_PET')
+event_frame:RegisterEvent('SPELLS_CHANGED')
+event_frame:RegisterEvent('UPDATE_MACROS')
+event_frame:RegisterEvent('PLAYER_EQUIPMENT_CHANGED')
+event_frame:RegisterEvent('UNIT_INVENTORY_CHANGED')
 
 function BHelper:PLAYER_LOGIN()
     BHelper.core:namespace_init()
     BHelper.keybinds:namespace_init()
-    BHelper.macros:namespace_init()
     BHelper.pet:namespace_init()
     BHelper.player:namespace_init()
     BHelper.target:namespace_init()
@@ -32,12 +34,34 @@ function BHelper:PLAYER_LOGIN()
     end, 'main_execute', true)
 end
 
-function BHelper:UNIT_PET(unit_id)
-    if (unit_id == 'player') then BHelper.keybinds:bind_spells() end
+function BHelper:SPELLS_CHANGED()
+    self.timers:create(1, function()
+        BHelper.keybinds:bind_spells()
+    end, 'spells_update')
+end
+
+function BHelper:UPDATE_MACROS()
+    self.timers:create(1, function()
+        BHelper.keybinds:bind_macros()
+    end, 'macros_update')
+end
+
+function BHelper:PLAYER_EQUIPMENT_CHANGED()
+    self.timers:create(1, function()
+        BHelper.keybinds:bind_items()
+    end, 'items_update')
+end
+
+function BHelper:UNIT_INVENTORY_CHANGED(unit_id)
+    if (unit_id ~= 'player') then return false end
+
+    self.timers:create(1, function()
+        BHelper.keybinds:bind_items()
+    end, 'items_update')
 end
 
 function BHelper:ACTIVE_TALENT_GROUP_CHANGED()
-    self.timers:create(5, function()
+    self.timers:create(1, function()
         self.core:reload()
     end, 'reload')
 end

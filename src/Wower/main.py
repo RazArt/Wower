@@ -32,6 +32,12 @@ def get_pixels_color():
     return result
 
 
+def modifier_resend():
+    key_send(16)
+    key_send(17)
+    key_send(18)
+
+
 def key_send_with_modifier(key_code, modifier):
     if (modifier == 1): key_press(18)
     if (modifier == 2): key_press(18)
@@ -108,6 +114,7 @@ while True:
         if (keyboard.is_pressed(56)): continue
         if (keyboard.is_pressed(29)): continue
 
+        modifier_resend()
         pixels = get_pixels_color()
 
         if ((not runing) and (check_keys())): send_start()
